@@ -1,0 +1,5 @@
+/.settings/
+/package-lock.json
+/node_modules/
+/.angular/
+/CLAUDE.md
