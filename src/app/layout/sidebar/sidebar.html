@@ -1,0 +1,46 @@
+<div class="backdrop" [class.show]="layout.menuOpen()" (click)="layout.menuOpen.set(false)"></div>
+
+<aside class="sidebar" [class.open]="layout.menuOpen()">
+  <a class="brand" routerLink="/" (click)="layout.menuOpen.set(false)" [title]="'ui.home' | t">
+    <span class="brand-logo" role="img" aria-label="Formuvia"></span>
+    <span class="brand-name">Formuvia</span>
+  </a>
+
+  <nav class="menu">
+    <ng-container *ngTemplateOutlet="menuItems; context: { $implicit: session.user()?.menu ?? [] }"></ng-container>
+  </nav>
+
+  @if (session.user(); as user) {
+    <div class="user">
+      <button type="button" class="user-button" (click)="changePassword()" [title]="'ChangePasswordDTO.title' | t">
+        <span class="avatar">{{ user.name.charAt(0) }}{{ user.surname.charAt(0) }}</span>
+        <span class="user-name">{{ user.name }} {{ user.surname }}</span>
+      </button>
+      <button type="button" class="icon-button" (click)="logout()" [title]="'ui.logout' | t" [attr.aria-label]="'ui.logout' | t">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+  }
+</aside>
+
+<ng-template #menuItems let-list>
+  @for (item of list; track $index) {
+    @if (item.children.length) {
+      <button type="button" class="item" (click)="toggle(item)">
+        <i class="item-icon" [class]="item.icon"></i>
+        <span class="item-name">{{ item.name }}</span>
+        <i class="fa-solid fa-chevron-down chevron" [class.open]="isOpen(item)"></i>
+      </button>
+      @if (isOpen(item)) {
+        <div class="children">
+          <ng-container *ngTemplateOutlet="menuItems; context: { $implicit: item.children }"></ng-container>
+        </div>
+      }
+    } @else {
+      <a class="item" [routerLink]="item.url" routerLinkActive="active">
+        <i class="item-icon" [class]="item.icon"></i>
+        <span class="item-name">{{ item.name }}</span>
+      </a>
+    }
+  }
+</ng-template>

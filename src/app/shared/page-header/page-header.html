@@ -1,0 +1,14 @@
+<section class="page-header">
+  <div class="titles">
+    @if (breadcrumb()) {
+      <span class="breadcrumb">{{ breadcrumb() }}</span>
+    }
+    <h1 class="title">{{ title() }}</h1>
+    @if (subtitle()) {
+      <p class="subtitle">{{ subtitle() }}</p>
+    }
+  </div>
+  <div class="actions">
+    <ng-content></ng-content>
+  </div>
+</section>

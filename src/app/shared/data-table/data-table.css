@@ -1,0 +1,354 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.table-card {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px 8px;
+  background: #f8fafc;
+}
+
+.chips {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 4px 4px 4px 12px;
+  border-radius: 999px;
+  background: #e5edff;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.chip-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.chip-remove {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.chip-remove:hover {
+  background: #d3e0ff;
+}
+
+.advanced-button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.advanced-button:hover {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+}
+
+.count {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #1f5eff;
+  color: #fff;
+  font-size: 11px;
+}
+
+.progress {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  height: 4px;
+  --mat-progress-bar-active-indicator-color: #1f5eff;
+  --mat-progress-bar-track-color: #dbe6ff;
+}
+
+.table-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.toolbar,
+.paginator {
+  flex-shrink: 0;
+}
+
+.table {
+  width: 100%;
+  --mat-table-background-color: #fff;
+  --mat-table-header-headline-color: #64748b;
+  --mat-table-header-headline-size: 11px;
+  --mat-table-header-headline-weight: 700;
+  --mat-table-header-container-height: 48px;
+  --mat-table-row-item-label-text-color: #0f172a;
+  --mat-table-row-item-label-text-size: 14px;
+  --mat-table-row-item-container-height: 60px;
+  --mat-table-row-item-outline-color: #eef2f7;
+  --mat-sort-arrow-color: #94a3b8;
+}
+
+th.mat-mdc-header-cell {
+  background: #f8fafc;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+th.mat-mdc-header-cell,
+td.mat-mdc-cell {
+  padding: 0 16px;
+}
+
+tr.mat-mdc-row {
+  transition: background-color 0.12s;
+}
+
+tr.mat-mdc-row:hover {
+  background: #f8fafc;
+}
+
+/* Upravo dodat ili izmenjen red: zeleni ton sa trakom levo, kratko zablesne pa ostane blag */
+tr.mat-mdc-row.row-highlight,
+tr.mat-mdc-row.row-highlight:hover {
+  background: #ecfdf5;
+  animation: row-highlight 1.6s ease-out;
+}
+
+tr.mat-mdc-row.row-highlight td:first-child {
+  box-shadow: inset 4px 0 0 #22c55e;
+}
+
+@keyframes row-highlight {
+  0%,
+  30% {
+    background: #bbf7d0;
+  }
+  100% {
+    background: #ecfdf5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  tr.mat-mdc-row.row-highlight {
+    animation: none;
+  }
+}
+
+.filter-row th.filter-cell {
+  height: 56px;
+  padding-top: 0;
+  padding-bottom: 10px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.filter-input {
+  width: 100%;
+  min-width: 120px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #1f5eff;
+  box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.12);
+}
+
+/* Kolone sa kratkim vrednostima (boolean) — zaglavlje, filter i bedž centrirani */
+.cell-center {
+  text-align: center;
+}
+
+.cell-center ::ng-deep .mat-sort-header-container {
+  justify-content: center;
+}
+
+.filter-select {
+  min-width: 120px;
+}
+
+.actions-cell {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.row-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-button,
+.delete-button,
+.clear-filters {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.edit-button {
+  padding: 0 14px;
+  background: #eef3ff;
+  color: #1f5eff;
+}
+
+.edit-button:hover {
+  background: #dbe6ff;
+}
+
+.delete-button,
+.clear-filters {
+  width: 36px;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.delete-button:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.clear-filters:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badge-yes {
+  background: #dcfce7;
+  color: #047857;
+}
+
+.badge-no {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.badge-enum {
+  background: #eef3ff;
+  color: #1f5eff;
+}
+
+.empty-cell {
+  padding: 48px 16px;
+  color: #94a3b8;
+  font-size: 14px;
+  text-align: center;
+}
+
+.empty-cell i {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+.paginator {
+  border-top: 1px solid #eef2f7;
+  --mat-paginator-container-background-color: #fff;
+  --mat-paginator-container-text-color: #64748b;
+  --mat-paginator-container-text-size: 13px;
+  --mat-paginator-enabled-icon-color: #0f172a;
+  --mat-paginator-disabled-icon-color: #cbd5e1;
+}
+
+@media (max-width: 900px) {
+  .table-card {
+    border-radius: 18px;
+  }
+
+  .toolbar {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    padding: 12px 12px 8px;
+  }
+
+  .advanced-button {
+    justify-content: center;
+  }
+
+  .edit-label {
+    display: none;
+  }
+
+  .edit-button {
+    width: 36px;
+    padding: 0;
+  }
+}

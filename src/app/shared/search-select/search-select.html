@@ -1,0 +1,37 @@
+<button #trigger type="button" class="trigger" cdkOverlayOrigin #origin="cdkOverlayOrigin" [disabled]="disabled()"
+  (click)="toggle()" (keydown)="onTriggerKeydown($event)" role="combobox" aria-haspopup="listbox"
+  [attr.aria-expanded]="open()" [attr.aria-controls]="listId" [attr.aria-label]="ariaLabel() || null">
+  @if (icon()) {
+    <i class="lead-icon {{ icon() }}"></i>
+  }
+  <span class="label" [class.placeholder]="!selectedLabel()">{{ selectedLabel() || placeholder() }}</span>
+  <i class="fa-solid fa-chevron-down chevron"></i>
+</button>
+
+<ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="origin" [cdkConnectedOverlayOpen]="open()"
+  [cdkConnectedOverlayPositions]="positions" [cdkConnectedOverlayMinWidth]="panelWidth()"
+  [cdkConnectedOverlayHasBackdrop]="true" cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+  (backdropClick)="close(false)" (detach)="open.set(false)" (attach)="onAttached()">
+  <div class="panel" (keydown)="onPanelKeydown($event)">
+    <div class="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input #search type="text" autocomplete="off" spellcheck="false" [value]="query()"
+        (input)="onQuery($any($event.target).value)" [placeholder]="'ui.search' | t" [attr.aria-label]="'ui.search' | t"
+        [attr.aria-controls]="listId" [attr.aria-activedescendant]="filtered().length ? optionId(activeIndex()) : null" />
+    </div>
+    <ul class="options" role="listbox" [id]="listId" [attr.aria-label]="ariaLabel() || null">
+      @for (option of filtered(); track option.value; let index = $index) {
+        <li [id]="optionId(index)" role="option" class="option" [class.active]="index === activeIndex()"
+          [class.selected]="option.value === value()" [attr.aria-selected]="option.value === value()"
+          (mousedown)="$event.preventDefault()" (click)="select(option)" (mouseenter)="activeIndex.set(index)">
+          <span class="option-label">{{ option.label }}</span>
+          @if (option.value === value()) {
+            <i class="fa-solid fa-check"></i>
+          }
+        </li>
+      } @empty {
+        <li class="empty">{{ 'ui.noResults' | t }}</li>
+      }
+    </ul>
+  </div>
+</ng-template>

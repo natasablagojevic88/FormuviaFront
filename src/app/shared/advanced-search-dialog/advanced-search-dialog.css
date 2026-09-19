@@ -1,0 +1,98 @@
+:host {
+  display: block;
+}
+
+.criterion {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1.5fr) auto;
+  gap: 10px;
+  align-items: start;
+}
+
+.values {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+
+.value-select {
+  flex: 1;
+}
+
+.remove {
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 14px;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.remove:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 14px;
+  background: none;
+  color: #1f5eff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.add:hover {
+  border-color: #1f5eff;
+  background: #eef3ff;
+}
+
+.empty {
+  padding: 12px 0;
+  color: #64748b;
+  font-size: 14px;
+  text-align: center;
+}
+
+.clear {
+  border: 0;
+  background: none;
+  color: #dc2626;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.clear:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+  .criterion {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+  }
+
+  .criterion > app-search-select,
+  .values {
+    grid-column: 1;
+  }
+
+  .remove {
+    grid-row: 1;
+    grid-column: 2;
+  }
+}

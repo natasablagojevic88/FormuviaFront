@@ -1,0 +1,63 @@
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 320px;
+  max-width: 480px;
+  padding: 12px 10px 12px 14px;
+  border-radius: 16px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.success {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%);
+  box-shadow: 0 14px 34px rgba(4, 120, 87, 0.35);
+}
+
+.error {
+  background: linear-gradient(135deg, #b91c1c 0%, #e11d48 100%);
+  box-shadow: 0 14px 34px rgba(185, 28, 28, 0.35);
+}
+
+.icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 16px;
+}
+
+.message {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+@media (max-width: 600px) {
+  .toast {
+    min-width: 0;
+    max-width: none;
+  }
+}

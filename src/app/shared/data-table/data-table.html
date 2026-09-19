@@ -1,0 +1,112 @@
+<div class="table-card">
+  <div class="toolbar">
+    <div class="chips">
+      @for (criterion of criteria(); track $index) {
+        <span class="chip">
+          <span class="chip-text">{{ criterionLabel(criterion) }}</span>
+          <button type="button" class="chip-remove" (click)="removeCriterion($index)" [attr.aria-label]="'ui.delete' | t">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </span>
+      }
+    </div>
+    <button type="button" class="advanced-button" (click)="openAdvancedSearch()">
+      <i class="fa-solid fa-sliders"></i>
+      <span>{{ 'ui.advancedSearch' | t }}</span>
+      @if (criteria().length) {
+        <span class="count">{{ criteria().length }}</span>
+      }
+    </button>
+  </div>
+
+  <div class="progress">
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+  </div>
+
+  <div class="table-scroll">
+    <table mat-table [dataSource]="rows()" matSort (matSortChange)="onSort($event)" class="table">
+
+      <ng-container [matColumnDef]="actionsColumn">
+        <th mat-header-cell *matHeaderCellDef class="actions-cell">{{ 'ui.actions' | t }}</th>
+        <td mat-cell *matCellDef="let row" class="actions-cell">
+          <div class="row-actions">
+            <button type="button" class="edit-button" (click)="edit.emit(row)" [title]="'ui.edit' | t">
+              <i class="fa-solid fa-pen"></i>
+              <span class="edit-label">{{ 'ui.edit' | t }}</span>
+            </button>
+            <button type="button" class="delete-button" (click)="remove.emit(row)"
+              [title]="'ui.delete' | t" [attr.aria-label]="'ui.delete' | t">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container [matColumnDef]="filterPrefix + actionsColumn">
+        <th mat-header-cell *matHeaderCellDef class="filter-cell actions-cell">
+          @if (hasFilters()) {
+            <button type="button" class="clear-filters" (click)="clearFilters()"
+              [title]="'ui.clearFilters' | t" [attr.aria-label]="'ui.clearFilters' | t">
+              <i class="fa-solid fa-filter-circle-xmark"></i>
+            </button>
+          }
+        </th>
+      </ng-container>
+
+      @for (column of columns(); track column.fieldName) {
+        <ng-container [matColumnDef]="column.fieldName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header [class.cell-center]="column.columnType === 'BOOLEAN'">{{ column.description }}</th>
+          <td mat-cell *matCellDef="let row" [class.cell-center]="column.columnType === 'BOOLEAN'">
+            @if (column.columnType === 'BOOLEAN') {
+              <span class="badge" [class.badge-yes]="row[column.fieldName]" [class.badge-no]="!row[column.fieldName]">
+                {{ (row[column.fieldName] ? 'ui.yes' : 'ui.no') | t }}
+              </span>
+            } @else if (isEnum(column) && row[column.fieldName]) {
+              <span class="badge badge-enum">{{ format(row, column) }}</span>
+            } @else {
+              {{ format(row, column) }}
+            }
+          </td>
+        </ng-container>
+
+        <ng-container [matColumnDef]="filterPrefix + column.fieldName">
+          <th mat-header-cell *matHeaderCellDef class="filter-cell" [class.cell-center]="column.columnType === 'BOOLEAN'">
+            @if (isEnum(column) || column.columnType === 'BOOLEAN') {
+              <app-search-select class="filter-select" appearance="compact" [options]="filterOptions().get(column.fieldName) ?? []"
+                [ngModel]="filterValue(column.fieldName)" (ngModelChange)="onFilter(column.fieldName, $event)"
+                [centered]="column.columnType === 'BOOLEAN'" [ariaLabel]="column.description" />
+            } @else if (column.columnType !== 'UUID') {
+              <input class="filter-input" [type]="column.columnType === 'LOCALDATETIME' ? 'date' : inputType(column)" [value]="filterValue(column.fieldName)"
+                (input)="onFilter(column.fieldName, $any($event.target).value)"
+                [placeholder]="'ui.search' | t" [attr.aria-label]="column.description" />
+            }
+          </th>
+        </ng-container>
+      }
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: true"></tr>
+      <tr mat-header-row *matHeaderRowDef="filterColumns(); sticky: true" class="filter-row"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns()" [class.row-highlight]="row.id === highlightedId()"></tr>
+      <tr class="mat-mdc-no-data-row" *matNoDataRow>
+        <td class="empty-cell" [attr.colspan]="displayedColumns().length">
+          @if (!loading()) {
+            <i class="fa-regular fa-folder-open"></i>
+            <span>{{ 'ui.noData' | t }}</span>
+          }
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <mat-paginator
+    class="paginator"
+    [length]="total()"
+    [pageIndex]="pageIndex()"
+    [pageSize]="pageSize()"
+    [pageSizeOptions]="pageSizes"
+    [showFirstLastButtons]="true"
+    (page)="onPage($event)">
+  </mat-paginator>
+</div>

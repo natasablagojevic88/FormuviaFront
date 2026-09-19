@@ -1,0 +1,12 @@
+<header class="header">
+  <button type="button" class="menu-button" (click)="layout.menuOpen.set(true)" [attr.aria-label]="'ui.menu' | t">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+  <a class="logo" routerLink="/" [title]="'ui.home' | t" [attr.aria-label]="'ui.home' | t"></a>
+
+  <span class="brand-name">Formuvia</span>
+  <span class="spacer"></span>
+
+  <app-search-select class="language" appearance="dark" icon="fa-solid fa-globe" [options]="languageOptions"
+    [ngModel]="language.current()" (ngModelChange)="language.change($event)" [ariaLabel]="'ui.language' | t" />
+</header>

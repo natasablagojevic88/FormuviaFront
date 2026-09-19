@@ -1,0 +1,33 @@
+:host {
+  display: block;
+}
+
+.message {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  color: #334155;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.message-icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: #eef3ff;
+  color: #1f5eff;
+  font-size: 18px;
+}
+
+.message-icon.danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.message p {
+  padding-top: 10px;
+}

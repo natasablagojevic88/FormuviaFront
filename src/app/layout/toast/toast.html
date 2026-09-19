@@ -1,0 +1,9 @@
+<div class="toast" [class.success]="data.type === 'success'" [class.error]="data.type === 'error'">
+  <span class="icon">
+    <i class="fa-solid" [class.fa-circle-check]="data.type === 'success'" [class.fa-circle-exclamation]="data.type === 'error'"></i>
+  </span>
+  <span class="message">{{ data.message }}</span>
+  <button type="button" class="close" (click)="snackBarRef.dismiss()" [attr.aria-label]="'ui.close' | t">
+    <i class="fa-solid fa-xmark"></i>
+  </button>
+</div>

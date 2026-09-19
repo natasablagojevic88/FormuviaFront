@@ -1,0 +1,11 @@
+<div class="layout" [class.layout-login]="login()">
+  @if (!login()) {
+    <app-sidebar />
+  }
+  <main class="content">
+    @if (!login()) {
+      <app-header />
+    }
+    <router-outlet />
+  </main>
+</div>

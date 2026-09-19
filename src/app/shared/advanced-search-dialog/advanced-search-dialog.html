@@ -1,0 +1,72 @@
+<form class="fd" (ngSubmit)="apply()">
+  <header class="fd-header">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ 'ui.advancedSearch' | t }}</h2>
+      <p class="fd-subtitle">{{ 'ui.advancedSearchSubtitle' | t }}</p>
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    @for (criterion of criteria; track $index; let index = $index) {
+      @let column = columnOf(criterion.fieldName);
+      <div class="criterion">
+        <app-search-select [options]="columnOptions" [ngModel]="criterion.fieldName"
+          (ngModelChange)="setColumn(criterion, $event)" [ngModelOptions]="{ standalone: true }"
+          [ariaLabel]="'ui.column' | t" />
+
+        <app-search-select [options]="operationOptions.get(column.fieldName) ?? []" [(ngModel)]="criterion.searchOperation"
+          [ngModelOptions]="{ standalone: true }" [ariaLabel]="'ui.operation' | t" />
+
+        <div class="values">
+          @if (needsValue(criterion.searchOperation)) {
+            @if (valueOptions.has(column.fieldName)) {
+              <app-search-select class="value-select" [options]="valueOptions.get(column.fieldName) ?? []"
+                [(ngModel)]="criterion.value1" [ngModelOptions]="{ standalone: true }"
+                [placeholder]="'ui.value' | t" [ariaLabel]="'ui.value' | t" />
+            } @else {
+              <input class="fd-input" [type]="inputType(column)" [(ngModel)]="criterion.value1"
+                [ngModelOptions]="{ standalone: true }" [class.fd-invalid]="isInvalid(criterion)"
+                [placeholder]="(criterion.searchOperation === 'BETWEEN' ? 'ui.from' : 'ui.value') | t"
+                [attr.aria-label]="(criterion.searchOperation === 'BETWEEN' ? 'ui.from' : 'ui.value') | t" />
+              @if (criterion.searchOperation === 'BETWEEN') {
+                <input class="fd-input" [type]="inputType(column)" [(ngModel)]="criterion.value2"
+                  [ngModelOptions]="{ standalone: true }" [class.fd-invalid]="isInvalid(criterion)"
+                  [placeholder]="'ui.to' | t" [attr.aria-label]="'ui.to' | t" />
+              }
+            }
+          }
+        </div>
+
+        <button type="button" class="remove" (click)="removeCriterion(index)" [attr.aria-label]="'ui.delete' | t"
+          [title]="'ui.delete' | t">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </div>
+    } @empty {
+      <p class="empty">{{ 'ui.noCriteria' | t }}</p>
+    }
+
+    <button type="button" class="add" (click)="addCriterion()">
+      <i class="fa-solid fa-plus"></i>
+      {{ 'ui.addCriterion' | t }}
+    </button>
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint">
+      @if (criteria.length) {
+        <button type="button" class="clear" (click)="clearAll()">{{ 'ui.clearAll' | t }}</button>
+      }
+    </span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.cancel' | t }}</button>
+      <button type="submit" class="fd-button fd-button-primary">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        {{ 'ui.apply' | t }}
+      </button>
+    </div>
+  </footer>
+</form>

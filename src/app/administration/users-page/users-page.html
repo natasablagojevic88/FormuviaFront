@@ -1,0 +1,11 @@
+<app-page-header
+  [title]="title() || ('AppUserDTO.title' | t)"
+  [subtitle]="'ui.users.subtitle' | t"
+  [breadcrumb]="('menu.administration' | t) + ' / ' + ('menu.users' | t)">
+  <button type="button" class="add-button" (click)="add()">
+    <i class="fa-solid fa-plus"></i>
+    {{ 'ui.add' | t }}
+  </button>
+</app-page-header>
+
+<app-data-table [url]="tableUrl" (loaded)="onLoaded($event)" (edit)="edit($event)" (remove)="remove($event)"></app-data-table>

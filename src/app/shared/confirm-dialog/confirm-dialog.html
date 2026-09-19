@@ -1,0 +1,30 @@
+<div class="fd">
+  <header class="fd-header" [class.fd-danger]="data.danger">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ data.title }}</h2>
+    </div>
+    <button type="button" class="fd-close" (click)="close(false)" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    <div class="message">
+      <span class="message-icon" [class.danger]="data.danger">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </span>
+      <p>{{ data.message }}</p>
+    </div>
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint"></span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="close(false)">{{ 'ui.cancel' | t }}</button>
+      <button type="button" class="fd-button" [class.fd-button-danger]="data.danger"
+        [class.fd-button-primary]="!data.danger" (click)="close(true)">
+        {{ data.confirmText }}
+      </button>
+    </div>
+  </footer>
+</div>

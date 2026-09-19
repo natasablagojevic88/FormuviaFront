@@ -1,0 +1,38 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: #eef2f7;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  padding: 0 16px 16px;
+}
+
+.layout-login {
+  display: block;
+  background: none;
+}
+
+.layout-login .content {
+  padding: 0;
+}
+
+@media (min-width: 901px) {
+  .layout:not(.layout-login) {
+    height: 100vh;
+  }
+
+  .layout:not(.layout-login) .content {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .layout {
+    flex-direction: column;
+  }
+}
