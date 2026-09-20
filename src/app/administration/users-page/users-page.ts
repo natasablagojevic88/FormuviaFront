@@ -9,12 +9,6 @@ import { DataTable } from "../../shared/data-table/data-table";
 import { DatabaseColumn, DatabaseTable } from "../../shared/database-table";
 import { AppUserDialog, AppUserDialogData } from "../app-user-dialog/app-user-dialog";
 
-const DIALOG_CONFIG = {
-  maxWidth: "calc(100vw - 32px)",
-  panelClass: "formuvia-dialog",
-  backdropClass: "formuvia-backdrop",
-};
-
 @Component({
   selector: "app-users-page",
   standalone: false,
@@ -55,7 +49,7 @@ export class UsersPage {
       confirmText: this.translate.get("ui.delete"),
       danger: true,
     };
-    this.dialog.open(ConfirmDialog, { ...DIALOG_CONFIG, width: "460px", data })
+    this.dialog.open(ConfirmDialog, { width: "460px", data })
       .afterClosed()
       .subscribe((confirmed) => {
         if (!confirmed) {
@@ -65,17 +59,12 @@ export class UsersPage {
           .then(() => {
             this.notify.success(this.translate.get("ui.deleted"));
             this.table().reload();
-          })
-          .catch((error) => {
-            if (error?.status !== 401) {
-              this.notify.error(error?.error?.message ?? this.translate.get("ui.unexpectedError"));
-            }
           });
       });
   }
 
   private openForm(data: AppUserDialogData): void {
-    this.dialog.open(AppUserDialog, { ...DIALOG_CONFIG, width: "640px", data, autoFocus: "#username" })
+    this.dialog.open(AppUserDialog, { width: "640px", data, autoFocus: "#username" })
       .afterClosed()
       .subscribe((saved?: { id: string } | false) => {
         if (!saved) {

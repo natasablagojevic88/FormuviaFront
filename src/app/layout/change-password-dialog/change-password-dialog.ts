@@ -17,7 +17,6 @@ export class ChangePasswordDialog {
 
   readonly showPassword = signal(false);
   readonly saving = signal(false);
-  readonly errorMessage = signal("");
 
   constructor(
     private dialogRef: MatDialogRef<ChangePasswordDialog>,
@@ -39,7 +38,6 @@ export class ChangePasswordDialog {
       return;
     }
     this.saving.set(true);
-    this.errorMessage.set("");
 
     const body = { newPassword: this.newPassword, newPasswordAgain: this.newPasswordAgain };
     this.sendRequest.post(ApiRoute.changePassword, body)
@@ -47,10 +45,7 @@ export class ChangePasswordDialog {
         this.notify.success(this.translate.get("ui.changePassword.success"));
         this.dialogRef.close(true);
       })
-      .catch((error) => {
-        this.errorMessage.set(error?.error?.message ?? this.translate.get("ui.unexpectedError"));
-        this.saving.set(false);
-      });
+      .catch(() => this.saving.set(false));
   }
 
   close(): void {

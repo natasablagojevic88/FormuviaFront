@@ -45,6 +45,33 @@
           }
         </div>
 
+        <div class="fd-field fd-field-wide">
+          <span class="fd-label">{{ 'ui.users.roles' | t }}</span>
+          <div class="roles">
+            @if (userRoles().length) {
+              <div class="role-chips">
+                @for (role of userRoles(); track role.id) {
+                  <span class="role-chip">
+                    <span class="role-text">{{ roleLabel(role) }}</span>
+                    <button type="button" class="role-remove" (click)="removeRole(role.id)"
+                      [title]="'ui.users.removeRole' | t" [attr.aria-label]="('ui.users.removeRole' | t) + ': ' + roleLabel(role)">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </span>
+                }
+              </div>
+            } @else {
+              <span class="fd-help">{{ 'ui.users.noRoles' | t }}</span>
+            }
+
+            @if (roleOptions().length) {
+              <app-search-select class="role-select" [options]="roleOptions()" [ngModel]="roleToAdd"
+                (ngModelChange)="addRole($event)" [ngModelOptions]="{ standalone: true }"
+                icon="fa-solid fa-user-shield" [placeholder]="'ui.users.addRole' | t" [ariaLabel]="'ui.users.addRole' | t" />
+            }
+          </div>
+        </div>
+
         <div class="fd-field">
           <span class="fd-label">{{ label('active') }}</span>
           <label class="switch">
@@ -53,13 +80,6 @@
             <span class="switch-text">{{ (user.active ? 'ui.yes' : 'ui.no') | t }}</span>
           </label>
         </div>
-      </div>
-    }
-
-    @if (errorMessage()) {
-      <div class="fd-alert" role="alert">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <span>{{ errorMessage() }}</span>
       </div>
     }
   </div>

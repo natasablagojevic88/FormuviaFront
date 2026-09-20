@@ -1,7 +1,7 @@
 <app-page-header
-  [title]="title() || ('AppUserDTO.title' | t)"
+  [title]="title() || ('ui.users.title' | t)"
   [subtitle]="'ui.users.subtitle' | t"
-  [breadcrumb]="('menu.administration' | t) + ' / ' + ('menu.users' | t)">
+  [breadcrumb]="'ui.users.breadcrumb' | t">
   <button type="button" class="add-button" (click)="add()">
     <i class="fa-solid fa-plus"></i>
     {{ 'ui.add' | t }}

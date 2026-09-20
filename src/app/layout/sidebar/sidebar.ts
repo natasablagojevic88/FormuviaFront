@@ -43,13 +43,7 @@ export class Sidebar {
 
   changePassword(): void {
     this.layout.menuOpen.set(false);
-    this.dialog.open(ChangePasswordDialog, {
-      width: "520px",
-      maxWidth: "calc(100vw - 32px)",
-      panelClass: "formuvia-dialog",
-      backdropClass: "formuvia-backdrop",
-      autoFocus: "#newPassword",
-    });
+    this.dialog.open(ChangePasswordDialog, { width: "520px", autoFocus: "#newPassword" });
   }
 
   logout(): void {

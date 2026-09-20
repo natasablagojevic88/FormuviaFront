@@ -1,8 +1,8 @@
-import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ErrorHandler, NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MAT_DIALOG_DEFAULT_OPTIONS, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 
@@ -15,6 +15,7 @@ import { Toast } from './layout/toast/toast';
 import { TranslateModule } from './shared/translate-module';
 import { FormControlsModule } from './shared/form-controls-module';
 import { TranslatedPaginatorIntl } from './shared/paginator-intl';
+import { AppErrorHandler } from './services/app-error-handler';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,18 @@ import { TranslatedPaginatorIntl } from './shared/paginator-intl';
   providers: [
     provideBrowserGlobalErrorListeners(),
     { provide: MatPaginatorIntl, useClass: TranslatedPaginatorIntl },
+    { provide: ErrorHandler, useClass: AppErrorHandler },
+    // Zajednicka podesavanja svih dijaloga; kratke animacije da se otvaranje ne oseca sporo.
+    {
+      provide: MAT_DIALOG_DEFAULT_OPTIONS,
+      useValue: {
+        maxWidth: 'calc(100vw - 32px)',
+        panelClass: 'formuvia-dialog',
+        backdropClass: 'formuvia-backdrop',
+        enterAnimationDuration: '90ms',
+        exitAnimationDuration: '60ms',
+      },
+    },
   ],
   bootstrap: [App]
 })

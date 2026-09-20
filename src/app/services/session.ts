@@ -25,7 +25,7 @@ export class Session {
   constructor(private sendRequest: SendRequest) {}
 
   load(): Promise<UserInfo> {
-    return this.sendRequest.get(ApiRoute.session).then((user: UserInfo) => {
+    return this.sendRequest.get(ApiRoute.session, { notifyError: false }).then((user: UserInfo) => {
       this.user.set(user);
       return user;
     });

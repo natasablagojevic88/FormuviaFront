@@ -92,6 +92,91 @@
   background: #f1f5f9;
 }
 
+.export-button {
+  margin-left: auto;
+}
+
+/* Rezim izmene */
+.edit-mode-button.mode-on {
+  border-color: #1f5eff;
+  background: #eef4ff;
+  color: #1f5eff;
+}
+
+.new-row-cell-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: #eef3ff;
+  color: #1f5eff;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.new-row-cell-button:hover:not(:disabled) {
+  background: #dbe6ff;
+}
+
+.new-row-cell-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Na desktopu je dugme za nov red u redu sa filterima; na telefonu tog reda nema, pa ostaje u toolbar-u */
+.new-row-button {
+  display: none;
+}
+
+.required-mark {
+  margin-left: 2px;
+  color: #dc2626;
+}
+
+tr.mat-mdc-row.row-editing,
+tr.mat-mdc-row.row-editing:hover {
+  background: #f8fbff;
+}
+
+.save-row-button:disabled,
+.edit-button:disabled,
+.delete-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Izbor sortiranja samo na telefonu (u kartici nema zaglavlja na koje se klikne) */
+.mobile-sort {
+  display: none;
+  gap: 8px;
+}
+
+.sort-select {
+  flex: 1;
+  min-width: 0;
+}
+
+.sort-direction {
+  flex: none;
+  width: 44px;
+  padding: 0;
+  justify-content: center;
+}
+
+.export-button i {
+  color: #047857;
+}
+
+.export-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .count {
   display: grid;
   place-items: center;
@@ -153,6 +238,7 @@ td.mat-mdc-cell {
 }
 
 tr.mat-mdc-row {
+  cursor: pointer;
   transition: background-color 0.12s;
 }
 
@@ -160,11 +246,52 @@ tr.mat-mdc-row:hover {
   background: #f8fafc;
 }
 
-/* Upravo dodat ili izmenjen red: zeleni ton sa trakom levo, kratko zablesne pa ostane blag */
+/* Oznacen red: zeleni ton sa trakom levo; dodat ili izmenjen red jos i kratko zablesne */
 tr.mat-mdc-row.row-highlight,
 tr.mat-mdc-row.row-highlight:hover {
   background: #ecfdf5;
+}
+
+tr.mat-mdc-row.row-flash {
   animation: row-highlight 1.6s ease-out;
+}
+
+/* Izmena direktno u tabeli */
+td.cell-editable:hover {
+  box-shadow: inset 0 0 0 1px #cbd5e1;
+}
+
+td.cell-saving {
+  opacity: 0.55;
+}
+
+td.cell-saved {
+  animation: cell-saved 1.6s ease-out;
+}
+
+@keyframes cell-saved {
+  0%,
+  30% {
+    background: #bbf7d0;
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+.cell-editor {
+  width: 100%;
+  min-width: 120px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #1f5eff;
+  border-radius: 10px;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.15);
 }
 
 tr.mat-mdc-row.row-highlight td:first-child {
@@ -182,7 +309,8 @@ tr.mat-mdc-row.row-highlight td:first-child {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  tr.mat-mdc-row.row-highlight {
+  tr.mat-mdc-row.row-flash,
+  td.cell-saved {
     animation: none;
   }
 }
@@ -333,18 +461,151 @@ tr.mat-mdc-row.row-highlight td:first-child {
     border-radius: 18px;
   }
 
+  /* Prvi red: napredna pretraga + ikonica za izvoz; kriterijumi u redu ispod */
   .toolbar {
-    flex-direction: column-reverse;
-    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 8px;
     padding: 12px 12px 8px;
   }
 
+  .chips {
+    flex-basis: 100%;
+    order: 1;
+  }
+
   .advanced-button {
+    flex: 1;
     justify-content: center;
+  }
+
+  /* Na telefonu export ostaje samo ikonica, napredna pretraga zauzima ostatak reda */
+  .export-button {
+    flex: none;
+    width: 44px;
+    padding: 0;
+  }
+
+  .export-label {
+    display: none;
   }
 
   .edit-label {
     display: none;
+  }
+
+  /* 16px sprecava da iOS zumira stranu kad se fokusira polje */
+  .cell-editor {
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .mobile-sort {
+    display: flex;
+    flex-basis: 100%;
+    order: 2;
+  }
+
+  .mode-label {
+    display: none;
+  }
+
+  .edit-mode-button,
+  .new-row-button {
+    flex: none;
+    width: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .new-row-button {
+    display: inline-flex;
+  }
+
+  /* Red tabele postaje kartica: labela kolone levo, vrednost desno, akcije u dnu */
+  .table-scroll {
+    padding: 4px 12px 12px;
+    background: #f8fafc;
+  }
+
+  .table,
+  .table tbody {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .table td.mat-mdc-cell,
+  .table tr.mat-mdc-row {
+    box-sizing: border-box;
+  }
+
+  .table tr.mat-mdc-header-row,
+  .table tr.filter-row {
+    display: none;
+  }
+
+  /* Material redu zadaje fiksnu visinu (--mat-table-row-item-container-height); u kartici visina mora da prati sadrzaj */
+  .table tr.mat-mdc-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    margin-bottom: 12px;
+    border: 1px solid #eef2f7;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(3, 8, 23, 0.05);
+    overflow: visible;
+  }
+
+  .table td.mat-mdc-cell {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 10px 14px;
+    border-bottom: 0;
+    text-align: left;
+  }
+
+  .table td.mat-mdc-cell::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .table td.actions-cell {
+    order: 1;
+    width: auto;
+    justify-content: flex-end;
+    border-top: 1px solid #f1f5f9;
+    background: #f8fafc;
+  }
+
+  .table td.actions-cell::before {
+    content: none;
+  }
+
+  /* Oznacen red: traka levo ide na celu karticu, a ne na prvu celiju */
+  .table tr.mat-mdc-row.row-highlight td:first-child {
+    box-shadow: none;
+  }
+
+  .table tr.mat-mdc-row.row-highlight {
+    box-shadow: inset 4px 0 0 #22c55e;
+  }
+
+  .table td.mat-mdc-cell .cell-editor {
+    max-width: 60%;
   }
 
   .edit-button {

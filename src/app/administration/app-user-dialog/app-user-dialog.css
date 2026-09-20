@@ -10,6 +10,70 @@
   font-size: 28px;
 }
 
+.fd-field-wide {
+  grid-column: 1 / -1;
+}
+
+.roles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.role-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.role-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 6px 6px 6px 14px;
+  border-radius: 999px;
+  background: #eef3ff;
+  color: #1f5eff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.role-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role-remove {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(31, 94, 255, 0.12);
+  color: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.role-remove:hover {
+  background: rgba(31, 94, 255, 0.25);
+}
+
+.role-select {
+  max-width: 320px;
+}
+
+@media (max-width: 600px) {
+  .role-select {
+    max-width: none;
+  }
+}
+
 .switch {
   display: inline-flex;
   align-items: center;

@@ -35,6 +35,10 @@ export interface DatabaseColumn {
   listOfValues?: ComboOption[];
   /** Ako backend posalje false, kolona se ne nudi u naprednoj pretrazi. */
   searchable?: boolean;
+  /** false: kolona se ne moze menjati direktno u tabeli (@NotEditableInTable na back-u). */
+  editable?: boolean;
+  /** true: polje je obavezno (@NotNull na back-u) - bez njega se red ne moze snimiti. */
+  required?: boolean;
 }
 
 export interface DatabaseTable<T> {
@@ -46,6 +50,8 @@ export interface DatabaseTable<T> {
   list: T[];
   total: number;
   numberOfPages: number;
+  /** Putanja za snimanje reda bez /api prefiksa (npr. "/appuser"); bez nje tabela je samo za citanje. */
+  saveUrl?: string;
 }
 
 export interface DatabaseFilter {

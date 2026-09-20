@@ -19,11 +19,9 @@ export class App {
     public router: Router,
     private translate: Translate
   ){
-    this.translate.load()
-    .catch(()=>{});
+    this.translate.load();
 
-    this.session.load()
-    .catch(()=>{});
+    this.session.load();
 
     this.router.events.subscribe((route)=>{
       if(route instanceof NavigationStart){

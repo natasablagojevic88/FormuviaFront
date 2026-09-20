@@ -1,14 +1,21 @@
-import { Component, Inject, OnInit, signal } from "@angular/core";
+import { Component, computed, Inject, OnInit, signal } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { SendRequest } from "../../services/send-request";
-import { Translate } from "../../services/translate";
 import { ApiRoute } from "../../shared/ApiRoute";
 import { DatabaseColumn } from "../../shared/database-table";
+import { Translate } from "../../services/translate";
+import { SelectOption } from "../../shared/search-select/search-select";
 
 export interface AppUserDialogData {
   id?: string;
   /** allColumns iz odgovora tabele: prevedeni nazivi svih polja AppUserDTO-a. */
   columns: DatabaseColumn[];
+}
+
+export interface Role {
+  id: string;
+  code: string;
+  description?: string;
 }
 
 interface AppUser {
@@ -19,6 +26,10 @@ interface AppUser {
   email: string;
   password?: string;
   active: boolean;
+  /** Role koje korisnik ima; back po njima dodeljuje i oduzima role. */
+  userRoles?: Role[];
+  /** Sve role u aplikaciji; salje ih back uz korisnika, pri unosu se citaju sa all-roles. */
+  allRoles?: Role[];
 }
 
 @Component({
@@ -32,7 +43,17 @@ export class AppUserDialog implements OnInit {
 
   readonly loading = signal(false);
   readonly saving = signal(false);
-  readonly errorMessage = signal("");
+
+  readonly userRoles = signal<Role[]>([]);
+  readonly allRoles = signal<Role[]>([]);
+  /** U listi za dodavanje su samo role koje korisnik jos nema. */
+  readonly roleOptions = computed<SelectOption[]>(() => {
+    const taken = new Set(this.userRoles().map((role) => role.id));
+    return this.allRoles()
+      .filter((role) => !taken.has(role.id))
+      .map((role) => ({ value: role.id, label: this.roleLabel(role) }));
+  });
+  roleToAdd = "";
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: AppUserDialogData,
@@ -41,9 +62,25 @@ export class AppUserDialog implements OnInit {
     private translate: Translate
   ) {}
 
+  roleLabel(role: Role): string {
+    return role.description || role.code;
+  }
+
+  addRole(id: string): void {
+    const role = this.allRoles().find((item) => item.id === id);
+    this.roleToAdd = "";
+    if (role) {
+      this.userRoles.update((roles) => [...roles, role]);
+    }
+  }
+
+  removeRole(id: string): void {
+    this.userRoles.update((roles) => roles.filter((role) => role.id !== id));
+  }
+
   label(fieldName: string): string {
     return this.data.columns.find((column) => column.fieldName === fieldName)?.description
-      ?? this.translate.get("AppUserDTO." + fieldName);
+      ?? this.translate.get("ui.users." + fieldName);
   }
 
   get isNew(): boolean {
@@ -51,16 +88,17 @@ export class AppUserDialog implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.isNew) {
-      return;
-    }
     this.loading.set(true);
-    this.sendRequest.get(ApiRoute.appuserId(this.data.id!))
-      .then((user: AppUser) => {
-        this.user = { ...user, password: "", active: user.active ?? false };
-      })
-      .catch((error) => this.errorMessage.set(error?.error?.message ?? this.translate.get("ui.unexpectedError")))
-      .finally(() => this.loading.set(false));
+    // Kod unosa sve role stizu sa all-roles, a kod izmene vec dolaze uz korisnika.
+    const request = this.isNew
+      ? this.sendRequest.get(ApiRoute.appuserAllRoles).then((roles: Role[]) => this.allRoles.set(roles ?? []))
+      : this.sendRequest.get(ApiRoute.appuserId(this.data.id!)).then((user: AppUser) => {
+          this.user = { ...user, password: "", active: user.active ?? false };
+          this.allRoles.set(user.allRoles ?? []);
+          this.userRoles.set(user.userRoles ?? []);
+        });
+
+    request.finally(() => this.loading.set(false));
   }
 
   canSave(): boolean {
@@ -75,13 +113,9 @@ export class AppUserDialog implements OnInit {
       return;
     }
     this.saving.set(true);
-    this.errorMessage.set("");
-    this.sendRequest.post(ApiRoute.appuser, { ...this.user, id: this.data.id })
+    this.sendRequest.post(ApiRoute.appuser, { ...this.user, id: this.data.id, userRoles: this.userRoles() })
       .then((saved: AppUser) => this.dialogRef.close(saved))
-      .catch((error) => {
-        this.errorMessage.set(error?.error?.message ?? this.translate.get("ui.unexpectedError"));
-        this.saving.set(false);
-      });
+      .catch(() => this.saving.set(false));
   }
 
   close(): void {

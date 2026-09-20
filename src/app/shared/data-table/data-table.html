@@ -1,21 +1,51 @@
 <div class="table-card">
+  <!-- Napredna pretraga levo, aktivni kriterijumi u sredini, izvoz u Excel skroz desno -->
   <div class="toolbar">
-    <div class="chips">
-      @for (criterion of criteria(); track $index) {
-        <span class="chip">
-          <span class="chip-text">{{ criterionLabel(criterion) }}</span>
-          <button type="button" class="chip-remove" (click)="removeCriterion($index)" [attr.aria-label]="'ui.delete' | t">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </span>
-      }
-    </div>
     <button type="button" class="advanced-button" (click)="openAdvancedSearch()">
       <i class="fa-solid fa-sliders"></i>
       <span>{{ 'ui.advancedSearch' | t }}</span>
       @if (criteria().length) {
         <span class="count">{{ criteria().length }}</span>
       }
+    </button>
+    @if (criteria().length) {
+      <div class="chips">
+        @for (criterion of criteria(); track $index) {
+          <span class="chip">
+            <span class="chip-text">{{ criterionLabel(criterion) }}</span>
+            <button type="button" class="chip-remove" (click)="removeCriterion($index)" [attr.aria-label]="'ui.delete' | t">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </span>
+        }
+      </div>
+    }
+    @if (canEditMode()) {
+      <button type="button" class="advanced-button edit-mode-button" [class.mode-on]="editMode()" (click)="toggleEditMode()"
+        [title]="'ui.editMode' | t" [attr.aria-label]="'ui.editMode' | t" [attr.aria-pressed]="editMode()">
+        <i class="fa-solid fa-table-cells-large"></i>
+        <span class="mode-label">{{ 'ui.editMode' | t }}</span>
+      </button>
+      @if (editMode()) {
+        <button type="button" class="advanced-button new-row-button" (click)="startNew()" [disabled]="rowEditMode()"
+          [title]="'ui.newRow' | t" [attr.aria-label]="'ui.newRow' | t">
+          <i class="fa-solid fa-plus"></i>
+          <span class="mode-label">{{ 'ui.newRow' | t }}</span>
+        </button>
+      }
+    }
+    <div class="mobile-sort">
+      <app-search-select class="sort-select" appearance="compact" [options]="sortOptions()" [ngModel]="sortField()"
+        (ngModelChange)="setSortField($event)" [placeholder]="'ui.sortBy' | t" [ariaLabel]="'ui.sortBy' | t" />
+      <button type="button" class="advanced-button sort-direction" (click)="toggleSortDirection()" [disabled]="!sortField()"
+        [title]="'ui.sortDirection' | t" [attr.aria-label]="'ui.sortDirection' | t">
+        <i class="fa-solid" [class.fa-arrow-down-a-z]="sortAscending()" [class.fa-arrow-up-a-z]="!sortAscending()"></i>
+      </button>
+    </div>
+    <button type="button" class="advanced-button export-button" (click)="exportExcel()" [disabled]="exporting()"
+      [title]="'ui.exportExcel' | t" [attr.aria-label]="'ui.exportExcel' | t">
+      <i class="fa-solid" [class.fa-file-excel]="!exporting()" [class.fa-spinner]="exporting()" [class.fa-spin]="exporting()"></i>
+      <span class="export-label">{{ 'ui.exportExcel' | t }}</span>
     </button>
   </div>
 
@@ -26,40 +56,99 @@
   </div>
 
   <div class="table-scroll">
-    <table mat-table [dataSource]="rows()" matSort (matSortChange)="onSort($event)" class="table">
+    <table mat-table [dataSource]="tableRows()" matSort (matSortChange)="onSort($event)" class="table">
 
       <ng-container [matColumnDef]="actionsColumn">
         <th mat-header-cell *matHeaderCellDef class="actions-cell">{{ 'ui.actions' | t }}</th>
         <td mat-cell *matCellDef="let row" class="actions-cell">
           <div class="row-actions">
-            <button type="button" class="edit-button" (click)="edit.emit(row)" [title]="'ui.edit' | t">
-              <i class="fa-solid fa-pen"></i>
-              <span class="edit-label">{{ 'ui.edit' | t }}</span>
-            </button>
-            <button type="button" class="delete-button" (click)="remove.emit(row)"
-              [title]="'ui.delete' | t" [attr.aria-label]="'ui.delete' | t">
-              <i class="fa-solid fa-trash-can"></i>
-            </button>
+            @if (isRowEditing(row)) {
+              <button type="button" class="edit-button save-row-button" (click)="saveRow()" [disabled]="!canSaveRow()"
+                [title]="'ui.save' | t">
+                <i class="fa-solid fa-check"></i>
+                <span class="edit-label">{{ 'ui.save' | t }}</span>
+              </button>
+              <button type="button" class="delete-button" (click)="cancelRowEdit()"
+                [title]="'ui.cancel' | t" [attr.aria-label]="'ui.cancel' | t">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            } @else {
+              <button type="button" class="edit-button" (click)="editRow(row)" [disabled]="rowEditMode()" [title]="'ui.edit' | t">
+                <i class="fa-solid fa-pen"></i>
+                <span class="edit-label">{{ 'ui.edit' | t }}</span>
+              </button>
+              <button type="button" class="delete-button" (click)="remove.emit(row)" [disabled]="rowEditMode()"
+                [title]="'ui.delete' | t" [attr.aria-label]="'ui.delete' | t">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            }
           </div>
         </td>
       </ng-container>
 
       <ng-container [matColumnDef]="filterPrefix + actionsColumn">
         <th mat-header-cell *matHeaderCellDef class="filter-cell actions-cell">
-          @if (hasFilters()) {
-            <button type="button" class="clear-filters" (click)="clearFilters()"
-              [title]="'ui.clearFilters' | t" [attr.aria-label]="'ui.clearFilters' | t">
-              <i class="fa-solid fa-filter-circle-xmark"></i>
-            </button>
-          }
+          <div class="row-actions">
+            @if (editMode()) {
+              <button type="button" class="new-row-cell-button" (click)="startNew()" [disabled]="rowEditMode()"
+                [title]="'ui.newRow' | t" [attr.aria-label]="'ui.newRow' | t">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            }
+            @if (hasFilters()) {
+              <button type="button" class="clear-filters" (click)="clearFilters()"
+                [title]="'ui.clearFilters' | t" [attr.aria-label]="'ui.clearFilters' | t">
+                <i class="fa-solid fa-filter-circle-xmark"></i>
+              </button>
+            }
+          </div>
         </th>
       </ng-container>
 
-      @for (column of columns(); track column.fieldName) {
+      @for (column of cellColumns(); track column.fieldName) {
         <ng-container [matColumnDef]="column.fieldName">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header [class.cell-center]="column.columnType === 'BOOLEAN'">{{ column.description }}</th>
-          <td mat-cell *matCellDef="let row" [class.cell-center]="column.columnType === 'BOOLEAN'">
-            @if (column.columnType === 'BOOLEAN') {
+          <th mat-header-cell *matHeaderCellDef mat-sort-header [class.cell-center]="column.columnType === 'BOOLEAN'">{{ column.description
+            }}@if (editMode() && column.required) {<span class="required-mark">*</span>}</th>
+          <td mat-cell *matCellDef="let row" [attr.data-label]="column.description" [class.cell-center]="column.columnType === 'BOOLEAN'"
+            [class.cell-editable]="canEdit(column)" [class.cell-saving]="isCell(savingCell(), row, column)"
+            [class.cell-saved]="isCell(savedCell(), row, column)" [attr.title]="canEdit(column) ? ('ui.cellEditHint' | t) : null"
+            (click)="onCellClick(row, column)" (dblclick)="startEdit(row, column)">
+            @if (isRowEditing(row)) {
+              @if (isEnum(column) || column.columnType === 'BOOLEAN') {
+                <select class="cell-editor" [(ngModel)]="rowValues[column.fieldName]" [attr.aria-label]="column.description">
+                  @if (column.columnType === 'BOOLEAN') {
+                    <option value="true">{{ 'ui.yes' | t }}</option>
+                    <option value="false">{{ 'ui.no' | t }}</option>
+                  } @else {
+                    <option value=""></option>
+                    @for (option of column.listOfValues; track option.value) {
+                      <option [value]="option.value">{{ option.option }}</option>
+                    }
+                  }
+                </select>
+              } @else {
+                <input class="cell-editor" [type]="editorType(column)" [(ngModel)]="rowValues[column.fieldName]"
+                  (keydown.enter)="saveRow()" (keydown.escape)="cancelRowEdit()" [attr.aria-label]="column.description" />
+              }
+            } @else if (isCell(editing(), row, column)) {
+              @if (isEnum(column) || column.columnType === 'BOOLEAN') {
+                <select class="cell-editor" [ngModel]="editValue" (ngModelChange)="editValue = $event; commitEdit()" (blur)="cancelEdit()"
+                  (keydown.escape)="cancelEdit()" [attr.aria-label]="column.description">
+                  @if (column.columnType === 'BOOLEAN') {
+                    <option value="true">{{ 'ui.yes' | t }}</option>
+                    <option value="false">{{ 'ui.no' | t }}</option>
+                  } @else {
+                    @for (option of column.listOfValues; track option.value) {
+                      <option [value]="option.value">{{ option.option }}</option>
+                    }
+                  }
+                </select>
+              } @else {
+                <input class="cell-editor" [type]="editorType(column)" [(ngModel)]="editValue"
+                  (keydown.enter)="commitEdit()" (keydown.escape)="cancelEdit()" (blur)="commitEdit()"
+                  [attr.aria-label]="column.description" />
+              }
+            } @else if (column.columnType === 'BOOLEAN') {
               <span class="badge" [class.badge-yes]="row[column.fieldName]" [class.badge-no]="!row[column.fieldName]">
                 {{ (row[column.fieldName] ? 'ui.yes' : 'ui.no') | t }}
               </span>
@@ -88,7 +177,8 @@
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: true"></tr>
       <tr mat-header-row *matHeaderRowDef="filterColumns(); sticky: true" class="filter-row"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns()" [class.row-highlight]="row.id === highlightedId()"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns()" (click)="selectRow(row)" [class.row-editing]="isRowEditing(row)"
+        [class.row-highlight]="row.id === highlightedId()" [class.row-flash]="row.id === highlightedId() && highlightFlash()"></tr>
       <tr class="mat-mdc-no-data-row" *matNoDataRow>
         <td class="empty-cell" [attr.colspan]="displayedColumns().length">
           @if (!loading()) {
