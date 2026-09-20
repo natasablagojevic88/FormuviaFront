@@ -52,6 +52,41 @@ export interface DatabaseTable<T> {
   numberOfPages: number;
   /** Putanja za snimanje reda bez /api prefiksa (npr. "/appuser"); bez nje tabela je samo za citanje. */
   saveUrl?: string;
+  /** Naziv DTO klase (npr. "AppUserDTO"); koristi se za istoriju reda. */
+  className?: string;
+  /** Podredjene tabele; iz menija reda se otvara tabela deteta filtrirana po tom redu. */
+  children?: TableChild[];
+}
+
+/** Podredjena tabela jedne tabele (nadredjeni -> podredjeni). */
+export interface TableChild {
+  className: string;
+  /** Vec preveden naziv, npr. "Partneri". */
+  title: string;
+  /** Putanja tabele deteta bez /api prefiksa, npr. "/partner/table". */
+  tableUrl: string;
+  /** Polje u detetu koje drzi id nadredjenog reda, npr. "tipPartneraId". */
+  parentField: string;
+  icon?: string;
+}
+
+/** Jedna izmena u istoriji reda; fieldName je vec preveden na back-u. */
+export interface HistoryChange {
+  fieldName: string;
+  /** Tip kolone sa back-a; po njemu se vrednost formatira u istoriji. */
+  columnType?: ColumnType;
+  oldData?: any;
+  newData?: any;
+}
+
+/** Jedan zapis istorije: ko je, kada i sta promenio. */
+export interface HistoryEntry {
+  appUserUsername?: string;
+  appUserName?: string;
+  appUserSurname?: string;
+  action: string;
+  time: string;
+  changes: HistoryChange[];
 }
 
 export interface DatabaseFilter {

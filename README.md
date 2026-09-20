@@ -9,8 +9,10 @@ It requires the backend API from the separate repository: **Formuvia** (Java).
 - Login and logout
 - Menu based on the user's roles
 - User administration: paged table with search, advanced filters and sorting; add, edit and delete users, and assign their roles
+- Role administration: add, edit and delete the roles that grant access
 - Export of any table to Excel, respecting the current filters and sort order
 - Editing a value directly in the table (double-click a cell), plus an edit mode for changing a whole row or adding a new one in the grid
+- History of every row: who changed what and when, with old and new values
 - Change own password
 - Language switch: English, Srpski (latinica), Српски (ћирилица)
 - Responsive layout – on small screens the menu becomes a slide-out panel and tables are shown as cards
@@ -73,6 +75,8 @@ On the backend, set `cors.url` to the address where the client is served. The cl
 - **Tables** – filter using the search fields under the column headers, open *Advanced search* for more filter options, click a column header to sort, use the paginator at the bottom. *Export to Excel* downloads all rows matching the current filters and sort order (not only the current page).
 - **Edit mode** – the *Edit mode* button in the table toolbar shows every editable column; *Edit* then opens the row in the table itself and *New row* adds an empty row at the top. Required fields are marked with `*`.
 - **Edit in the table** – double-click a cell to change its value, `Enter` saves and `Esc` cancels (on a phone: tap the row, then tap the cell). Columns the server marks as read-only cannot be changed.
+- **Row actions** – *Edit* opens the row, and the ⋯ button next to it holds *History* and *Delete*.
+- **History** – shows who changed the row and when, with the old and new value of every changed field, in a panel that slides in from the right.
 - **Roles** – in the user form, add a role from the list and remove one with the × on its chip.
 - **Change password** – click your name at the bottom of the menu.
 - **Log out** – the icon next to your name.

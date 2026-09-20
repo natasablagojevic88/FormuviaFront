@@ -2,11 +2,13 @@ import { Component, computed, ElementRef, input, OnInit, output, signal, viewChi
 import { MatDialog } from "@angular/material/dialog";
 import { PageEvent } from "@angular/material/paginator";
 import { MatSort, Sort } from "@angular/material/sort";
+import { Router } from "@angular/router";
 import { SendRequest } from "../../services/send-request";
 import { ApiRoute } from "../ApiRoute";
 import { Translate } from "../../services/translate";
 import { AdvancedSearchDialog, AdvancedSearchDialogData } from "../advanced-search-dialog/advanced-search-dialog";
-import { DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, QueryDatabaseOrder } from "../database-table";
+import { DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, QueryDatabaseOrder, TableChild } from "../database-table";
+import { HistoryPanel } from "../history-panel/history-panel";
 import { Criterion, inputTypeFor, isEnum, needsValue, quickFilter, toFilter } from "../filter-operations";
 import { SelectOption } from "../search-select/search-select";
 
@@ -15,6 +17,13 @@ const FILTER_PREFIX = "filter-";
 const FILTER_DELAY = 350;
 const ID_FIELD = "id";
 const TOUCH_QUERY = window.matchMedia("(hover: none)");
+
+/** Jedan korak u putanji nadredjeni -> podredjeni; route je adresa sa koje se doslo. */
+export interface TrailCrumb {
+  title: string;
+  label: string;
+  route: string;
+}
 
 interface CellRef {
   id: string;
@@ -58,6 +67,10 @@ function fromEditValue(text: string, column: DatabaseColumn): any {
 })
 export class DataTable implements OnInit {
   readonly url = input.required<string>();
+  /** Stalni filter (npr. tabela deteta po nadredjenom redu); korisnik ga ne moze skinuti. */
+  readonly parentFilter = input<{ field: string; value: string } | null>(null);
+  /** Putanja do ove tabele, za dugmad povratka u tabeli deteta. */
+  readonly trail = input<TrailCrumb[]>([]);
   readonly edit = output<any>();
   readonly remove = output<any>();
   readonly loaded = output<DatabaseTable<any>>();
@@ -79,6 +92,10 @@ export class DataTable implements OnInit {
   readonly editing = signal<CellRef | null>(null);
   readonly savingCell = signal<CellRef | null>(null);
   readonly savedCell = signal<CellRef | null>(null);
+  // Istorija reda: naziv DTO klase stize uz tabelu (className), a panel se izvlaci sa desne strane.
+  readonly tableName = signal("");
+  readonly className = signal<string | null>(null);
+  readonly children = signal<TableChild[]>([]);
   // Na telefonu nema zaglavlja tabele, pa se sortiranje bira u toolbar-u.
   readonly sortOptions = computed<SelectOption[]>(() =>
     this.columns().map((column) => ({ value: column.fieldName, label: column.description })));
@@ -120,6 +137,7 @@ export class DataTable implements OnInit {
   readonly highlightFlash = signal(false);
 
   private readonly sort = viewChild(MatSort);
+  private readonly historyPanel = viewChild(HistoryPanel);
 
   readonly displayedColumns = computed(() =>
     [ACTIONS_COLUMN, ...(this.editMode() ? this.editColumns() : this.columns()).map((column) => column.fieldName)]);
@@ -151,6 +169,7 @@ export class DataTable implements OnInit {
     private sendRequest: SendRequest,
     private translate: Translate,
     private dialog: MatDialog,
+    private router: Router,
     private host: ElementRef<HTMLElement>
   ) {}
 
@@ -165,7 +184,7 @@ export class DataTable implements OnInit {
     const parameter: DatabaseParameter = {
       pageIndex: this.pageIndex(),
       pageSize: this.pageSize(),
-      filters: this.buildFilters(),
+      filters: this.allFilters(),
       orders: order ? [order] : [],
     };
 
@@ -182,6 +201,9 @@ export class DataTable implements OnInit {
         }
         this.columns.set(table.column);
         this.saveUrl.set(table.saveUrl || null);
+        this.tableName.set(table.name ?? "");
+        this.className.set(table.className || null);
+        this.children.set(table.children ?? []);
         this.editing.set(null);
         this.editRowId.set(null);
         this.draftRow.set(null);
@@ -213,7 +235,7 @@ export class DataTable implements OnInit {
     }
     const order = this.order();
     const parameter: Partial<DatabaseParameter> = {
-      filters: this.buildFilters(),
+      filters: this.allFilters(),
       orders: order ? [order] : [],
     };
 
@@ -241,6 +263,57 @@ export class DataTable implements OnInit {
   }
 
   // Posle izmene: ista strana i isti filteri, izmenjeni red oznacen.
+  /** Filteri korisnika + stalni filter po nadredjenom redu. */
+  private allFilters(): DatabaseFilter[] {
+    const filters = this.buildFilters();
+    const parent = this.parentFilter();
+    if (parent) {
+      filters.push({ field: parent.field, searchOperation: "EQUALS", columnType: "UUID", field1: parent.value });
+    }
+    return filters;
+  }
+
+  /** Otvara tabelu deteta kao novu stranu, sa putanjom nazad u zaglavlju. */
+  openChild(child: TableChild, row: any): void {
+    this.selectRow(row);
+    const trail: TrailCrumb[] = [
+      ...this.trail(),
+      { title: this.tableName(), label: this.rowTitle(row), route: this.router.url },
+    ];
+    this.router.navigate(["/table", child.className], {
+      queryParams: {
+        url: child.tableUrl,
+        field: child.parentField,
+        id: row[ID_FIELD],
+        title: child.title,
+        trail: JSON.stringify(trail),
+      },
+    });
+  }
+
+  /** Istorija se nudi samo kad back posalje className uz tabelu. */
+  canShowHistory(): boolean {
+    return !!this.className();
+  }
+
+  openHistory(row: any): void {
+    const className = this.className();
+    if (!className) {
+      return;
+    }
+    this.selectRow(row);
+    this.historyPanel()?.open(className, row[ID_FIELD], this.rowTitle(row));
+  }
+
+  /** Naslov panela ili stavke u putanji: vrednosti prve dve vidljive kolone reda. */
+  rowTitle(row: any): string {
+    return this.columns()
+      .slice(0, 2)
+      .map((column) => this.format(row, column))
+      .filter((value) => value !== "")
+      .join(" ");
+  }
+
   isRowEditing(row: any): boolean {
     return row === this.draftRow() || (this.editRowId() !== null && row[ID_FIELD] === this.editRowId());
   }
@@ -407,8 +480,24 @@ export class DataTable implements OnInit {
     this.highlightFlash.set(false);
   }
 
-  showChanged(id: string): void {
-    this.reload(id);
+  /**
+   * Posle izmene: red se osvezava iz odgovora back-a, bez ponovnog ucitavanja tabele.
+   * Tabela se u medjuvremenu mogla promeniti (drugi korisnik je uneo red), pa se ponovnim
+   * ucitavanjem izmenjeni red lako nadje na drugoj strani. Ako reda nema na strani, ucitava se strana.
+   */
+  showChanged(saved: any): void {
+    const id = saved?.[ID_FIELD];
+    if (!id) {
+      return;
+    }
+    const current = this.rows().find((row) => row[ID_FIELD] === id);
+    if (!current) {
+      this.reload(id);
+      return;
+    }
+    this.replaceRow({ ...current, ...saved });
+    this.highlightedId.set(id);
+    this.highlightFlash.set(true);
   }
 
   onFilter(fieldName: string, value: string): void {

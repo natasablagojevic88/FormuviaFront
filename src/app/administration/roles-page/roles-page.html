@@ -1,0 +1,11 @@
+<app-page-header
+  [title]="title() || ('ui.roles.title' | t)"
+  [subtitle]="'ui.roles.subtitle' | t"
+  [breadcrumb]="'ui.roles.breadcrumb' | t">
+  <button type="button" class="add-button" (click)="add()">
+    <i class="fa-solid fa-plus"></i>
+    {{ 'ui.add' | t }}
+  </button>
+</app-page-header>
+
+<app-data-table [url]="tableUrl" (loaded)="onLoaded($event)" (edit)="edit($event)" (remove)="remove($event)"></app-data-table>

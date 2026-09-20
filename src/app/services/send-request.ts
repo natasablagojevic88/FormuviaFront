@@ -19,6 +19,9 @@ export class SendRequest {
   private static readonly LANGUAGE_HEADER = "X-Language";
   private static readonly DEFAULT_FILE_NAME = "download";
 
+  /** Red zahteva: svaki novi poziv se nadovezuje na kraj. */
+  private queue: Promise<unknown> = Promise.resolve();
+
   constructor(
     public http: HttpClient,
     private router: Router,
@@ -58,8 +61,14 @@ export class SendRequest {
     };
   }
 
+  // Pozivi se izvrsavaju jedan za drugim: sledeci krece tek kad se prethodni zavrsi.
+  // HttpClient observable je hladan, pa se zahtev zaista salje tek kad dodje na red (firstValueFrom).
   private send(request: Observable<any>, requestOptions?: RequestOptions): Promise<any> {
-    return firstValueFrom(request.pipe(catchError((err) => this.handleError(err, requestOptions))));
+    const run = () => firstValueFrom(request.pipe(catchError((err) => this.handleError(err, requestOptions))));
+    const result = this.queue.then(run, run);
+    // Red ne sme da ostane u odbijenom stanju, inace bi greska zaustavila sve sledece pozive.
+    this.queue = result.catch(() => undefined);
+    return result;
   }
 
   get(api: string, requestOptions?: RequestOptions): Promise<any> {

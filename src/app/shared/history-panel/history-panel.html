@@ -1,0 +1,54 @@
+<div class="history-backdrop" [class.show]="historyOpen()" (click)="closeHistory()"></div>
+<aside class="history-panel" [class.open]="historyOpen()" role="dialog" [attr.aria-label]="'ui.history.title' | t"
+  (keydown.escape)="closeHistory()" tabindex="-1">
+  <header class="history-header">
+    <div class="history-titles">
+      <h2 class="history-title">{{ 'ui.history.title' | t }}</h2>
+      @if (historyTitle()) {
+        <p class="history-subtitle">{{ historyTitle() }}</p>
+      }
+    </div>
+    <button type="button" class="history-close" (click)="closeHistory()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="history-body">
+    @if (historyLoading()) {
+      <div class="history-loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    } @else if (!historyRows().length) {
+      <div class="history-empty">
+        <i class="fa-regular fa-clock"></i>
+        <span>{{ 'ui.history.empty' | t }}</span>
+      </div>
+    } @else {
+      @for (entry of historyRows(); track $index) {
+        <article class="history-entry">
+          <div class="entry-head">
+            <span class="entry-action">{{ entry.action }}</span>
+            <span class="entry-time">{{ historyTime(entry.time) }}</span>
+          </div>
+          <div class="entry-user">
+            <i class="fa-regular fa-user"></i>
+            <span>{{ historyUser(entry) }}</span>
+          </div>
+
+          @if (entry.changes.length) {
+            <div class="changes">
+              @for (change of entry.changes; track change.fieldName) {
+                <div class="change">
+                  <span class="change-field">{{ change.fieldName }}</span>
+                  <div class="change-values">
+                    <span class="value old">{{ historyValue(change.oldData, change) }}</span>
+                    <i class="fa-solid fa-arrow-right-long"></i>
+                    <span class="value new">{{ historyValue(change.newData, change) }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </article>
+      }
+    }
+  </div>
+</aside>

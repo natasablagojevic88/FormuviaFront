@@ -14,6 +14,61 @@ body { font-family: 'Inter', sans-serif; }
   background: rgba(3, 8, 23, 0.55);
 }
 
+/* ---------- Lista izbora (mat-select, npr. broj redova u paginatoru) ---------- */
+.cdk-overlay-pane .mat-mdc-select-panel {
+  padding: 6px;
+  border: 1px solid #eef2f7;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 40px rgba(3, 8, 23, 0.16);
+}
+
+.cdk-overlay-pane .mat-mdc-option {
+  min-height: 40px;
+  border-radius: 10px;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cdk-overlay-pane .mat-mdc-option:hover:not(.mdc-list-item--disabled) {
+  background: #f1f5f9;
+}
+
+.cdk-overlay-pane .mat-mdc-option.mdc-list-item--selected {
+  background: #eef3ff;
+  color: #1f5eff;
+}
+
+/* ---------- Meni reda u tabeli (mat-menu se crta van komponente) ---------- */
+.row-menu.mat-mdc-menu-panel {
+  min-width: 200px;
+  padding: 6px;
+  border: 1px solid #eef2f7;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 18px 40px rgba(3, 8, 23, 0.16);
+}
+
+.row-menu .mat-mdc-menu-content {
+  padding: 0;
+}
+
+.row-menu .mat-mdc-menu-item {
+  min-height: 42px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.row-menu .mat-mdc-menu-item:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+.row-menu .menu-danger:hover:not(:disabled) {
+  background: #fef2f2;
+}
+
 .formuvia-toast {
   --mat-snack-bar-container-color: transparent;
 }

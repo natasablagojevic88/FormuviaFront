@@ -1,0 +1,11 @@
+<app-page-header [title]="title()" [breadcrumb]="breadcrumb()">
+  @if (trail().length) {
+    <button type="button" class="back-button" (click)="back(trail().length - 1)">
+      <i class="fa-solid fa-arrow-left"></i>
+      {{ 'ui.back' | t }}
+    </button>
+  }
+</app-page-header>
+
+<app-data-table [url]="tableUrl()" [parentFilter]="parentFilter()" [trail]="trail()"
+  (loaded)="onLoaded($event)" (remove)="remove($event)"></app-data-table>

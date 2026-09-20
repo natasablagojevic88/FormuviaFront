@@ -145,7 +145,8 @@ tr.mat-mdc-row.row-editing:hover {
 
 .save-row-button:disabled,
 .edit-button:disabled,
-.delete-button:disabled {
+.delete-button:disabled,
+.more-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -369,6 +370,7 @@ tr.mat-mdc-row.row-highlight td:first-child {
 
 .edit-button,
 .delete-button,
+.more-button,
 .clear-filters {
   display: inline-flex;
   align-items: center;
@@ -399,6 +401,31 @@ tr.mat-mdc-row.row-highlight td:first-child {
   width: 36px;
   background: #f1f5f9;
   color: #64748b;
+}
+
+.more-button {
+  width: 36px;
+  border-radius: 999px;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 15px;
+}
+
+.more-button:hover:not(:disabled),
+.more-button[aria-expanded="true"] {
+  background: #eef3ff;
+  color: #1f5eff;
+}
+
+.menu-icon {
+  width: 18px;
+  margin-right: 10px;
+  color: #64748b;
+}
+
+.menu-danger,
+.menu-danger .menu-icon {
+  color: #dc2626;
 }
 
 .delete-button:hover {

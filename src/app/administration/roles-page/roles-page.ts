@@ -7,16 +7,16 @@ import { ApiRoute } from "../../shared/ApiRoute";
 import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
 import { DataTable } from "../../shared/data-table/data-table";
 import { DatabaseColumn, DatabaseTable } from "../../shared/database-table";
-import { AppUserDialog, AppUserDialogData } from "../app-user-dialog/app-user-dialog";
+import { RoleDialog, RoleDialogData } from "../role-dialog/role-dialog";
 
 @Component({
-  selector: "app-users-page",
+  selector: "app-roles-page",
   standalone: false,
-  templateUrl: "./users-page.html",
-  styleUrl: "./users-page.css",
+  templateUrl: "./roles-page.html",
+  styleUrl: "./roles-page.css",
 })
-export class UsersPage {
-  readonly tableUrl = ApiRoute.appuserTable;
+export class RolesPage {
+  readonly tableUrl = ApiRoute.roleTable;
   readonly title = signal("");
   private allColumns: DatabaseColumn[] = [];
 
@@ -45,7 +45,8 @@ export class UsersPage {
   remove(row: { id: string }): void {
     const data: ConfirmDialogData = {
       title: this.translate.get("ui.deleteTitle"),
-      message: this.translate.get("ui.deleteConfirm"),
+      // Brisanje uloge je skida i svim korisnicima koji su je imali (ON DELETE CASCADE na back-u).
+      message: this.translate.get("ui.roles.deleteConfirm"),
       confirmText: this.translate.get("ui.delete"),
       danger: true,
     };
@@ -55,7 +56,7 @@ export class UsersPage {
         if (!confirmed) {
           return;
         }
-        this.sendRequest.delete(ApiRoute.appuserId(row.id))
+        this.sendRequest.delete(ApiRoute.roleId(row.id))
           .then(() => {
             this.notify.success(this.translate.get("ui.deleted"));
             this.table().reload();
@@ -63,8 +64,8 @@ export class UsersPage {
       });
   }
 
-  private openForm(data: AppUserDialogData): void {
-    this.dialog.open(AppUserDialog, { width: "640px", data, autoFocus: "#username" })
+  private openForm(data: RoleDialogData): void {
+    this.dialog.open(RoleDialog, { width: "560px", data, autoFocus: "#code" })
       .afterClosed()
       .subscribe((saved?: { id: string } | false) => {
         if (!saved) {

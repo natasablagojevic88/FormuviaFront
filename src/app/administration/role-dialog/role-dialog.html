@@ -1,0 +1,41 @@
+<form class="fd" (ngSubmit)="save()">
+  <header class="fd-header">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ (isNew ? 'ui.roles.addTitle' : 'ui.roles.editTitle') | t }}</h2>
+      <p class="fd-subtitle">{{ 'ui.roles.formSubtitle' | t }}</p>
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    @if (loading()) {
+      <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    } @else {
+      <div class="fd-grid">
+        <div class="fd-field">
+          <label class="fd-label fd-required" for="code">{{ label('code') }}</label>
+          <input id="code" name="code" class="fd-input" [(ngModel)]="role.code" autocomplete="off" required />
+          <span class="fd-help">{{ 'ui.roles.codeHint' | t }}</span>
+        </div>
+
+        <div class="fd-field">
+          <label class="fd-label" for="description">{{ label('description') }}</label>
+          <input id="description" name="description" class="fd-input" [(ngModel)]="role.description" autocomplete="off" />
+        </div>
+      </div>
+    }
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint">{{ 'ui.requiredFieldsMarked' | t }}</span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.cancel' | t }}</button>
+      <button type="submit" class="fd-button fd-button-primary" [disabled]="!canSave()">
+        <i class="fa-solid" [class.fa-floppy-disk]="!saving()" [class.fa-spinner]="saving()" [class.fa-spin]="saving()"></i>
+        {{ 'ui.save' | t }}
+      </button>
+    </div>
+  </footer>
+</form>
