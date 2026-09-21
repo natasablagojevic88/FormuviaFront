@@ -1,0 +1,59 @@
+<app-page-header [title]="'ui.model.title' | t" [subtitle]="'ui.model.subtitle' | t" [breadcrumb]="'ui.model.breadcrumb' | t">
+</app-page-header>
+
+<div class="tree-card">
+  @if (loading() && !roots().length) {
+    <div class="tree-loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+  }
+
+  <mat-tree #tree [dataSource]="roots()" [childrenAccessor]="childrenAccessor" [expansionKey]="expansionKey" class="model-tree">
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding [matTreeNodePaddingIndent]="28"
+      [isExpandable]="!!node.children?.length" class="node" [class.selected]="key(node) === selectedKey()"
+      (click)="select(node)">
+      <button type="button" class="toggle" matTreeNodeToggle [class.hidden]="!node.children?.length"
+        [attr.aria-label]="('ui.model.toggle' | t) + ': ' + node.name" (click)="$event.stopPropagation()">
+        <i class="fa-solid fa-chevron-right" [class.open]="tree.isExpanded(node)"></i>
+      </button>
+
+      <span class="node-icon" [class.root]="isRoot(node)" [class.menu]="node.type === 'MENU'" [class.table]="node.type === 'TABLE'">
+        <i [class]="nodeIcon(node)"></i>
+      </span>
+
+      <span class="node-text">
+        <span class="node-name">{{ node.name }}</span>
+        @if (node.code) {
+          <span class="node-code">{{ node.code }}</span>
+        }
+      </span>
+
+      <span class="node-actions" (click)="$event.stopPropagation()">
+        <button type="button" class="add-child" (click)="add(node)" [title]="addLabel(node) | t" [attr.aria-label]="addLabel(node) | t">
+          <i class="fa-solid fa-plus"></i>
+          <span class="add-label">{{ addLabel(node) | t }}</span>
+        </button>
+        @if (!isRoot(node)) {
+          <button type="button" class="more-button" [matMenuTriggerFor]="nodeMenu" (click)="select(node)"
+            [title]="'ui.moreActions' | t" [attr.aria-label]="'ui.moreActions' | t">
+            <i class="fa-solid fa-ellipsis"></i>
+          </button>
+          <mat-menu #nodeMenu="matMenu" class="row-menu">
+            <button type="button" mat-menu-item (click)="edit(node)">
+              <i class="fa-solid fa-pen menu-icon"></i>
+              <span>{{ 'ui.edit' | t }}</span>
+            </button>
+            <button type="button" mat-menu-item class="menu-danger" (click)="remove(node)">
+              <i class="fa-solid fa-trash-can menu-icon"></i>
+              <span>{{ 'ui.delete' | t }}</span>
+            </button>
+            <button type="button" mat-menu-item (click)="history(node)">
+              <i class="fa-solid fa-clock-rotate-left menu-icon"></i>
+              <span>{{ 'ui.history.title' | t }}</span>
+            </button>
+          </mat-menu>
+        }
+      </span>
+    </mat-tree-node>
+  </mat-tree>
+</div>
+
+<app-history-panel />

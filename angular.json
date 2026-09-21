@@ -28,6 +28,9 @@
           "options": {
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
+            "assets": [
+              { "glob": "**/*", "input": "src/assets", "output": "assets" }
+            ],
             "styles": [
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "src/material-theme.scss",

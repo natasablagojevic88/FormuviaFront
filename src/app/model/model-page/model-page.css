@@ -1,0 +1,210 @@
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+app-page-header {
+  flex-shrink: 0;
+}
+
+.tree-card {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(3, 8, 23, 0.06);
+}
+
+.tree-loading {
+  display: grid;
+  place-items: center;
+  min-height: 160px;
+  color: #1f5eff;
+  font-size: 26px;
+}
+
+.model-tree {
+  --mat-tree-container-background-color: transparent;
+  --mat-tree-node-min-height: 52px;
+}
+
+.node {
+  gap: 10px;
+  margin-bottom: 2px;
+  padding-right: 8px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background-color 0.12s;
+}
+
+.node:hover {
+  background: #f8fafc;
+}
+
+.node.selected {
+  background: #eef3ff;
+}
+
+.toggle {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.toggle:hover {
+  background: #e2e8f0;
+}
+
+.toggle.hidden {
+  visibility: hidden;
+}
+
+.toggle i {
+  font-size: 12px;
+  transition: transform 0.15s;
+}
+
+.toggle i.open {
+  transform: rotate(90deg);
+}
+
+.node-icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+.node-icon.root {
+  background: #0f172a;
+  color: #fff;
+}
+
+.node-icon.menu {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.node-icon.table {
+  background: #eef3ff;
+  color: #1f5eff;
+}
+
+.node-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.node-name {
+  overflow: hidden;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.node-code {
+  overflow: hidden;
+  color: #94a3b8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.node-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.add-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: #eef3ff;
+  color: #1f5eff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.add-child:hover {
+  background: #dbe6ff;
+}
+
+.more-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.more-button:hover,
+.more-button[aria-expanded="true"] {
+  background: #eef3ff;
+  color: #1f5eff;
+}
+
+.menu-icon {
+  width: 18px;
+  margin-right: 10px;
+  color: #64748b;
+}
+
+.menu-danger,
+.menu-danger .menu-icon {
+  color: #dc2626;
+}
+
+@media (max-width: 900px) {
+  .tree-card {
+    border-radius: 18px;
+    padding: 8px;
+  }
+
+  /* Na telefonu dugme za dodavanje ostaje samo ikonica, da naziv cvora ima mesta */
+  .add-label {
+    display: none;
+  }
+
+  .add-child {
+    width: 34px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .node {
+    gap: 6px;
+  }
+}

@@ -11,6 +11,9 @@ export type SelectAppearance = "field" | "compact" | "dark";
 
 let nextId = 0;
 
+// Lista moze biti velika (npr. svi partneri); iscrtava se najvise ovoliko stavki, a pretraga ide kroz sve.
+const MAX_SHOWN = 200;
+
 // Pretraga ne gleda velika/mala slova ni kvacice: "sifra" nalazi "Šifra", "dorde" nalazi "Đorđe".
 function normalize(text: string): string {
   return text
@@ -56,6 +59,19 @@ export class SearchSelect implements ControlValueAccessor {
     const query = normalize(this.query().trim());
     return query ? this.options().filter((option) => normalize(option.label).includes(query)) : this.options();
   });
+  /** Stavke koje se iscrtavaju: prvih MAX_SHOWN pogodaka, uz izabranu vrednost ako je van tog dela. */
+  readonly shown = computed(() => {
+    const filtered = this.filtered();
+    if (filtered.length <= MAX_SHOWN) {
+      return filtered;
+    }
+    const first = filtered.slice(0, MAX_SHOWN);
+    const selected = filtered.find((option) => option.value === this.value());
+    return selected && !first.includes(selected) ? [selected, ...first] : first;
+  });
+  /** Koliko pogodaka nije iscrtano; tada se korisniku kaze da suzi pretragu. */
+  readonly hiddenCount = computed(() => Math.max(this.filtered().length - this.shown().length, 0));
+  readonly maxShown = MAX_SHOWN;
 
   readonly positions: ConnectedPosition[] = [
     { originX: "start", originY: "bottom", overlayX: "start", overlayY: "top", offsetY: 6 },
@@ -101,7 +117,7 @@ export class SearchSelect implements ControlValueAccessor {
     }
     this.panelWidth.set(this.host.nativeElement.getBoundingClientRect().width);
     this.query.set(query);
-    const selected = this.filtered().findIndex((option) => option.value === this.value());
+    const selected = this.shown().findIndex((option) => option.value === this.value());
     this.activeIndex.set(Math.max(selected, 0));
     this.open.set(true);
   }
@@ -151,7 +167,7 @@ export class SearchSelect implements ControlValueAccessor {
   }
 
   onPanelKeydown(event: KeyboardEvent): void {
-    const count = this.filtered().length;
+    const count = this.shown().length;
     switch (event.key) {
       case "ArrowDown":
         event.preventDefault();
@@ -163,7 +179,7 @@ export class SearchSelect implements ControlValueAccessor {
         break;
       case "Enter": {
         event.preventDefault();
-        const option = this.filtered()[this.activeIndex()];
+        const option = this.shown()[this.activeIndex()];
         if (option) {
           this.select(option);
         }

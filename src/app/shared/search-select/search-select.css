@@ -208,6 +208,22 @@
   text-align: center;
 }
 
+.more-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-top: 1px solid #eef2f7;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.more-hint i {
+  color: #94a3b8;
+}
+
 @keyframes panel-in {
   from {
     opacity: 0;

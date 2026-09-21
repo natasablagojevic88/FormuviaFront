@@ -7,6 +7,10 @@ const routes: Routes = [
     loadChildren: () => import('./administration/administration-module').then(m => m.AdministrationModule)
   },
   {
+    path: 'model',
+    loadChildren: () => import('./model/model-module').then(m => m.ModelModule)
+  },
+  {
     path: 'table',
     loadChildren: () => import('./table-page/table-page-module').then(m => m.TablePageModule)
   },

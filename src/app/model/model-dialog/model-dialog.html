@@ -1,0 +1,75 @@
+<form class="fd" (ngSubmit)="save()">
+  <header class="fd-header">
+    <div class="fd-titles">
+      <h2 class="fd-title">
+        {{ (isNew ? (isTable ? 'ui.model.addTable' : 'ui.model.addMenu') : (isTable ? 'ui.model.editTable' : 'ui.model.editMenu')) | t }}
+      </h2>
+      <p class="fd-subtitle">
+        @if (data.parent?.id) {
+          {{ 'ui.model.under' | t }} {{ data.parent?.name }}
+        } @else {
+          {{ (isTable ? 'ui.model.tableSubtitle' : 'ui.model.menuSubtitle') | t }}
+        }
+      </p>
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    <div class="fd-grid">
+      <div class="fd-field">
+        <label class="fd-label fd-required" for="name">{{ label('name') }}</label>
+        <input id="name" name="name" class="fd-input" [(ngModel)]="model.name" autocomplete="off" required />
+      </div>
+
+      @if (isTable) {
+        <div class="fd-field">
+          <label class="fd-label fd-required" for="code">{{ label('code') }}</label>
+          <!-- sifra je naziv tabele u bazi: posle pravljenja se ne menja, jer back ne preimenuje tabelu -->
+          <input id="code" name="code" class="fd-input code" [(ngModel)]="model.code" autocomplete="off"
+            spellcheck="false" [readonly]="!isNew" [class.fd-input-error]="codeInvalid()" required />
+          @if (codeInvalid()) {
+            <span class="fd-field-error">{{ 'ui.model.codeInvalid' | t }}</span>
+          } @else if (isNew) {
+            <span class="fd-help">{{ 'ui.model.codeHint' | t }}</span>
+          } @else {
+            <span class="fd-help">{{ 'ui.model.codeLocked' | t }}</span>
+          }
+        </div>
+      }
+
+      <div class="fd-field fd-field-wide">
+        <label class="fd-label" for="description">{{ label('description') }}</label>
+        <input id="description" name="description" class="fd-input" [(ngModel)]="model.description" autocomplete="off" />
+      </div>
+
+      <div class="fd-field fd-field-wide">
+        <span class="fd-label">{{ label('icon') }}</span>
+        <app-icon-select name="icon" [(ngModel)]="model.icon" [ariaLabel]="label('icon')" />
+      </div>
+
+      @if (isTable) {
+        @for (field of roleFields; track field) {
+          <div class="fd-field">
+            <span class="fd-label fd-required">{{ label(field) }}</span>
+            <app-search-select [options]="roleOptions()" [(ngModel)]="model[field]" [ngModelOptions]="{ standalone: true }"
+              icon="fa-solid fa-user-shield" [placeholder]="label(field)" [ariaLabel]="label(field)" />
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint">{{ 'ui.requiredFieldsMarked' | t }}</span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.cancel' | t }}</button>
+      <button type="submit" class="fd-button fd-button-primary" [disabled]="!canSave()">
+        <i class="fa-solid" [class.fa-floppy-disk]="!saving()" [class.fa-spinner]="saving()" [class.fa-spin]="saving()"></i>
+        {{ 'ui.save' | t }}
+      </button>
+    </div>
+  </footer>
+</form>

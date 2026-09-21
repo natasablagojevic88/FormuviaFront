@@ -18,6 +18,13 @@
         return `/api/role/${id}`;
     }
 
+    static readonly model='/api/model';
+    static readonly modelTree='/api/model/tree';
+
+    static modelId(id: string): string {
+        return `/api/model/${id}`;
+    }
+
     static history(className: string, id: string): string {
         return `/api/history/${className}/${id}`;
     }

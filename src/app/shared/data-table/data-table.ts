@@ -30,6 +30,11 @@ interface CellRef {
   fieldName: string;
 }
 
+/** UUID se menja samo kad ima listu vrednosti (strani kljuc); sam id reda se ne menja. */
+function isEditableType(column: DatabaseColumn): boolean {
+  return column.columnType !== "UUID" || isEnum(column);
+}
+
 /** Vrednost reda -> tekst za polje za izmenu (input/select rade sa stringovima). */
 function toEditValue(value: any, column: DatabaseColumn): string {
   if (value === null || value === undefined) {
@@ -114,7 +119,7 @@ export class DataTable implements OnInit {
   readonly canEditMode = computed(() => !!this.saveUrl() && this.editColumns().length > 0);
   /** Kolone koje se nude u rezimu izmene: sve izmenljive iz allColumns, i one skrivene u tabeli. */
   readonly editColumns = computed(() =>
-    this.allColumns().filter((column) => column.editable !== false && column.columnType !== "UUID"));
+    this.allColumns().filter((column) => column.editable !== false && isEditableType(column)));
   /** Definicije celija se prave za uniju: kolone tabele + kolone koje se vide samo u rezimu izmene. */
   readonly cellColumns = computed(() => {
     const columns = this.columns();
@@ -410,7 +415,7 @@ export class DataTable implements OnInit {
 
   canEdit(column: DatabaseColumn): boolean {
     // Dvoklik radi i u rezimu izmene; iskljucen je samo dok je neki red otvoren za izmenu.
-    return !!this.saveUrl() && !this.rowEditMode() && column.editable !== false && column.columnType !== "UUID";
+    return !!this.saveUrl() && !this.rowEditMode() && column.editable !== false && isEditableType(column);
   }
 
   isCell(cell: CellRef | null, row: any, column: DatabaseColumn): boolean {

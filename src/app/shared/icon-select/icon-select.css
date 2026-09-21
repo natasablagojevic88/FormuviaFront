@@ -1,0 +1,63 @@
+:host {
+  display: block;
+}
+
+.picker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.picker:hover:not(:disabled) {
+  border-color: #cbd5e1;
+}
+
+.picker:focus-visible {
+  border-color: #1f5eff;
+  box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.15);
+  outline: none;
+}
+
+.picker:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.preview {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: #eef3ff;
+  color: #1f5eff;
+  font-size: 15px;
+}
+
+.text {
+  flex: 1;
+  overflow: hidden;
+  color: #64748b;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: #94a3b8;
+  font-size: 12px;
+}

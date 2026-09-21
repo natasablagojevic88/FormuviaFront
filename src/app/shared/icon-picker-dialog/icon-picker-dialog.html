@@ -1,0 +1,46 @@
+<div class="fd">
+  <header class="fd-header">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ 'ui.icon.title' | t }}</h2>
+      <p class="fd-subtitle">{{ 'ui.icon.subtitle' | t }}</p>
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    <input class="fd-input search" [value]="query()" (input)="onQuery($any($event.target).value)"
+      [placeholder]="'ui.icon.search' | t" [attr.aria-label]="'ui.icon.search' | t" autocomplete="off" />
+
+    @if (loading()) {
+      <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    } @else if (!found().length) {
+      <p class="empty">{{ 'ui.noResults' | t }}</p>
+    } @else {
+      <div class="grid">
+        @for (icon of shown(); track icon.classes) {
+          <button type="button" class="icon" [class.selected]="icon.classes === data.selected"
+            (click)="select(icon)" [title]="icon.label + ' (' + icon.classes + ')'">
+            <i [class]="icon.classes"></i>
+            <span class="icon-name">{{ icon.name }}</span>
+          </button>
+        }
+      </div>
+
+      @if (found().length > shown().length) {
+        <button type="button" class="more" (click)="more()">
+          {{ 'ui.icon.more' | t }} ({{ found().length - shown().length }})
+        </button>
+      }
+    }
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint">{{ found().length }} / {{ 'ui.icon.total' | t }}</span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="clear()">{{ 'ui.icon.clear' | t }}</button>
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.cancel' | t }}</button>
+    </div>
+  </footer>
+</div>

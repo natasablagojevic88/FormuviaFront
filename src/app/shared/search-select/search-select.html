@@ -17,10 +17,10 @@
       <i class="fa-solid fa-magnifying-glass"></i>
       <input #search type="text" autocomplete="off" spellcheck="false" [value]="query()"
         (input)="onQuery($any($event.target).value)" [placeholder]="'ui.search' | t" [attr.aria-label]="'ui.search' | t"
-        [attr.aria-controls]="listId" [attr.aria-activedescendant]="filtered().length ? optionId(activeIndex()) : null" />
+        [attr.aria-controls]="listId" [attr.aria-activedescendant]="shown().length ? optionId(activeIndex()) : null" />
     </div>
     <ul class="options" role="listbox" [id]="listId" [attr.aria-label]="ariaLabel() || null">
-      @for (option of filtered(); track option.value; let index = $index) {
+      @for (option of shown(); track option.value; let index = $index) {
         <li [id]="optionId(index)" role="option" class="option" [class.active]="index === activeIndex()"
           [class.selected]="option.value === value()" [attr.aria-selected]="option.value === value()"
           (mousedown)="$event.preventDefault()" (click)="select(option)" (mouseenter)="activeIndex.set(index)">
@@ -33,5 +33,11 @@
         <li class="empty">{{ 'ui.noResults' | t }}</li>
       }
     </ul>
+    @if (hiddenCount()) {
+      <div class="more-hint">
+        <i class="fa-solid fa-circle-info"></i>
+        {{ 'ui.select.moreHint' | t }} ({{ hiddenCount() }})
+      </div>
+    }
   </div>
 </ng-template>

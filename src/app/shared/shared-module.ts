@@ -12,11 +12,13 @@ import { FormControlsModule } from "./form-controls-module";
 import { PageHeader } from "./page-header/page-header";
 import { DataTable } from "./data-table/data-table";
 import { HistoryPanel } from "./history-panel/history-panel";
+import { IconPickerDialog } from "./icon-picker-dialog/icon-picker-dialog";
+import { IconSelect } from "./icon-select/icon-select";
 import { ConfirmDialog } from "./confirm-dialog/confirm-dialog";
 import { AdvancedSearchDialog } from "./advanced-search-dialog/advanced-search-dialog";
 
 @NgModule({
-  declarations: [PageHeader, DataTable, ConfirmDialog, AdvancedSearchDialog, HistoryPanel],
+  declarations: [PageHeader, DataTable, ConfirmDialog, AdvancedSearchDialog, HistoryPanel, IconPickerDialog, IconSelect],
   imports: [
     CommonModule,
     FormsModule,
@@ -34,7 +36,9 @@ import { AdvancedSearchDialog } from "./advanced-search-dialog/advanced-search-d
     FormControlsModule,
     PageHeader,
     DataTable,
-    ConfirmDialog
+    ConfirmDialog,
+    IconSelect,
+    HistoryPanel
   ]
 })
 export class SharedModule {}

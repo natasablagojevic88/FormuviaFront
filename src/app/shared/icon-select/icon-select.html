@@ -1,0 +1,12 @@
+<button type="button" class="picker" (click)="openPicker()" [disabled]="disabled()"
+  [attr.aria-label]="ariaLabel() || ('ui.icon.title' | t)">
+  <span class="preview">
+    @if (value()) {
+      <i [class]="value()"></i>
+    } @else {
+      <i class="fa-regular fa-image"></i>
+    }
+  </span>
+  <span class="text">{{ value() || ('ui.icon.none' | t) }}</span>
+  <i class="fa-solid fa-chevron-down chevron"></i>
+</button>

@@ -170,7 +170,7 @@
               <span class="badge" [class.badge-yes]="row[column.fieldName]" [class.badge-no]="!row[column.fieldName]">
                 {{ (row[column.fieldName] ? 'ui.yes' : 'ui.no') | t }}
               </span>
-            } @else if (isEnum(column) && row[column.fieldName]) {
+            } @else if (isEnum(column) && column.columnType !== 'UUID' && row[column.fieldName]) {
               <span class="badge badge-enum">{{ format(row, column) }}</span>
             } @else {
               {{ format(row, column) }}
