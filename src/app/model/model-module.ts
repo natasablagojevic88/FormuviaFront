@@ -9,9 +9,11 @@ import { ModelRoutingModule } from "./model-routing-module";
 import { SharedModule } from "../shared/shared-module";
 import { ModelPage } from "./model-page/model-page";
 import { ModelDialog } from "./model-dialog/model-dialog";
+import { ColumnsPage } from "./columns-page/columns-page";
+import { ColumnDialog } from "./column-dialog/column-dialog";
 
 @NgModule({
-  declarations: [ModelPage, ModelDialog],
+  declarations: [ModelPage, ModelDialog, ColumnsPage, ColumnDialog],
   imports: [CommonModule, FormsModule, MatDialogModule, MatMenuModule, MatTreeModule, ModelRoutingModule, SharedModule],
 })
 export class ModelModule {}

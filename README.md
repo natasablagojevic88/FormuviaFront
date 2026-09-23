@@ -10,6 +10,7 @@ It requires the backend API from the separate repository: **Formuvia** (Java).
 - Menu based on the user's roles
 - User administration: paged table with search, advanced filters and sorting; add, edit and delete users, and assign their roles
 - Role administration: add, edit and delete the roles that grant access
+- Form designer: arrange the fields of a table in the grid of its entry dialog
 - Model: a tree of menus and tables; a table added to the tree is created in the database, with the roles that may view, add, edit and delete its data
 - Export of any table to Excel, respecting the current filters and sort order
 - Editing a value directly in the table (double-click a cell), plus an edit mode for changing a whole row or adding a new one in the grid

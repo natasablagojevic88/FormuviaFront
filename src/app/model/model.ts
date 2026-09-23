@@ -9,6 +9,10 @@ export interface ModelNode {
   name: string;
   description?: string;
   icon?: string;
+  /** Izgled dijaloga za unos u tabelu: sirina u px i raspored polja (kolone x redovi). */
+  dialogWidth?: number;
+  rowNumber?: number;
+  columnNumber?: number;
   previewRoleId?: string;
   addRoleId?: string;
   updateRoleId?: string;
@@ -25,6 +29,16 @@ export interface ModelNode {
 export function childTypeOf(node: ModelNode): ModelType {
   return node.type ? "TABLE" : "MENU";
 }
+
+/** Granice iz ModelDTO (@Min/@Max na back-u). */
+export const DIALOG_LIMITS = {
+  dialogWidth: { min: 400 },
+  rowNumber: { min: 1 },
+  columnNumber: { min: 1, max: 12 },
+};
+
+/** Pocetne vrednosti za novu tabelu. */
+export const DIALOG_DEFAULTS = { dialogWidth: 800, columnNumber: 2, rowNumber: 5 };
 
 /** Sifra tabele: mala slova, cifre i donja crta, pocinje slovom, najvise 63 znaka (isto kao na back-u). */
 export const TABLE_CODE_PATTERN = /^[a-z][a-z0-9_]{0,62}$/;

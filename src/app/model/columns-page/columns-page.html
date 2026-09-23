@@ -1,0 +1,103 @@
+<app-page-header [title]="(model()?.name || '') + ' — ' + ('ui.column.title' | t)"
+  [subtitle]="'ui.column.subtitle' | t"
+  [breadcrumb]="('ui.model.title' | t) + ' / ' + (model()?.name || '')">
+  <button type="button" class="back-button" (click)="back()">
+    <i class="fa-solid fa-arrow-left"></i>
+    {{ 'ui.back' | t }}
+  </button>
+</app-page-header>
+
+<div class="designer">
+  @if (loading() && !model()) {
+    <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+  } @else if (model()) {
+    <!-- izgled dijaloga se menja odmah ovde, pregled ispod prati unos -->
+    <div class="settings">
+      <div class="setting">
+        <span class="setting-label"><i class="fa-solid fa-table-columns"></i> {{ 'ui.column.columns' | t }}</span>
+        <input type="number" class="setting-input" [ngModel]="columnCount()" (ngModelChange)="columnCount.set($event)"
+          [min]="limits.columnNumber.min" [max]="limits.columnNumber.max" [attr.aria-label]="'ui.column.columns' | t" />
+      </div>
+
+      <div class="setting">
+        <span class="setting-label"><i class="fa-solid fa-grip-lines"></i> {{ 'ui.column.rows' | t }}</span>
+        <input type="number" class="setting-input" [ngModel]="rowCount()" (ngModelChange)="rowCount.set($event)"
+          [min]="limits.rowNumber.min" [attr.aria-label]="'ui.column.rows' | t" />
+      </div>
+
+      <div class="setting wide">
+        <span class="setting-label"><i class="fa-solid fa-left-right"></i> {{ 'ui.column.width' | t }}</span>
+        <div class="width-row">
+          <input type="range" class="setting-range" [ngModel]="dialogWidth()" (ngModelChange)="dialogWidth.set($event)"
+            min="400" max="1400" step="20" [attr.aria-label]="'ui.column.width' | t" />
+          <input type="number" class="setting-input small" [ngModel]="dialogWidth()" (ngModelChange)="dialogWidth.set($event)"
+            [min]="limits.dialogWidth.min" step="10" [attr.aria-label]="'ui.column.width' | t" />
+          <span class="unit">px</span>
+        </div>
+      </div>
+
+      <span class="chip fields"><i class="fa-solid fa-list"></i> {{ columns().length }}</span>
+
+      @if (layoutChanged()) {
+        <div class="setting-actions">
+          <button type="button" class="ghost-button" (click)="resetLayout()">{{ 'ui.column.reset' | t }}</button>
+          <button type="button" class="save-button" (click)="saveLayout()" [disabled]="!layoutValid() || savingLayout()">
+            <i class="fa-solid" [class.fa-floppy-disk]="!savingLayout()" [class.fa-spinner]="savingLayout()"
+              [class.fa-spin]="savingLayout()"></i>
+            {{ 'ui.save' | t }}
+          </button>
+        </div>
+      }
+    </div>
+
+    @if (outsideColumns().length) {
+      <p class="warning">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        {{ 'ui.column.outside' | t }} {{ outsideColumns().length }}
+      </p>
+    } @else {
+      <p class="hint">{{ 'ui.column.designerHint' | t }}</p>
+    }
+
+    <!-- Mreza je u sirini pravog dijaloga, pa se vidi kako ce forma stvarno izgledati -->
+    <div class="canvas" [style.max-width.px]="dialogWidth()">
+      <div class="canvas-head">
+        <i class="fa-regular fa-window-maximize"></i>
+        {{ model()?.name }}
+      </div>
+      <div class="grid" [style.grid-template-columns]="'repeat(' + columnCount() + ', minmax(0, 1fr))'">
+        @for (cell of cells(); track cell.row + '-' + cell.column) {
+          @if (cell.column_; as column) {
+            <button type="button" class="field" [style.grid-column]="'span ' + cell.span"
+              [class.selected]="column.id === selectedId()" (click)="edit(column)" [title]="'ui.edit' | t">
+              <span class="field-head">
+                <span class="field-name">{{ column.name }}</span>
+                @if (!column.nullable) {
+                  <span class="required">*</span>
+                }
+              </span>
+              <span class="field-box">{{ typeLabel(column) }}</span>
+              <span class="field-foot">
+                <span class="code">{{ column.code }}</span>
+                @if (!column.showInTable) {
+                  <i class="fa-solid fa-eye-slash" [title]="'ui.column.notInTable' | t"></i>
+                }
+                @if (!column.editable) {
+                  <i class="fa-solid fa-lock" [title]="'ui.column.notEditable' | t"></i>
+                }
+              </span>
+            </button>
+          } @else {
+            <button type="button" class="empty" (click)="add(cell)" [title]="'ui.column.addHere' | t">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          }
+        }
+      </div>
+    </div>
+
+    @if (!freePlaces()) {
+      <p class="full">{{ 'ui.column.gridFull' | t }}</p>
+    }
+  }
+</div>

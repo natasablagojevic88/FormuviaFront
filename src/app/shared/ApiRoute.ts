@@ -21,6 +21,16 @@
     static readonly model='/api/model';
     static readonly modelTree='/api/model/tree';
 
+    static readonly modelColumn='/api/model-column';
+
+    static modelColumnList(modelId: string): string {
+        return `/api/model-column/list/${modelId}`;
+    }
+
+    static modelColumnId(id: string): string {
+        return `/api/model-column/${id}`;
+    }
+
     static modelId(id: string): string {
         return `/api/model/${id}`;
     }

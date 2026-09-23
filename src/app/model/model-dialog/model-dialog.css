@@ -18,3 +18,33 @@
 .fd-input-error {
   border-color: #dc2626;
 }
+
+.section {
+  gap: 2px;
+  padding-top: 6px;
+  border-top: 1px solid #eef2f7;
+}
+
+.section-title {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Umanjen prikaz rasporeda polja u dijalogu za unos */
+.layout-preview {
+  display: grid;
+  gap: 4px;
+  max-height: 120px;
+  padding: 8px;
+  overflow: hidden;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.layout-cell {
+  height: 10px;
+  border-radius: 4px;
+  background: #dbe6ff;
+}

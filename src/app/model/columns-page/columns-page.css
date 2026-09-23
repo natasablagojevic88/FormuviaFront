@@ -1,0 +1,365 @@
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+app-page-header {
+  flex-shrink: 0;
+}
+
+.designer {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(3, 8, 23, 0.06);
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  min-height: 200px;
+  color: #1f5eff;
+  font-size: 26px;
+}
+
+.settings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border: 1px solid #eef2f7;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.setting {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.setting.wide {
+  flex: 1;
+  min-width: 260px;
+}
+
+.setting-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.setting-input {
+  width: 92px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.setting-input:focus {
+  border-color: #1f5eff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.15);
+}
+
+.setting-input.small {
+  width: 84px;
+}
+
+.width-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.setting-range {
+  flex: 1;
+  min-width: 120px;
+  accent-color: #1f5eff;
+}
+
+.unit {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.setting-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.save-button,
+.ghost-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.save-button {
+  background: #1f5eff;
+  color: #fff;
+}
+
+.save-button:hover:not(:disabled) {
+  background: #1b4fd8;
+}
+
+.save-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ghost-button {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+}
+
+.ghost-button:hover {
+  background: #f1f5f9;
+}
+
+.warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.chip.fields {
+  height: 40px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.chip i {
+  color: #64748b;
+}
+
+.hint {
+  margin-bottom: 12px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* Platno je u sirini pravog dijaloga za unos */
+.canvas {
+  margin: 0 auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+.canvas-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #1f5eff 0%, #0ea5e9 100%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+
+.field,
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 78px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.field {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.field:hover {
+  border-color: #1f5eff;
+}
+
+.field.selected {
+  border-color: #1f5eff;
+  box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.15);
+}
+
+.field-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.field-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.required {
+  color: #dc2626;
+}
+
+.field-box {
+  padding: 6px 10px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.field-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.code {
+  overflow: hidden;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #cbd5e1;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 15px;
+}
+
+.empty:hover {
+  border-color: #1f5eff;
+  background: #eef3ff;
+  color: #1f5eff;
+}
+
+.full {
+  margin-top: 14px;
+  color: #64748b;
+  font-size: 13px;
+  text-align: center;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 16px;
+  background: #fff;
+  color: #1f5eff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(3, 8, 23, 0.15);
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .settings {
+    gap: 10px;
+  }
+
+  .setting.wide {
+    min-width: 100%;
+  }
+
+  .setting-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .save-button,
+  .ghost-button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .designer {
+    padding: 10px;
+    border-radius: 18px;
+  }
+
+  /* Na telefonu mreza ide u jednu kolonu, kao i sam dijalog za unos */
+  .grid {
+    grid-template-columns: 1fr !important;
+    padding: 12px;
+  }
+
+  .field,
+  .empty {
+    grid-column: auto !important;
+  }
+
+  .back-button {
+    justify-content: center;
+    width: 100%;
+  }
+}

@@ -51,6 +51,48 @@
       </div>
 
       @if (isTable) {
+        <!-- izgled dijaloga za unos u ovu tabelu -->
+        <div class="fd-field fd-field-wide section">
+          <span class="section-title">{{ 'ui.model.layoutTitle' | t }}</span>
+          <span class="fd-help">{{ 'ui.model.layoutHint' | t }}</span>
+        </div>
+
+        <div class="fd-field">
+          <label class="fd-label fd-required" for="dialogWidth">{{ label('dialogWidth') }}</label>
+          <input id="dialogWidth" name="dialogWidth" type="number" class="fd-input" [(ngModel)]="model.dialogWidth"
+            [min]="limits.dialogWidth.min" step="10" [class.fd-input-error]="outOfRange('dialogWidth')" required />
+          @if (outOfRange('dialogWidth')) {
+            <span class="fd-field-error">{{ 'ui.model.minValue' | t }} {{ limits.dialogWidth.min }}</span>
+          }
+        </div>
+
+        <div class="fd-field">
+          <label class="fd-label fd-required" for="columnNumber">{{ label('columnNumber') }}</label>
+          <input id="columnNumber" name="columnNumber" type="number" class="fd-input" [(ngModel)]="model.columnNumber"
+            [min]="limits.columnNumber.min" [max]="limits.columnNumber.max" [class.fd-input-error]="outOfRange('columnNumber')" required />
+          @if (outOfRange('columnNumber')) {
+            <span class="fd-field-error">{{ 'ui.model.range' | t }} {{ limits.columnNumber.min }}–{{ limits.columnNumber.max }}</span>
+          }
+        </div>
+
+        <div class="fd-field">
+          <label class="fd-label fd-required" for="rowNumber">{{ label('rowNumber') }}</label>
+          <input id="rowNumber" name="rowNumber" type="number" class="fd-input" [(ngModel)]="model.rowNumber"
+            [min]="limits.rowNumber.min" [class.fd-input-error]="outOfRange('rowNumber')" required />
+          @if (outOfRange('rowNumber')) {
+            <span class="fd-field-error">{{ 'ui.model.minValue' | t }} {{ limits.rowNumber.min }}</span>
+          }
+        </div>
+
+        <div class="fd-field">
+          <span class="fd-label">{{ 'ui.model.layoutPreview' | t }}</span>
+          <div class="layout-preview" [style.grid-template-columns]="'repeat(' + (model.columnNumber || 1) + ', 1fr)'">
+            @for (cell of layoutCells(); track cell) {
+              <span class="layout-cell"></span>
+            }
+          </div>
+        </div>
+
         @for (field of roleFields; track field) {
           <div class="fd-field">
             <span class="fd-label fd-required">{{ label(field) }}</span>

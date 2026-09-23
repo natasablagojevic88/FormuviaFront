@@ -45,6 +45,12 @@
               <i class="fa-solid fa-trash-can menu-icon"></i>
               <span>{{ 'ui.delete' | t }}</span>
             </button>
+            @if (node.type === 'TABLE') {
+              <button type="button" mat-menu-item (click)="columns(node)">
+                <i class="fa-solid fa-table-columns menu-icon"></i>
+                <span>{{ 'ui.column.title' | t }}</span>
+              </button>
+            }
             <button type="button" mat-menu-item (click)="history(node)">
               <i class="fa-solid fa-clock-rotate-left menu-icon"></i>
               <span>{{ 'ui.history.title' | t }}</span>

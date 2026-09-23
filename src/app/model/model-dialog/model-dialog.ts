@@ -5,7 +5,7 @@ import { ApiRoute } from "../../shared/ApiRoute";
 import { Role } from "../../administration/app-user-dialog/app-user-dialog";
 import { Translate } from "../../services/translate";
 import { SelectOption } from "../../shared/search-select/search-select";
-import { ModelNode, ModelType, TABLE_CODE_PATTERN } from "../model";
+import { DIALOG_DEFAULTS, DIALOG_LIMITS, ModelNode, ModelType, TABLE_CODE_PATTERN } from "../model";
 
 export interface ModelDialogData {
   /** Cvor koji se menja; za nov cvor undefined. */
@@ -40,7 +40,14 @@ export class ModelDialog {
     const node = data.node;
     this.model = node
       ? { ...node, children: [] }
-      : { name: "", type: data.type, parentId: data.parent?.id, icon: "", children: [] };
+      : {
+          name: "",
+          type: data.type,
+          parentId: data.parent?.id,
+          icon: "",
+          ...(data.type === "TABLE" ? DIALOG_DEFAULTS : {}),
+          children: [],
+        };
   }
 
   get isNew(): boolean {
@@ -59,6 +66,30 @@ export class ModelDialog {
   readonly roleOptions = computed<SelectOption[]>(() =>
     this.data.roles.map((role) => ({ value: role.id, label: role.description || role.code })));
 
+  readonly limits = DIALOG_LIMITS;
+
+  /** Vrednost van granica sa back-a (prazno se proverava posebno, kao obavezno polje). */
+  outOfRange(field: "dialogWidth" | "rowNumber" | "columnNumber"): boolean {
+    const value = this.model[field];
+    if (value === null || value === undefined || (value as unknown) === "") {
+      return false;
+    }
+    const limit: { min: number; max?: number } = this.limits[field];
+    return !Number.isInteger(Number(value)) || value < limit.min || (limit.max !== undefined && value > limit.max);
+  }
+
+  private layoutValid(): boolean {
+    return (["dialogWidth", "rowNumber", "columnNumber"] as const)
+      .every((field) => this.model[field] !== null && this.model[field] !== undefined && !this.outOfRange(field));
+  }
+
+  /** Pregled rasporeda: celije mreze kolone x redovi (za prikaz ispod polja). */
+  layoutCells(): number[] {
+    const columns = Math.min(Math.max(Number(this.model.columnNumber) || 0, 0), 12);
+    const rows = Math.min(Math.max(Number(this.model.rowNumber) || 0, 0), 20);
+    return Array.from({ length: columns * rows }, (_, index) => index);
+  }
+
   codeInvalid(): boolean {
     return !!this.model.code && !TABLE_CODE_PATTERN.test(this.model.code);
   }
@@ -70,7 +101,8 @@ export class ModelDialog {
     if (!this.isTable) {
       return true;
     }
-    return !!this.model.code && !this.codeInvalid() && ROLE_FIELDS.every((field) => !!this.model[field]);
+    return !!this.model.code && !this.codeInvalid() && this.layoutValid()
+      && ROLE_FIELDS.every((field) => !!this.model[field]);
   }
 
   save(): void {
@@ -79,6 +111,12 @@ export class ModelDialog {
     }
     this.saving.set(true);
     const { children, ...body } = this.model;
+    if (!this.isTable) {
+      // meni nema dijalog za unos
+      delete body.dialogWidth;
+      delete body.rowNumber;
+      delete body.columnNumber;
+    }
     this.sendRequest.post(ApiRoute.model, body)
       .then((saved: ModelNode) => this.dialogRef.close(saved))
       .catch(() => this.saving.set(false));

@@ -1,0 +1,134 @@
+<form class="fd" (ngSubmit)="save()">
+  <header class="fd-header">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ (isNew ? 'ui.column.addTitle' : 'ui.column.editTitle') | t }}</h2>
+      <p class="fd-subtitle">{{ 'ui.column.formSubtitle' | t }}</p>
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    <div class="fd-grid">
+      <div class="fd-field">
+        <label class="fd-label fd-required" for="name">{{ label('name') }}</label>
+        <input id="name" name="name" class="fd-input" [(ngModel)]="column.name" autocomplete="off" required />
+      </div>
+
+      <div class="fd-field">
+        <label class="fd-label fd-required" for="code">{{ label('code') }}</label>
+        <input id="code" name="code" class="fd-input code" [(ngModel)]="column.code" autocomplete="off"
+          spellcheck="false" [readonly]="!isNew" [class.fd-input-error]="codeInvalid()" required />
+        @if (codeInvalid()) {
+          <span class="fd-field-error">{{ 'ui.column.codeInvalid' | t }}</span>
+        } @else if (isNew) {
+          <span class="fd-help">{{ 'ui.column.codeHint' | t }}</span>
+        } @else {
+          <span class="fd-help">{{ 'ui.column.codeLocked' | t }}</span>
+        }
+      </div>
+
+      <div class="fd-field">
+        <span class="fd-label fd-required">{{ label('columnType') }}</span>
+        <app-search-select [options]="typeOptions()" [(ngModel)]="column.columnType"
+          [ngModelOptions]="{ standalone: true }" [disabled]="!isNew" icon="fa-solid fa-shapes"
+          [ariaLabel]="label('columnType')" />
+        @if (!isNew) {
+          <span class="fd-help">{{ 'ui.column.typeLocked' | t }}</span>
+        }
+      </div>
+
+      @if (isCodebook) {
+        <div class="fd-field">
+          <span class="fd-label fd-required">{{ label('codebookId') }}</span>
+          <app-search-select [options]="codebooks()" [(ngModel)]="column.codebookId"
+            [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-book" [ariaLabel]="label('codebookId')" />
+        </div>
+      }
+
+      @if (isDecimal) {
+        <div class="fd-field">
+          <label class="fd-label fd-required" for="length">{{ label('length') }}</label>
+          <input id="length" name="length" type="number" class="fd-input" [(ngModel)]="column.length" min="0" max="10" required />
+        </div>
+      }
+
+      <!-- polozaj u mrezi forme -->
+      <div class="fd-field fd-field-wide section">
+        <span class="section-title">{{ 'ui.column.placeTitle' | t }}</span>
+        <span class="fd-help">{{ 'ui.column.placeHint' | t }} {{ data.columnNumber }} × {{ data.rowNumber }}</span>
+      </div>
+
+      <div class="fd-field">
+        <label class="fd-label fd-required" for="rowIndex">{{ label('rowIndex') }}</label>
+        <input id="rowIndex" name="rowIndex" type="number" class="fd-input" [(ngModel)]="column.rowIndex"
+          [min]="limits.rowIndex.min" [max]="data.rowNumber" required />
+      </div>
+
+      <div class="fd-field">
+        <label class="fd-label fd-required" for="columnIndex">{{ label('columnIndex') }}</label>
+        <input id="columnIndex" name="columnIndex" type="number" class="fd-input" [(ngModel)]="column.columnIndex"
+          [min]="limits.columnIndex.min" [max]="data.columnNumber" required />
+      </div>
+
+      <div class="fd-field">
+        <label class="fd-label fd-required" for="colspan">{{ label('colspan') }}</label>
+        <input id="colspan" name="colspan" type="number" class="fd-input" [(ngModel)]="column.colspan"
+          [min]="limits.colspan.min" [max]="data.columnNumber" required />
+        @if (placeInvalid()) {
+          <span class="fd-field-error">{{ 'ui.column.placeInvalid' | t }}</span>
+        }
+      </div>
+
+      <div class="fd-field fd-field-wide section">
+        <span class="section-title">{{ 'ui.column.optionsTitle' | t }}</span>
+      </div>
+
+      <div class="fd-field">
+        <label class="switch">
+          <input type="checkbox" name="nullable" [(ngModel)]="column.nullable" />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span class="switch-text">{{ label('nullable') }}</span>
+        </label>
+        <label class="switch">
+          <input type="checkbox" name="showInTable" [(ngModel)]="column.showInTable" />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span class="switch-text">{{ label('showInTable') }}</span>
+        </label>
+      </div>
+
+      <div class="fd-field">
+        <label class="switch">
+          <input type="checkbox" name="editable" [(ngModel)]="column.editable" />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span class="switch-text">{{ label('editable') }}</span>
+        </label>
+        @if (isText) {
+          <label class="switch">
+            <input type="checkbox" name="textArea" [(ngModel)]="column.textArea" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span class="switch-text">{{ label('textArea') }}</span>
+          </label>
+        }
+      </div>
+
+      <div class="fd-field fd-field-wide">
+        <label class="fd-label" for="defaultValueSql">{{ label('defaultValueSql') }}</label>
+        <input id="defaultValueSql" name="defaultValueSql" class="fd-input code" [(ngModel)]="column.defaultValueSql"
+          autocomplete="off" spellcheck="false" [placeholder]="'ui.column.defaultHint' | t" />
+      </div>
+    </div>
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint">{{ 'ui.requiredFieldsMarked' | t }}</span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.cancel' | t }}</button>
+      <button type="submit" class="fd-button fd-button-primary" [disabled]="!canSave()">
+        <i class="fa-solid" [class.fa-floppy-disk]="!saving()" [class.fa-spinner]="saving()" [class.fa-spin]="saving()"></i>
+        {{ 'ui.save' | t }}
+      </button>
+    </div>
+  </footer>
+</form>

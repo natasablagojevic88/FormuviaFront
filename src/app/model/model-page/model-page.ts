@@ -1,6 +1,7 @@
 import { Component, signal, viewChild } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatTree } from "@angular/material/tree";
+import { Router } from "@angular/router";
 import { Notify } from "../../services/notify";
 import { SendRequest } from "../../services/send-request";
 import { Translate } from "../../services/translate";
@@ -37,6 +38,7 @@ export class ModelPage {
 
   constructor(
     private dialog: MatDialog,
+    private router: Router,
     private sendRequest: SendRequest,
     private notify: Notify,
     private translate: Translate
@@ -98,6 +100,11 @@ export class ModelPage {
     this.select(node);
     this.sendRequest.get(ApiRoute.modelId(node.id!))
       .then((model: ModelNode) => this.openForm({ node: { ...model, children: [] }, type: model.type!, roles: this.roles }));
+  }
+
+  /** Dizajn forme te tabele: raspored polja u mrezi. */
+  columns(node: ModelNode): void {
+    this.router.navigate(["/model/columns", node.id]);
   }
 
   history(node: ModelNode): void {
