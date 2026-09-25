@@ -8,6 +8,7 @@ on:
       - "docs/**"
       - ".github/workflows/docs.yml"
       - "package.json"
+      - "package-lock.json"
   workflow_dispatch:
 
 permissions:
@@ -30,9 +31,10 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24 # donosi npm 11, kao lokalno
+          cache: npm
 
-      - run: npm install
+      - run: npm ci
 
       - run: npm run docs:build
 

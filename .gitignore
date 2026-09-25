@@ -1,8 +1,8 @@
 /.settings/
-/package-lock.json
 /node_modules/
 /.angular/
 /CLAUDE.md
 /dist/
 /docs/.vitepress/dist/
 /docs/.vitepress/cache/
+/package-lock.json
