@@ -8,7 +8,6 @@ on:
       - "docs/**"
       - ".github/workflows/docs.yml"
       - "package.json"
-      - "package-lock.json"
   workflow_dispatch:
 
 permissions:
@@ -31,10 +30,10 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 24 # donosi npm 11, kao lokalno
-          cache: npm
+          node-version: 24 # npm 11, kao lokalno; npm 10 pada na "edgesOut" bug
 
-      - run: npm ci
+      # package-lock.json je namerno van repoa, pa ne moze ni npm ci ni cache: npm.
+      - run: npm install --no-audit --no-fund
 
       - run: npm run docs:build
 
