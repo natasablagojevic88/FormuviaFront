@@ -37,10 +37,9 @@ jobs:
 
       - run: npm run docs:build
 
-      # enablement: ukljucuje Pages preko API-ja ako jos nije ukljucen u Settings.
+      # Pages mora biti ukljucen rucno: Settings -> Pages -> Source: GitHub Actions.
+      # (enablement: true ne radi - GITHUB_TOKEN ne sme da kreira Pages sajt.)
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
