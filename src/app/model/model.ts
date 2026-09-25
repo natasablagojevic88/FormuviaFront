@@ -40,5 +40,5 @@ export const DIALOG_LIMITS = {
 /** Pocetne vrednosti za novu tabelu. */
 export const DIALOG_DEFAULTS = { dialogWidth: 800, columnNumber: 2, rowNumber: 5 };
 
-/** Sifra tabele: mala slova, cifre i donja crta, pocinje slovom, najvise 63 znaka (isto kao na back-u). */
-export const TABLE_CODE_PATTERN = /^[a-z][a-z0-9_]{0,62}$/;
+/** Sifra tabele: mala slova, cifre i donja crta, pocinje slovom, najvise 56 znakova (isto kao UpdateModel.NAME_PARENT). */
+export const TABLE_CODE_PATTERN = /^[a-z][a-z0-9_]{0,55}$/;

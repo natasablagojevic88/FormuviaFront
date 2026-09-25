@@ -10,7 +10,7 @@ It requires the backend API from the separate repository: **Formuvia** (Java).
 - Menu based on the user's roles
 - User administration: paged table with search, advanced filters and sorting; add, edit and delete users, and assign their roles
 - Role administration: add, edit and delete the roles that grant access
-- Form designer: arrange the fields of a table in the grid of its entry dialog
+- Form designer: arrange the fields of a table in the grid of its entry dialog, choose each field's data type and options, give it a default value or a list of values from the database, and delete a field together with its database column
 - Model: a tree of menus and tables; a table added to the tree is created in the database, with the roles that may view, add, edit and delete its data
 - Export of any table to Excel, respecting the current filters and sort order
 - Editing a value directly in the table (double-click a cell), plus an edit mode for changing a whole row or adding a new one in the grid
@@ -82,6 +82,7 @@ On the backend, set `cors.url` to the address where the client is served. The cl
 - **Row actions** – *Edit* opens the row, and the ⋯ button next to it holds *History* and *Delete*.
 - **History** – shows who changed the row and when, with the old and new value of every changed field, in a panel that slides in from the right.
 - **Model** – the tree starts at *Model*; add a menu under it, then tables under a menu and subtables under a table. Use ⋯ on a node to edit or delete it. Deleting a table also deletes it from the database with all its data.
+- **Form design** – open ⋯ on a table in the model tree and choose *Form design*. Click an empty place in the grid to add a field, click a field to change it. A field can be a text, a number, a date, a yes/no switch or a link to another table used as a codebook; it can be hidden from the table, made read-only, filled with a default value or offered as a list of values (each of those is a single `SELECT`, written without `*`). Deleting a field also deletes its column and its data from the database. The grid cannot be made smaller than the fields already placed in it.
 - **Roles** – in the user form, add a role from the list and remove one with the × on its chip.
 - **Change password** – click your name at the bottom of the menu.
 - **Log out** – the icon next to your name.

@@ -71,6 +71,8 @@ export class ModelDialog implements OnInit {
   /** Najmanja dozvoljena mreza: onoliko koliko polja forme vec zauzimaju (back proverava isto). */
   readonly minColumns = signal(1);
   readonly minRows = signal(1);
+  /** Dok se kolone ne ucitaju, granice nisu poznate pa se ne moze snimiti (inace bi ih back odbio). */
+  readonly loadingColumns = signal(false);
 
   /** Vrednost van granica sa back-a (prazno se proverava posebno, kao obavezno polje). */
   ngOnInit(): void {
@@ -78,10 +80,11 @@ export class ModelDialog implements OnInit {
     if (!id || !this.isTable) {
       return;
     }
+    this.loadingColumns.set(true);
     this.sendRequest.get(ApiRoute.modelColumnList(id)).then((columns: ModelColumn[]) => {
       this.minColumns.set(Math.max(1, ...(columns ?? []).map((column) => column.columnIndex + column.colspan - 1)));
       this.minRows.set(Math.max(1, ...(columns ?? []).map((column) => column.rowIndex)));
-    });
+    }).finally(() => this.loadingColumns.set(false));
   }
 
   /** Mreza ne sme da se smanji ispod onoga sto polja vec zauzimaju. */
@@ -118,7 +121,7 @@ export class ModelDialog implements OnInit {
   }
 
   canSave(): boolean {
-    if (!this.model.name?.trim() || this.saving()) {
+    if (!this.model.name?.trim() || this.saving() || this.loadingColumns()) {
       return false;
     }
     if (!this.isTable) {
