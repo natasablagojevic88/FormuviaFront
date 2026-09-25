@@ -9,9 +9,9 @@
   gap: 10px;
   width: 100%;
   margin: 0;
-  border: 1px solid #e2e8f0;
-  background: #fff;
-  color: #0f172a;
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text);
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -19,13 +19,13 @@
 }
 
 .trigger:hover {
-  border-color: #cbd5e1;
+  border-color: var(--c-border-strong);
 }
 
 .trigger:focus-visible,
 :host(.open) .trigger {
   outline: none;
-  border-color: #1f5eff;
+  border-color: var(--c-primary);
   box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.12);
 }
 
@@ -43,7 +43,7 @@
 }
 
 .placeholder {
-  color: #94a3b8;
+  color: var(--c-text-faint);
 }
 
 :host(.centered) .label {
@@ -52,7 +52,7 @@
 
 .chevron {
   flex-shrink: 0;
-  color: #64748b;
+  color: var(--c-text-muted);
   font-size: 11px;
   transition: transform 0.15s;
 }
@@ -74,13 +74,13 @@
   height: 48px;
   padding: 0 16px;
   border-radius: 14px;
-  background: #f8fafc;
+  background: var(--c-surface-2);
   font-size: 15px;
 }
 
 :host(.appearance-field) .trigger:focus-visible,
 :host(.appearance-field.open) .trigger {
-  background: #fff;
+  background: var(--c-surface);
 }
 
 /* Tamna traka (header) */
@@ -90,7 +90,7 @@
   border-color: rgba(255, 255, 255, 0.12);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.06);
-  color: #fff;
+  color: var(--c-on-dark);
   font-size: 14px;
   font-weight: 600;
 }
@@ -108,7 +108,7 @@
 
 :host(.appearance-dark) .lead-icon,
 :host(.appearance-dark) .chevron {
-  color: #9aa4b8;
+  color: var(--c-text-faint);
 }
 
 .lead-icon {
@@ -123,11 +123,11 @@
   max-width: min(360px, calc(100vw - 32px));
   max-height: 320px;
   overflow: hidden;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--c-border);
   border-radius: 14px;
-  background: #fff;
+  background: var(--c-surface);
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.06);
-  color: #0f172a;
+  color: var(--c-text);
   font-size: 14px;
   animation: panel-in 0.12s ease-out;
 }
@@ -140,17 +140,17 @@
   height: 38px;
   margin: 8px;
   padding: 0 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--c-border);
   border-radius: 10px;
-  background: #f8fafc;
-  color: #94a3b8;
+  background: var(--c-surface-2);
+  color: var(--c-text-faint);
   font-size: 13px;
   transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
 }
 
 .search:focus-within {
-  border-color: #1f5eff;
-  background: #fff;
+  border-color: var(--c-primary);
+  background: var(--c-surface);
   box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.12);
 }
 
@@ -160,7 +160,7 @@
   border: 0;
   outline: 0;
   background: transparent;
-  color: #0f172a;
+  color: var(--c-text);
   font: inherit;
   font-size: 14px;
 }
@@ -189,11 +189,11 @@
 }
 
 .option.active {
-  background: #eff6ff;
+  background: var(--c-primary-soft);
 }
 
 .option.selected {
-  color: #1f5eff;
+  color: var(--c-primary);
   font-weight: 600;
 }
 
@@ -204,7 +204,7 @@
 
 .empty {
   padding: 12px 10px;
-  color: #94a3b8;
+  color: var(--c-text-faint);
   text-align: center;
 }
 
@@ -214,14 +214,14 @@
   gap: 8px;
   margin-top: 6px;
   padding: 8px 10px;
-  border-top: 1px solid #eef2f7;
-  color: #64748b;
+  border-top: 1px solid var(--c-border-soft);
+  color: var(--c-text-muted);
   font-size: 12px;
   font-weight: 600;
 }
 
 .more-hint i {
-  color: #94a3b8;
+  color: var(--c-text-faint);
 }
 
 @keyframes panel-in {

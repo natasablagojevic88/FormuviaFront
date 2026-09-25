@@ -16,6 +16,7 @@ It requires the backend API from the separate repository: **Formuvia** (Java).
 - Editing a value directly in the table (double-click a cell), plus an edit mode for changing a whole row or adding a new one in the grid
 - History of every row: who changed what and when, with old and new values
 - Change own password
+- Light and dark theme; by default it follows the system setting
 - Language switch: English, Srpski (latinica), Српски (ћирилица)
 - Responsive layout – on small screens the menu becomes a slide-out panel and tables are shown as cards
 
@@ -72,6 +73,7 @@ On the backend, set `cors.url` to the address where the client is served. The cl
 ## Usage
 
 - **Language** – choose it in the top bar; the choice is remembered in the browser.
+- **Theme** – the button next to the language switches light → dark → follow the system.
 - **Menu** – on the left; on phones open it with the menu button in the top bar.
 - **Tables on a phone** – each row is shown as a card; choose the sort column in the toolbar above the list and filter through *Advanced search*.
 - **Tables** – filter using the search fields under the column headers, open *Advanced search* for more filter options, click a column header to sort, use the paginator at the bottom. *Export to Excel* downloads all rows matching the current filters and sort order (not only the current page).

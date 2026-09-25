@@ -12,7 +12,7 @@
   min-height: 0;
   overflow: hidden;
   border-radius: 24px;
-  background: #fff;
+  background: var(--c-surface);
   box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
 }
 
@@ -21,7 +21,7 @@
   align-items: center;
   gap: 12px;
   padding: 16px 20px 8px;
-  background: #f8fafc;
+  background: var(--c-surface-2);
 }
 
 .chips {
@@ -76,10 +76,10 @@
   gap: 8px;
   height: 40px;
   padding: 0 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--c-border);
   border-radius: 12px;
-  background: #fff;
-  color: #0f172a;
+  background: var(--c-surface);
+  color: var(--c-text);
   font: inherit;
   font-size: 13px;
   font-weight: 700;
@@ -88,8 +88,8 @@
 }
 
 .advanced-button:hover {
-  border-color: #cbd5e1;
-  background: #f1f5f9;
+  border-color: var(--c-border-strong);
+  background: var(--c-surface-3);
 }
 
 .export-button {
@@ -98,9 +98,9 @@
 
 /* Rezim izmene */
 .edit-mode-button.mode-on {
-  border-color: #1f5eff;
+  border-color: var(--c-primary);
   background: #eef4ff;
-  color: #1f5eff;
+  color: var(--c-primary);
 }
 
 .new-row-cell-button {
@@ -111,8 +111,8 @@
   height: 36px;
   border: 0;
   border-radius: 10px;
-  background: #eef3ff;
-  color: #1f5eff;
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
   font: inherit;
   font-size: 13px;
   cursor: pointer;
@@ -120,7 +120,7 @@
 }
 
 .new-row-cell-button:hover:not(:disabled) {
-  background: #dbe6ff;
+  background: var(--c-primary-softer);
 }
 
 .new-row-cell-button:disabled {
@@ -135,7 +135,7 @@
 
 .required-mark {
   margin-left: 2px;
-  color: #dc2626;
+  color: var(--c-danger);
 }
 
 tr.mat-mdc-row.row-editing,
@@ -170,7 +170,7 @@ tr.mat-mdc-row.row-editing:hover {
 }
 
 .export-button i {
-  color: #047857;
+  color: var(--c-success);
 }
 
 .export-button:disabled {
@@ -185,8 +185,8 @@ tr.mat-mdc-row.row-editing:hover {
   height: 20px;
   padding: 0 6px;
   border-radius: 999px;
-  background: #1f5eff;
-  color: #fff;
+  background: var(--c-primary);
+  color: var(--c-on-dark);
   font-size: 11px;
 }
 
@@ -197,8 +197,8 @@ tr.mat-mdc-row.row-editing:hover {
   left: 0;
   z-index: 2;
   height: 4px;
-  --mat-progress-bar-active-indicator-color: #1f5eff;
-  --mat-progress-bar-track-color: #dbe6ff;
+  --mat-progress-bar-active-indicator-color: var(--c-primary);
+  --mat-progress-bar-track-color: var(--c-primary-softer);
 }
 
 .table-scroll {
@@ -214,20 +214,20 @@ tr.mat-mdc-row.row-editing:hover {
 
 .table {
   width: 100%;
-  --mat-table-background-color: #fff;
-  --mat-table-header-headline-color: #64748b;
+  --mat-table-background-color: var(--c-surface);
+  --mat-table-header-headline-color: var(--c-text-muted);
   --mat-table-header-headline-size: 11px;
   --mat-table-header-headline-weight: 700;
   --mat-table-header-container-height: 48px;
-  --mat-table-row-item-label-text-color: #0f172a;
+  --mat-table-row-item-label-text-color: var(--c-text);
   --mat-table-row-item-label-text-size: 14px;
   --mat-table-row-item-container-height: 60px;
-  --mat-table-row-item-outline-color: #eef2f7;
-  --mat-sort-arrow-color: #94a3b8;
+  --mat-table-row-item-outline-color: var(--c-border-soft);
+  --mat-sort-arrow-color: var(--c-text-faint);
 }
 
 th.mat-mdc-header-cell {
-  background: #f8fafc;
+  background: var(--c-surface-2);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -244,13 +244,13 @@ tr.mat-mdc-row {
 }
 
 tr.mat-mdc-row:hover {
-  background: #f8fafc;
+  background: var(--c-surface-3);
 }
 
 /* Oznacen red: zeleni ton sa trakom levo; dodat ili izmenjen red jos i kratko zablesne */
 tr.mat-mdc-row.row-highlight,
 tr.mat-mdc-row.row-highlight:hover {
-  background: #ecfdf5;
+  background: var(--c-success-soft);
 }
 
 tr.mat-mdc-row.row-flash {
@@ -259,7 +259,7 @@ tr.mat-mdc-row.row-flash {
 
 /* Izmena direktno u tabeli */
 td.cell-editable:hover {
-  box-shadow: inset 0 0 0 1px #cbd5e1;
+  box-shadow: inset 0 0 0 1px var(--c-border-strong);
 }
 
 td.cell-saving {
@@ -273,7 +273,7 @@ td.cell-saved {
 @keyframes cell-saved {
   0%,
   30% {
-    background: #bbf7d0;
+    background: var(--c-success-flash);
   }
   100% {
     background: transparent;
@@ -285,27 +285,27 @@ td.cell-saved {
   min-width: 120px;
   height: 36px;
   padding: 0 10px;
-  border: 1px solid #1f5eff;
+  border: 1px solid var(--c-primary);
   border-radius: 10px;
-  background: #fff;
-  color: #0f172a;
+  background: var(--c-surface);
+  color: var(--c-text);
   font: inherit;
   font-size: 14px;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.15);
+  box-shadow: 0 0 0 3px var(--c-focus);
 }
 
 tr.mat-mdc-row.row-highlight td:first-child {
-  box-shadow: inset 4px 0 0 #22c55e;
+  box-shadow: inset 4px 0 0 var(--c-success-strong);
 }
 
 @keyframes row-highlight {
   0%,
   30% {
-    background: #bbf7d0;
+    background: var(--c-success-flash);
   }
   100% {
-    background: #ecfdf5;
+    background: var(--c-success-soft);
   }
 }
 
@@ -329,10 +329,10 @@ tr.mat-mdc-row.row-highlight td:first-child {
   min-width: 120px;
   height: 36px;
   padding: 0 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--c-border);
   border-radius: 10px;
-  background: #fff;
-  color: #0f172a;
+  background: var(--c-surface);
+  color: var(--c-text);
   font: inherit;
   font-size: 13px;
   font-weight: 500;
@@ -341,7 +341,7 @@ tr.mat-mdc-row.row-highlight td:first-child {
 
 .filter-input:focus {
   outline: none;
-  border-color: #1f5eff;
+  border-color: var(--c-primary);
   box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.12);
 }
 
@@ -388,54 +388,54 @@ tr.mat-mdc-row.row-highlight td:first-child {
 
 .edit-button {
   padding: 0 14px;
-  background: #eef3ff;
-  color: #1f5eff;
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
 }
 
 .edit-button:hover {
-  background: #dbe6ff;
+  background: var(--c-primary-softer);
 }
 
 .delete-button,
 .clear-filters {
   width: 36px;
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--c-surface-3);
+  color: var(--c-text-muted);
 }
 
 .more-button {
   width: 36px;
   border-radius: 999px;
   background: transparent;
-  color: #94a3b8;
+  color: var(--c-text-faint);
   font-size: 15px;
 }
 
 .more-button:hover:not(:disabled),
 .more-button[aria-expanded="true"] {
-  background: #eef3ff;
-  color: #1f5eff;
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
 }
 
 .menu-icon {
   width: 18px;
   margin-right: 10px;
-  color: #64748b;
+  color: var(--c-text-muted);
 }
 
 .menu-danger,
 .menu-danger .menu-icon {
-  color: #dc2626;
+  color: var(--c-danger);
 }
 
 .delete-button:hover {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--c-danger-softer);
+  color: var(--c-danger);
 }
 
 .clear-filters:hover {
-  background: #e2e8f0;
-  color: #0f172a;
+  background: var(--c-border);
+  color: var(--c-text);
 }
 
 .badge {
@@ -447,23 +447,23 @@ tr.mat-mdc-row.row-highlight td:first-child {
 }
 
 .badge-yes {
-  background: #dcfce7;
-  color: #047857;
+  background: var(--c-success-soft);
+  color: var(--c-success);
 }
 
 .badge-no {
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
 }
 
 .badge-enum {
-  background: #eef3ff;
-  color: #1f5eff;
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
 }
 
 .empty-cell {
   padding: 48px 16px;
-  color: #94a3b8;
+  color: var(--c-text-faint);
   font-size: 14px;
   text-align: center;
 }
@@ -475,12 +475,12 @@ tr.mat-mdc-row.row-highlight td:first-child {
 }
 
 .paginator {
-  border-top: 1px solid #eef2f7;
-  --mat-paginator-container-background-color: #fff;
-  --mat-paginator-container-text-color: #64748b;
+  border-top: 1px solid var(--c-border-soft);
+  --mat-paginator-container-background-color: var(--c-surface);
+  --mat-paginator-container-text-color: var(--c-text-muted);
   --mat-paginator-container-text-size: 13px;
-  --mat-paginator-enabled-icon-color: #0f172a;
-  --mat-paginator-disabled-icon-color: #cbd5e1;
+  --mat-paginator-enabled-icon-color: var(--c-text);
+  --mat-paginator-disabled-icon-color: var(--c-border-strong);
 }
 
 @media (max-width: 900px) {
@@ -551,28 +551,22 @@ tr.mat-mdc-row.row-highlight td:first-child {
   /* Red tabele postaje kartica: labela kolone levo, vrednost desno, akcije u dnu */
   .table-scroll {
     padding: 4px 12px 12px;
-    background: #f8fafc;
+    background: var(--c-surface-2);
   }
 
-  .table,
-  .table tbody {
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
+  /* sam <table> i <tbody> se postavljaju u globalnom styles.css, vidi objasnjenje tamo */
   .table td.mat-mdc-cell,
   .table tr.mat-mdc-row {
     box-sizing: border-box;
   }
 
-  .table tr.mat-mdc-header-row,
-  .table tr.filter-row {
+  table.table tr.mat-mdc-header-row,
+  table.table tr.filter-row {
     display: none;
   }
 
   /* Material redu zadaje fiksnu visinu (--mat-table-row-item-container-height); u kartici visina mora da prati sadrzaj */
-  .table tr.mat-mdc-row {
+  table.table tr.mat-mdc-row {
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -580,14 +574,14 @@ tr.mat-mdc-row.row-highlight td:first-child {
     height: auto;
     min-height: 0;
     margin-bottom: 12px;
-    border: 1px solid #eef2f7;
+    border: 1px solid var(--c-border-soft);
     border-radius: 16px;
-    background: #fff;
+    background: var(--c-surface);
     box-shadow: 0 4px 14px rgba(3, 8, 23, 0.05);
     overflow: visible;
   }
 
-  .table td.mat-mdc-cell {
+  table.table td.mat-mdc-cell {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -600,38 +594,38 @@ tr.mat-mdc-row.row-highlight td:first-child {
     text-align: left;
   }
 
-  .table td.mat-mdc-cell::before {
+  table.table td.mat-mdc-cell::before {
     content: attr(data-label);
     flex-shrink: 0;
-    color: #64748b;
+    color: var(--c-text-muted);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
 
-  .table td.actions-cell {
+  table.table td.actions-cell {
     order: 1;
     width: auto;
     justify-content: flex-end;
-    border-top: 1px solid #f1f5f9;
-    background: #f8fafc;
+    border-top: 1px solid var(--c-surface-3);
+    background: var(--c-surface-2);
   }
 
-  .table td.actions-cell::before {
+  table.table td.actions-cell::before {
     content: none;
   }
 
   /* Oznacen red: traka levo ide na celu karticu, a ne na prvu celiju */
-  .table tr.mat-mdc-row.row-highlight td:first-child {
+  table.table tr.mat-mdc-row.row-highlight td:first-child {
     box-shadow: none;
   }
 
-  .table tr.mat-mdc-row.row-highlight {
-    box-shadow: inset 4px 0 0 #22c55e;
+  table.table tr.mat-mdc-row.row-highlight {
+    box-shadow: inset 4px 0 0 var(--c-success-strong);
   }
 
-  .table td.mat-mdc-cell .cell-editor {
+  table.table td.mat-mdc-cell .cell-editor {
     max-width: 60%;
   }
 

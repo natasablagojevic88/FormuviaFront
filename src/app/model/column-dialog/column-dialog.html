@@ -43,7 +43,11 @@
         <div class="fd-field">
           <span class="fd-label fd-required">{{ label('codebookId') }}</span>
           <app-search-select [options]="codebooks()" [(ngModel)]="column.codebookId"
-            [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-book" [ariaLabel]="label('codebookId')" />
+            [ngModelOptions]="{ standalone: true }" [disabled]="!isNew" icon="fa-solid fa-book"
+            [ariaLabel]="label('codebookId')" />
+          @if (!isNew) {
+            <span class="fd-help">{{ 'ui.column.codebookLocked' | t }}</span>
+          }
         </div>
       }
 
@@ -78,6 +82,8 @@
           [min]="limits.colspan.min" [max]="data.columnNumber" required />
         @if (placeInvalid()) {
           <span class="fd-field-error">{{ 'ui.column.placeInvalid' | t }}</span>
+        } @else if (placeTaken()) {
+          <span class="fd-field-error">{{ 'ui.column.placeTaken' | t }}</span>
         }
       </div>
 
@@ -86,11 +92,14 @@
       </div>
 
       <div class="fd-field">
-        <label class="switch">
-          <input type="checkbox" name="nullable" [(ngModel)]="column.nullable" />
+        <label class="switch" [class.switch-disabled]="!isNew">
+          <input type="checkbox" name="nullable" [(ngModel)]="column.nullable" [disabled]="!isNew" />
           <span class="switch-track"><span class="switch-thumb"></span></span>
           <span class="switch-text">{{ label('nullable') }}</span>
         </label>
+        @if (!isNew) {
+          <span class="fd-help">{{ 'ui.column.nullableLocked' | t }}</span>
+        }
         <label class="switch">
           <input type="checkbox" name="showInTable" [(ngModel)]="column.showInTable" />
           <span class="switch-track"><span class="switch-thumb"></span></span>
@@ -113,15 +122,50 @@
         }
       </div>
 
+      @if (!isCodebook) {
+        <div class="fd-field fd-field-wide">
+          <label class="switch">
+            <input type="checkbox" name="inDescriptionForCodebook" [(ngModel)]="column.inDescriptionForCodebook" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span class="switch-text">{{ label('inDescriptionForCodebook') }}</span>
+          </label>
+          <span class="fd-help">{{ 'ui.column.codebookLabelHelp' | t }}</span>
+        </div>
+      }
+
       <div class="fd-field fd-field-wide">
         <label class="fd-label" for="defaultValueSql">{{ label('defaultValueSql') }}</label>
-        <input id="defaultValueSql" name="defaultValueSql" class="fd-input code" [(ngModel)]="column.defaultValueSql"
-          autocomplete="off" spellcheck="false" [placeholder]="'ui.column.defaultHint' | t" />
+        <textarea id="defaultValueSql" name="defaultValueSql" class="fd-input code sql" rows="2"
+          [(ngModel)]="column.defaultValueSql" autocomplete="off" spellcheck="false"
+          [class.fd-input-error]="defaultSqlInvalid()" [placeholder]="'ui.column.defaultHint' | t"></textarea>
+        @if (defaultSqlInvalid()) {
+          <span class="fd-field-error">{{ 'ui.column.defaultInvalid' | t }}</span>
+        } @else {
+          <span class="fd-help">{{ 'ui.column.defaultHelp' | t }}</span>
+        }
+      </div>
+
+      <div class="fd-field fd-field-wide">
+        <label class="fd-label" for="listOfValuesSql">{{ label('listOfValuesSql') }}</label>
+        <textarea id="listOfValuesSql" name="listOfValuesSql" class="fd-input code sql" rows="2"
+          [(ngModel)]="column.listOfValuesSql" autocomplete="off" spellcheck="false"
+          [class.fd-input-error]="listSqlInvalid()" [placeholder]="'ui.column.listHint' | t"></textarea>
+        @if (listSqlInvalid()) {
+          <span class="fd-field-error">{{ 'ui.column.defaultInvalid' | t }}</span>
+        } @else {
+          <span class="fd-help">{{ 'ui.column.listHelp' | t }}</span>
+        }
       </div>
     </div>
   </div>
 
   <footer class="fd-footer">
+    @if (!isNew) {
+      <button type="button" class="fd-button fd-button-danger delete" (click)="remove()" [disabled]="saving()">
+        <i class="fa-solid fa-trash-can"></i>
+        {{ 'ui.delete' | t }}
+      </button>
+    }
     <span class="fd-hint">{{ 'ui.requiredFieldsMarked' | t }}</span>
     <div class="fd-actions">
       <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.cancel' | t }}</button>

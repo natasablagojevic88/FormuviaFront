@@ -11,8 +11,8 @@
   border-radius: 28px;
   background:
     radial-gradient(120% 160% at 90% -10%, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 50%),
-    linear-gradient(120deg, #1d4ed8 0%, #2563eb 40%, #1e90ff 75%, #0ea5e9 100%);
-  color: #fff;
+    linear-gradient(120deg, #1d4ed8 0%, #2563eb 40%, #1e90ff 75%, var(--c-accent) 100%);
+  color: var(--c-on-dark);
   box-shadow: 0 18px 40px rgba(37, 99, 235, 0.28);
 }
 

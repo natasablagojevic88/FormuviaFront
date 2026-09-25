@@ -10,20 +10,21 @@ app-page-header {
 }
 
 .tree-card {
+  border: 1px solid var(--c-border-soft);
   flex: 1;
   min-height: 0;
   overflow: auto;
   padding: 12px;
   border-radius: 24px;
-  background: #fff;
-  box-shadow: 0 10px 30px rgba(3, 8, 23, 0.06);
+  background: var(--c-surface);
+  box-shadow: 0 10px 30px var(--c-shadow);
 }
 
 .tree-loading {
   display: grid;
   place-items: center;
   min-height: 160px;
-  color: #1f5eff;
+  color: var(--c-primary);
   font-size: 26px;
 }
 
@@ -42,11 +43,11 @@ app-page-header {
 }
 
 .node:hover {
-  background: #f8fafc;
+  background: var(--c-surface-3);
 }
 
 .node.selected {
-  background: #eef3ff;
+  background: var(--c-primary-soft);
 }
 
 .toggle {
@@ -58,12 +59,12 @@ app-page-header {
   border: 0;
   border-radius: 10px;
   background: none;
-  color: #64748b;
+  color: var(--c-text-muted);
   cursor: pointer;
 }
 
 .toggle:hover {
-  background: #e2e8f0;
+  background: var(--c-border);
 }
 
 .toggle.hidden {
@@ -90,18 +91,20 @@ app-page-header {
 }
 
 .node-icon.root {
-  background: #0f172a;
-  color: #fff;
+  /* neutralna plocica koja radi i u svetloj i u tamnoj temi */
+  background: var(--c-surface-3);
+  color: var(--c-text-muted);
+  border: 1px solid var(--c-border);
 }
 
 .node-icon.menu {
-  background: #fff7ed;
-  color: #ea580c;
+  background: var(--c-warning-soft);
+  color: var(--c-warning);
 }
 
 .node-icon.table {
-  background: #eef3ff;
-  color: #1f5eff;
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
 }
 
 .node-text {
@@ -113,7 +116,7 @@ app-page-header {
 
 .node-name {
   overflow: hidden;
-  color: #0f172a;
+  color: var(--c-text);
   font-size: 14px;
   font-weight: 600;
   text-overflow: ellipsis;
@@ -122,7 +125,7 @@ app-page-header {
 
 .node-code {
   overflow: hidden;
-  color: #94a3b8;
+  color: var(--c-text-faint);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 12px;
   text-overflow: ellipsis;
@@ -144,8 +147,8 @@ app-page-header {
   padding: 0 12px;
   border: 0;
   border-radius: 10px;
-  background: #eef3ff;
-  color: #1f5eff;
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
   font: inherit;
   font-size: 13px;
   font-weight: 700;
@@ -153,7 +156,7 @@ app-page-header {
 }
 
 .add-child:hover {
-  background: #dbe6ff;
+  background: var(--c-primary-softer);
 }
 
 .more-button {
@@ -165,26 +168,26 @@ app-page-header {
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: #94a3b8;
+  color: var(--c-text-faint);
   font-size: 15px;
   cursor: pointer;
 }
 
 .more-button:hover,
 .more-button[aria-expanded="true"] {
-  background: #eef3ff;
-  color: #1f5eff;
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
 }
 
 .menu-icon {
   width: 18px;
   margin-right: 10px;
-  color: #64748b;
+  color: var(--c-text-muted);
 }
 
 .menu-danger,
 .menu-danger .menu-icon {
-  color: #dc2626;
+  color: var(--c-danger);
 }
 
 @media (max-width: 900px) {

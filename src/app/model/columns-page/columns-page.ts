@@ -161,6 +161,7 @@ export class ColumnsPage {
     }
     const data: ColumnDialogData = {
       column,
+      columns: this.columns(),
       columnNumber: model.columnNumber ?? 1,
       rowNumber: model.rowNumber ?? 1,
       /** Sifarnici za vezu: sve tabele modela. */
@@ -168,8 +169,13 @@ export class ColumnsPage {
     };
     this.dialog.open(ColumnDialog, { width: "720px", data, autoFocus: "#name" })
       .afterClosed()
-      .subscribe((saved?: ModelColumn | false) => {
+      .subscribe((saved?: ModelColumn | "deleted" | false) => {
         if (!saved) {
+          return;
+        }
+        if (saved === "deleted") {
+          this.selectedId.set(null);
+          this.load(model.id!);
           return;
         }
         this.notify.success(this.translate.get("ui.saved"));

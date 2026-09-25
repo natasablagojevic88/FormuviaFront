@@ -1,5 +1,7 @@
 import { Component, computed, Inject, OnInit, signal } from "@angular/core";
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
+import { Notify } from "../../services/notify";
 import { SendRequest } from "../../services/send-request";
 import { Translate } from "../../services/translate";
 import { ApiRoute } from "../../shared/ApiRoute";
@@ -9,6 +11,8 @@ import { COLUMN_CODE_PATTERN, COLUMN_LIMITS, ModelColumn, ModelColumnType } from
 
 export interface ColumnDialogData {
   column: ModelColumn;
+  /** Sva polja te forme; sluzi za proveru da mesto u mrezi nije vec zauzeto. */
+  columns: ModelColumn[];
   columnNumber: number;
   rowNumber: number;
   modelId: string;
@@ -36,8 +40,10 @@ export class ColumnDialog implements OnInit {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ColumnDialogData,
-    private dialogRef: MatDialogRef<ColumnDialog, ModelColumn | false>,
+    private dialogRef: MatDialogRef<ColumnDialog, ModelColumn | "deleted" | false>,
+    private dialog: MatDialog,
     private sendRequest: SendRequest,
+    private notify: Notify,
     private translate: Translate
   ) {
     this.column = data.column;
@@ -76,6 +82,20 @@ export class ColumnDialog implements OnInit {
     return this.translate.get("ui.column." + fieldName);
   }
 
+  /** Back prima samo SELECT upit (JSqlParser), pa se to proverava i ovde. */
+  defaultSqlInvalid(): boolean {
+    return this.notSelect(this.column.defaultValueSql);
+  }
+
+  listSqlInvalid(): boolean {
+    return this.notSelect(this.column.listOfValuesSql);
+  }
+
+  private notSelect(sql?: string | null): boolean {
+    const value = sql?.trim();
+    return !!value && !/^\(?\s*select\b/i.test(value);
+  }
+
   codeInvalid(): boolean {
     return !!this.column.code && !COLUMN_CODE_PATTERN.test(this.column.code);
   }
@@ -86,11 +106,23 @@ export class ColumnDialog implements OnInit {
       || this.column.rowIndex > this.data.rowNumber;
   }
 
+  /** Na tom mestu ne sme da stoji drugo polje (back proverava isto). */
+  placeTaken(): boolean {
+    const from = Number(this.column.columnIndex);
+    const to = from + Number(this.column.colspan) - 1;
+    return this.data.columns
+      .filter((other) => other.id !== this.column.id && other.rowIndex === Number(this.column.rowIndex))
+      .some((other) => from <= other.columnIndex + other.colspan - 1 && to >= other.columnIndex);
+  }
+
   canSave(): boolean {
     if (this.saving() || !this.column.name?.trim() || !this.column.code?.trim() || this.codeInvalid()) {
       return false;
     }
-    if (this.placeInvalid()) {
+    if (this.defaultSqlInvalid() || this.listSqlInvalid()) {
+      return false;
+    }
+    if (this.placeInvalid() || this.placeTaken()) {
       return false;
     }
     if (this.isCodebook && !this.column.codebookId) {
@@ -103,10 +135,44 @@ export class ColumnDialog implements OnInit {
     if (!this.canSave()) {
       return;
     }
+    if (this.isCodebook) {
+      // veza na sifarnik ne moze i sama da ulazi u naziv sifarnika
+      this.column.inDescriptionForCodebook = false;
+    }
     this.saving.set(true);
     this.sendRequest.post(ApiRoute.modelColumn, this.column)
       .then((saved: ModelColumn) => this.dialogRef.close(saved))
       .catch(() => this.saving.set(false));
+  }
+
+  /**
+   * Brisanje polja: uklanja i kolonu iz baze sa svim podacima u njoj,
+   * pa se trazi izricita potvrda i jasno se kaze da povratka nema.
+   */
+  remove(): void {
+    if (this.isNew || this.saving()) {
+      return;
+    }
+    const data: ConfirmDialogData = {
+      title: this.translate.get("ui.column.deleteTitle"),
+      message: this.translate.get("ui.column.deleteConfirm").replace("{0}", this.column.name || this.column.code),
+      confirmText: this.translate.get("ui.column.deleteConfirmButton"),
+      danger: true,
+    };
+    this.dialog.open(ConfirmDialog, { width: "520px", data })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+        this.saving.set(true);
+        this.sendRequest.delete(ApiRoute.modelColumnId(this.column.id!))
+          .then(() => {
+            this.notify.success(this.translate.get("ui.deleted"));
+            this.dialogRef.close("deleted");
+          })
+          .catch(() => this.saving.set(false));
+      });
   }
 
   close(): void {

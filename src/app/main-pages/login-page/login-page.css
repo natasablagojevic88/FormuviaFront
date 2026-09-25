@@ -1,3 +1,4 @@
+/* Login strana ima svoj izgled, uvek tamna pozadina i svetla kartica, pa ne koristi tokene teme. */
 .login-wrapper {
   min-height: 100vh;
   background-color: #0f172a;

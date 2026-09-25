@@ -24,15 +24,15 @@
   height: 48px;
   border: 0;
   border-radius: 14px;
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--c-surface-3);
+  color: var(--c-text-muted);
   cursor: pointer;
   transition: background-color 0.15s, color 0.15s;
 }
 
 .remove:hover {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--c-danger-softer);
+  color: var(--c-danger);
 }
 
 .add {
@@ -41,10 +41,10 @@
   justify-content: center;
   gap: 8px;
   height: 44px;
-  border: 1px dashed #cbd5e1;
+  border: 1px dashed var(--c-border-strong);
   border-radius: 14px;
   background: none;
-  color: #1f5eff;
+  color: var(--c-primary);
   font: inherit;
   font-size: 14px;
   font-weight: 700;
@@ -53,13 +53,13 @@
 }
 
 .add:hover {
-  border-color: #1f5eff;
-  background: #eef3ff;
+  border-color: var(--c-primary);
+  background: var(--c-primary-soft);
 }
 
 .empty {
   padding: 12px 0;
-  color: #64748b;
+  color: var(--c-text-muted);
   font-size: 14px;
   text-align: center;
 }
@@ -67,7 +67,7 @@
 .clear {
   border: 0;
   background: none;
-  color: #dc2626;
+  color: var(--c-danger);
   font: inherit;
   font-size: 13px;
   font-weight: 700;
@@ -82,7 +82,7 @@
   .criterion {
     grid-template-columns: minmax(0, 1fr) auto;
     padding: 14px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--c-border);
     border-radius: 16px;
   }
 

@@ -72,6 +72,8 @@
             [min]="limits.columnNumber.min" [max]="limits.columnNumber.max" [class.fd-input-error]="outOfRange('columnNumber')" required />
           @if (outOfRange('columnNumber')) {
             <span class="fd-field-error">{{ 'ui.model.range' | t }} {{ limits.columnNumber.min }}–{{ limits.columnNumber.max }}</span>
+          } @else if (tooSmall('columnNumber')) {
+            <span class="fd-field-error">{{ 'ui.model.inUse' | t }} {{ minColumns() }}</span>
           }
         </div>
 
@@ -81,6 +83,8 @@
             [min]="limits.rowNumber.min" [class.fd-input-error]="outOfRange('rowNumber')" required />
           @if (outOfRange('rowNumber')) {
             <span class="fd-field-error">{{ 'ui.model.minValue' | t }} {{ limits.rowNumber.min }}</span>
+          } @else if (tooSmall('rowNumber')) {
+            <span class="fd-field-error">{{ 'ui.model.inUse' | t }} {{ minRows() }}</span>
           }
         </div>
 

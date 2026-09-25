@@ -7,6 +7,14 @@
   <span class="brand-name">Formuvia</span>
   <span class="spacer"></span>
 
+  <button type="button" class="theme-button" (click)="theme.next()"
+    [title]="('ui.theme.' + theme.mode()) | t" [attr.aria-label]="('ui.theme.' + theme.mode()) | t">
+    <i class="fa-solid"
+      [class.fa-sun]="theme.mode() === 'light'"
+      [class.fa-moon]="theme.mode() === 'dark'"
+      [class.fa-circle-half-stroke]="theme.mode() === 'system'"></i>
+  </button>
+
   <app-search-select class="language" appearance="dark" icon="fa-solid fa-globe" [options]="languageOptions"
     [ngModel]="language.current()" (ngModelChange)="language.change($event)" [ariaLabel]="'ui.language' | t" />
 </header>

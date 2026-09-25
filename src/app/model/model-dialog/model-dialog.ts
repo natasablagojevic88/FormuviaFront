@@ -1,7 +1,8 @@
-import { Component, computed, Inject, signal } from "@angular/core";
+import { Component, computed, Inject, OnInit, signal } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { SendRequest } from "../../services/send-request";
 import { ApiRoute } from "../../shared/ApiRoute";
+import { ModelColumn } from "../model-column";
 import { Role } from "../../administration/app-user-dialog/app-user-dialog";
 import { Translate } from "../../services/translate";
 import { SelectOption } from "../../shared/search-select/search-select";
@@ -25,7 +26,7 @@ const ROLE_FIELDS = ["previewRoleId", "addRoleId", "updateRoleId", "deleteRoleId
   templateUrl: "./model-dialog.html",
   styleUrl: "./model-dialog.css",
 })
-export class ModelDialog {
+export class ModelDialog implements OnInit {
   readonly roleFields = ROLE_FIELDS;
   readonly saving = signal(false);
 
@@ -67,8 +68,29 @@ export class ModelDialog {
     this.data.roles.map((role) => ({ value: role.id, label: role.description || role.code })));
 
   readonly limits = DIALOG_LIMITS;
+  /** Najmanja dozvoljena mreza: onoliko koliko polja forme vec zauzimaju (back proverava isto). */
+  readonly minColumns = signal(1);
+  readonly minRows = signal(1);
 
   /** Vrednost van granica sa back-a (prazno se proverava posebno, kao obavezno polje). */
+  ngOnInit(): void {
+    const id = this.data.node?.id;
+    if (!id || !this.isTable) {
+      return;
+    }
+    this.sendRequest.get(ApiRoute.modelColumnList(id)).then((columns: ModelColumn[]) => {
+      this.minColumns.set(Math.max(1, ...(columns ?? []).map((column) => column.columnIndex + column.colspan - 1)));
+      this.minRows.set(Math.max(1, ...(columns ?? []).map((column) => column.rowIndex)));
+    });
+  }
+
+  /** Mreza ne sme da se smanji ispod onoga sto polja vec zauzimaju. */
+  tooSmall(field: "columnNumber" | "rowNumber"): boolean {
+    const value = Number(this.model[field]);
+    const min = field === "columnNumber" ? this.minColumns() : this.minRows();
+    return !!value && value < min;
+  }
+
   outOfRange(field: "dialogWidth" | "rowNumber" | "columnNumber"): boolean {
     const value = this.model[field];
     if (value === null || value === undefined || (value as unknown) === "") {
@@ -80,7 +102,8 @@ export class ModelDialog {
 
   private layoutValid(): boolean {
     return (["dialogWidth", "rowNumber", "columnNumber"] as const)
-      .every((field) => this.model[field] !== null && this.model[field] !== undefined && !this.outOfRange(field));
+      .every((field) => this.model[field] !== null && this.model[field] !== undefined && !this.outOfRange(field))
+      && !this.tooSmall("columnNumber") && !this.tooSmall("rowNumber");
   }
 
   /** Pregled rasporeda: celije mreze kolone x redovi (za prikaz ispod polja). */

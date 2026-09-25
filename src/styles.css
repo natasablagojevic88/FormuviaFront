@@ -1,17 +1,199 @@
 @import '@angular/material/prebuilt-themes/azure-blue.css';
 
+/* ---------- Tokeni izgleda ----------
+   Sve boje, zaobljenja i senke aplikacije su ovde. Komponente koriste var(--...),
+   pa se izgled menja na jednom mestu, a tamna tema je samo drugi skup vrednosti. */
+:root {
+  color-scheme: light;
+
+  --c-primary: #1f5eff;
+  --c-primary-strong: #1b4fd8;
+  --c-primary-soft: #eef3ff;
+  --c-primary-softer: #dbe6ff;
+  --c-accent: #0ea5e9;
+
+  --c-text: #0f172a;
+  --c-text-muted: #64748b;
+  --c-text-faint: #94a3b8;
+  --c-text-on-primary: #fff;
+  /* Tekst na uvek tamnoj ili plavoj podlozi (meni, zaglavlje, traka strane) - isti u obe teme */
+  --c-on-dark: #fff;
+  --c-on-dark-muted: #cbd5e1;
+  --c-on-dark-faint: #94a3b8;
+
+  --c-surface: #fff;
+  --c-surface-2: #f8fafc;
+  --c-surface-3: #f1f5f9;
+  --c-border: #e2e8f0;
+  --c-border-soft: #eef2f7;
+  --c-border-strong: #cbd5e1;
+
+  --c-danger: #dc2626;
+  --c-danger-strong: #b91c1c;
+  --c-danger-soft: #fef2f2;
+  --c-danger-softer: #fee2e2;
+  /* podloga crvenog dugmeta; mora da nosi beo tekst u obe teme */
+  --c-danger-bg: #dc2626;
+  --c-danger-bg-hover: #b91c1c;
+
+  --c-success: #047857;
+  --c-success-soft: #ecfdf5;
+  --c-success-strong: #22c55e;
+  --c-success-flash: #bbf7d0;
+
+  --c-warning: #ea580c;
+  --c-warning-soft: #fff7ed;
+
+  --c-shadow: rgba(3, 8, 23, 0.06);
+  --c-shadow-strong: rgba(3, 8, 23, 0.16);
+  --c-focus: rgba(31, 94, 255, 0.15);
+  --c-backdrop: rgba(3, 8, 23, 0.55);
+
+  --gradient-brand: linear-gradient(135deg, #1f5eff 0%, #0ea5e9 100%);
+  --gradient-danger: linear-gradient(135deg, #b91c1c 0%, #e11d48 100%);
+
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+
+  --shadow-1: 0 10px 30px var(--c-shadow);
+  --shadow-2: 0 18px 40px var(--c-shadow-strong);
+}
+
+/* Tamna tema: sistemsko podesavanje, osim kad je korisnik izabrao svetlu */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --c-primary: #4d84ff;
+    --c-primary-strong: #6b9bff;
+    --c-primary-soft: #1d2a47;
+    --c-primary-softer: #26385e;
+
+    --c-text: #e8edf7;
+    --c-text-muted: #a7b4cc;
+    --c-text-faint: #75839c;
+
+    --c-surface: #1a2335;
+    --c-surface-2: #121a29;
+    --c-surface-3: #232e45;
+    --c-border: #2c3850;
+    --c-border-soft: #232e45;
+    --c-border-strong: #3a4763;
+
+    --c-danger: #f87171;
+    --c-danger-strong: #fca5a5;
+    --c-danger-soft: #2a1618;
+    --c-danger-softer: #3a1b1e;
+    --c-danger-bg: #c2453f;
+    --c-danger-bg-hover: #d75a54;
+
+    --c-success: #34d399;
+    --c-success-soft: #10231d;
+    --c-success-strong: #34d399;
+    --c-success-flash: #14452f;
+
+    --c-warning: #fb923c;
+    --c-warning-soft: #2a1c10;
+
+    --c-shadow: rgba(0, 0, 0, 0.45);
+    --c-shadow-strong: rgba(0, 0, 0, 0.6);
+    --c-focus: rgba(107, 155, 255, 0.25);
+    --c-backdrop: rgba(2, 5, 12, 0.7);
+
+    --gradient-brand: linear-gradient(135deg, #2b4a92 0%, #0d6f95 100%);
+    --gradient-danger: linear-gradient(135deg, #7f1d1d 0%, #9f1239 100%);
+  }
+}
+
+/* Izbor korisnika ima prednost nad sistemskim podesavanjem */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --c-primary: #3f74f0;
+  --c-primary-strong: #5b8cff;
+  --c-primary-soft: #1d2a47;
+  --c-primary-softer: #26385e;
+
+  --c-text: #e8edf7;
+  --c-text-muted: #a7b4cc;
+  --c-text-faint: #75839c;
+
+  --c-surface: #1a2335;
+  --c-surface-2: #121a29;
+  --c-surface-3: #232e45;
+  --c-border: #2c3850;
+  --c-border-soft: #232e45;
+  --c-border-strong: #3a4763;
+
+  --c-danger: #f87171;
+  --c-danger-strong: #fca5a5;
+  --c-danger-soft: #2a1618;
+  --c-danger-softer: #3a1b1e;
+  --c-danger-bg: #c2453f;
+  --c-danger-bg-hover: #d75a54;
+
+  --c-success: #34d399;
+  --c-success-soft: #10231d;
+  --c-success-strong: #34d399;
+  --c-success-flash: #14452f;
+
+  --c-warning: #fb923c;
+  --c-warning-soft: #2a1c10;
+
+  --c-shadow: rgba(0, 0, 0, 0.45);
+  --c-shadow-strong: rgba(0, 0, 0, 0.6);
+  --c-focus: rgba(107, 155, 255, 0.25);
+  --c-backdrop: rgba(2, 5, 12, 0.7);
+
+  --gradient-brand: linear-gradient(135deg, #2b4a92 0%, #0d6f95 100%);
+  --gradient-danger: linear-gradient(135deg, #7f1d1d 0%, #9f1239 100%);
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Inter', sans-serif; }
+body {
+  background: var(--c-surface-2);
+  color: var(--c-text);
+  font-family: 'Inter', sans-serif;
+}
 
 .formuvia-dialog .mat-mdc-dialog-surface {
+  /* Material sam postavlja boju teksta iz svetle teme, pa je ovde vezujemo za tokene */
+  background: var(--c-surface);
+  color: var(--c-text);
   border-radius: 28px;
   overflow: hidden;
-  box-shadow: 0 18px 44px rgba(3, 8, 23, 0.3);
+  box-shadow: var(--shadow-2);
 }
 
 /* Bez backdrop-filter: zamucenje se pri svakom kadru animacije iznova crta i oseca se kao sporo otvaranje */
 .formuvia-backdrop {
-  background: rgba(3, 8, 23, 0.55);
+  background: var(--c-backdrop);
+}
+
+/* Material komponente koje same crtaju tekst (paginator, select, polja) prate temu */
+.mat-mdc-select-value,
+.mat-mdc-select-value-text,
+.mat-mdc-paginator,
+.mat-mdc-paginator .mat-mdc-select-value {
+  color: var(--c-text);
+}
+
+.mat-mdc-select-arrow,
+.mat-mdc-paginator-icon {
+  fill: var(--c-text-muted);
+  color: var(--c-text-muted);
+}
+
+.mat-mdc-paginator .mat-mdc-text-field-wrapper {
+  background: var(--c-surface);
+}
+
+.mat-mdc-paginator .mdc-notched-outline__leading,
+.mat-mdc-paginator .mdc-notched-outline__notch,
+.mat-mdc-paginator .mdc-notched-outline__trailing {
+  border-color: var(--c-border);
 }
 
 /* ---------- Lista izbora (mat-select, npr. broj redova u paginatoru) ---------- */
@@ -86,7 +268,8 @@ body { font-family: 'Inter', sans-serif; }
   display: flex;
   flex-direction: column;
   max-height: 90vh;
-  background: #fff;
+  background: var(--c-surface);
+  color: var(--c-text);
 }
 
 .fd-header {
@@ -94,12 +277,12 @@ body { font-family: 'Inter', sans-serif; }
   align-items: flex-start;
   gap: 16px;
   padding: 24px;
-  background: linear-gradient(135deg, #1f5eff 0%, #0ea5e9 100%);
-  color: #fff;
+  background: var(--gradient-brand);
+  color: var(--c-on-dark);
 }
 
 .fd-header.fd-danger {
-  background: linear-gradient(135deg, #b91c1c 0%, #e11d48 100%);
+  background: var(--gradient-danger);
 }
 
 .fd-titles {
@@ -121,12 +304,13 @@ body { font-family: 'Inter', sans-serif; }
 
 .fd-close {
   flex-shrink: 0;
+  color: var(--c-on-dark);
   width: 36px;
   height: 36px;
   border: 0;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.18);
-  color: #fff;
+  color: var(--c-on-dark);
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.15s;
@@ -158,7 +342,7 @@ body { font-family: 'Inter', sans-serif; }
 }
 
 .fd-label {
-  color: #0f172a;
+  color: var(--c-text);
   font-size: 13px;
   font-weight: 700;
 }
@@ -172,23 +356,23 @@ body { font-family: 'Inter', sans-serif; }
   width: 100%;
   height: 48px;
   padding: 0 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--c-border);
   border-radius: 14px;
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--c-surface-2);
+  color: var(--c-text);
   font: inherit;
   font-size: 15px;
   transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
 }
 
 .fd-input:hover {
-  border-color: #cbd5e1;
+  border-color: var(--c-border-strong);
 }
 
 .fd-input:focus {
   outline: none;
-  border-color: #1f5eff;
-  background: #fff;
+  border-color: var(--c-primary);
+  background: var(--c-surface);
   box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.12);
 }
 
@@ -197,12 +381,12 @@ body { font-family: 'Inter', sans-serif; }
 }
 
 .fd-help {
-  color: #64748b;
+  color: var(--c-text-muted);
   font-size: 12px;
 }
 
 .fd-field-error {
-  color: #dc2626;
+  color: var(--c-danger);
   font-size: 12px;
   font-weight: 600;
 }
@@ -213,8 +397,8 @@ body { font-family: 'Inter', sans-serif; }
   gap: 10px;
   padding: 12px 14px;
   border-radius: 12px;
-  background: #fef2f2;
-  color: #b91c1c;
+  background: var(--c-danger-soft);
+  color: var(--c-danger-strong);
   font-size: 13px;
   font-weight: 600;
 }
@@ -224,13 +408,13 @@ body { font-family: 'Inter', sans-serif; }
   align-items: center;
   gap: 16px;
   padding: 16px 24px;
-  border-top: 1px solid #eef2f7;
-  background: #f8fafc;
+  border-top: 1px solid var(--c-border-soft);
+  background: var(--c-surface-2);
 }
 
 .fd-hint {
   flex: 1;
-  color: #64748b;
+  color: var(--c-text-muted);
   font-size: 13px;
 }
 
@@ -255,35 +439,35 @@ body { font-family: 'Inter', sans-serif; }
 }
 
 .fd-button-secondary {
-  border: 1px solid #e2e8f0;
-  background: #fff;
-  color: #0f172a;
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text);
 }
 
 .fd-button-secondary:hover {
-  background: #f1f5f9;
+  background: var(--c-surface-3);
 }
 
 .fd-button-primary {
   border: 0;
-  background: #1f5eff;
-  color: #fff;
+  background: var(--c-primary);
+  color: var(--c-text-on-primary);
   box-shadow: 0 8px 20px rgba(31, 94, 255, 0.35);
 }
 
 .fd-button-primary:hover:not(:disabled) {
-  background: #1a50e0;
+  background: var(--c-primary-strong);
 }
 
 .fd-button-danger {
   border: 0;
-  background: #dc2626;
-  color: #fff;
+  background: var(--c-danger-bg);
+  color: var(--c-on-dark);
   box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
 }
 
 .fd-button-danger:hover:not(:disabled) {
-  background: #b91c1c;
+  background: var(--c-danger-bg-hover);
 }
 
 .fd-button:disabled {
@@ -314,5 +498,21 @@ body { font-family: 'Inter', sans-serif; }
 
   .fd-actions .fd-button {
     flex: 1;
+  }
+}
+
+/* ---------- Tabela kao kartice na telefonu ----------
+   <tbody> i <thead> pravi Angular Material van naseg sablona, pa ta pravila
+   ne mogu biti u CSS-u komponente (nemaju oznaku komponente). */
+@media (max-width: 900px) {
+  table.table,
+  table.table > tbody {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  table.table > thead {
+    display: none;
   }
 }

@@ -24,7 +24,11 @@ export interface ModelColumn {
   showInTable: boolean;
   editable: boolean;
   defaultValueSql?: string | null;
+  /** SELECT sa dve kolone (vrednost, tekst) koji puni listu izbora za ovo polje. */
+  listOfValuesSql?: string | null;
   textArea: boolean;
+  /** Kad se ova tabela koristi kao sifarnik, vrednost ovog polja ulazi u prikazani naziv. */
+  inDescriptionForCodebook: boolean;
   /** Polozaj u mrezi forme, broji se od 1. */
   rowIndex: number;
   columnIndex: number;
@@ -51,6 +55,7 @@ export function newColumn(modelId: string, rowIndex: number, columnIndex: number
     showInTable: true,
     editable: true,
     textArea: false,
+    inDescriptionForCodebook: false,
     rowIndex,
     columnIndex,
     colspan: 1,

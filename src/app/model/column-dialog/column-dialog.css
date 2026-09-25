@@ -9,11 +9,11 @@
 .section {
   gap: 2px;
   padding-top: 6px;
-  border-top: 1px solid #eef2f7;
+  border-top: 1px solid var(--c-border-soft);
 }
 
 .section-title {
-  color: #0f172a;
+  color: var(--c-text);
   font-size: 14px;
   font-weight: 700;
 }
@@ -23,12 +23,12 @@
 }
 
 .code[readonly] {
-  background: #f8fafc;
-  color: #64748b;
+  background: var(--c-surface-2);
+  color: var(--c-text-muted);
 }
 
 .fd-input-error {
-  border-color: #dc2626;
+  border-color: var(--c-danger);
 }
 
 .switch {
@@ -50,7 +50,7 @@
   width: 48px;
   height: 28px;
   border-radius: 999px;
-  background: #cbd5e1;
+  background: var(--c-border-strong);
   transition: background-color 0.2s;
 }
 
@@ -61,13 +61,13 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--c-surface);
   box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
   transition: transform 0.2s;
 }
 
 .switch input:checked + .switch-track {
-  background: #1f5eff;
+  background: var(--c-primary);
 }
 
 .switch input:checked + .switch-track .switch-thumb {
@@ -79,7 +79,23 @@
 }
 
 .switch-text {
-  color: #0f172a;
+  color: var(--c-text);
   font-size: 14px;
   font-weight: 600;
+}
+
+.sql {
+  height: auto;
+  padding: 12px 16px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.delete {
+  margin-right: auto;
+}
+
+.switch-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

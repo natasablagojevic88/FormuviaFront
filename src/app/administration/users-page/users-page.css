@@ -21,7 +21,8 @@ app-data-table {
   padding: 0 22px;
   border: 0;
   border-radius: 16px;
-  background: #fff;
+  /* stoji na plavoj traci, pa je uvek belo sa plavim tekstom */
+  background: var(--c-on-dark);
   color: #1f5eff;
   font: inherit;
   font-size: 15px;

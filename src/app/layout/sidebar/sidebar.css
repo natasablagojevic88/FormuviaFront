@@ -15,7 +15,7 @@
   flex-direction: column;
   padding: 0 16px 20px;
   background: #030817;
-  color: #9aa4b8;
+  color: var(--c-on-dark-faint);
   box-shadow: 4px 0 24px rgba(3, 8, 23, 0.12);
 }
 
@@ -79,12 +79,12 @@
 
 .item:hover {
   background: rgba(255, 255, 255, 0.06);
-  color: #fff;
+  color: var(--c-on-dark);
 }
 
 .item.active {
-  background: #1f5eff;
-  color: #fff;
+  background: var(--c-primary);
+  color: var(--c-on-dark);
   box-shadow: 0 8px 24px rgba(31, 94, 255, 0.45);
 }
 
@@ -153,8 +153,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #1f5eff;
-  color: #fff;
+  background: var(--c-primary);
+  color: var(--c-on-dark);
   font-size: 13px;
   font-weight: 700;
 }
@@ -162,7 +162,7 @@
 .user-name {
   flex: 1;
   overflow: hidden;
-  color: #fff;
+  color: var(--c-on-dark);
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
@@ -181,7 +181,7 @@
 
 .icon-button:hover {
   background: rgba(255, 255, 255, 0.06);
-  color: #fff;
+  color: var(--c-on-dark);
 }
 
 @media (max-width: 900px) {

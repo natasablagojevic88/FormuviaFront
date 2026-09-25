@@ -1,7 +1,7 @@
 .layout {
   display: flex;
   min-height: 100vh;
-  background: #eef2f7;
+  background: var(--c-border-soft);
 }
 
 .content {
