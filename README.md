@@ -4,6 +4,8 @@ Web client for Formuvia, built with Angular 21 and Angular Material. It works on
 
 It requires the backend API from the separate repository: **Formuvia** (Java).
 
+📖 **[User guide](https://natasablagojevic88.github.io/FormuviaFront/)** – how to use Formuvia, in English and Serbian.
+
 ## Features
 
 - Login and logout
@@ -72,6 +74,8 @@ On the backend, set `cors.url` to the address where the client is served. The cl
 
 ## Usage
 
+This is a quick reference. The full guide, with the model and the form designer explained step by step, is at **[https://natasablagojevic88.github.io/FormuviaFront/](https://natasablagojevic88.github.io/FormuviaFront/)**.
+
 - **Language** – choose it in the top bar; the choice is remembered in the browser.
 - **Theme** – the button next to the language switches light → dark → follow the system.
 - **Menu** – on the left; on phones open it with the menu button in the top bar.
@@ -92,6 +96,18 @@ On the backend, set `cors.url` to the address where the client is served. The cl
 ```sh
 npm test
 ```
+
+## User guide
+
+The guide in `docs/` is a VitePress site, published to GitHub Pages at [https://natasablagojevic88.github.io/FormuviaFront/](https://natasablagojevic88.github.io/FormuviaFront/) on every push to `main` that touches it.
+
+```sh
+npm run docs:dev      # preview at http://localhost:5173
+npm run docs:build    # build into docs/.vitepress/dist
+npm run docs:preview  # serve the built site
+```
+
+English pages are in `docs/`, Serbian ones in `docs/sr/`; both are kept in step.
 
 ## Icon list
 
