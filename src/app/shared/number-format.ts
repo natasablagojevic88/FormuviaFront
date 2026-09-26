@@ -1,19 +1,19 @@
 import { ColumnType } from "./database-table";
 
 /**
- * Brojevi u tabelama, formama i pretrazi.
+ * Numbers in tables, forms and search.
  *
- * - Ceo broj (INTEGER, LONG) se ne formatira: sifre, godine i slicni brojevi se ne
- *   razdvajaju na hiljade, pa se prikazuju onako kako su upisani.
- * - Decimalan broj (BIGDECIMAL) se prikazuje po jeziku: srpski 1.234,56, engleski 1,234.56.
- * - U polja za unos se decimala kuca separatorom svog jezika (srpska tastatura ima zarez),
- *   a back uvek dobija tacku.
+ * - A whole number (INTEGER, LONG) is not formatted: codes, years and numbers like them are not
+ *   split into thousands, so they are shown the way they were entered.
+ * - A decimal number (BIGDECIMAL) is shown by language: Serbian 1.234,56, English 1,234.56.
+ * - In an entry field the decimal is typed with the separator of that language (a Serbian keyboard has a comma),
+ *   and the server always gets a dot.
  */
 
-/** Najvise decimala koje kolona moze da ima (granica u dizajnu forme). */
+/** The most decimals a column can have (the limit in the form design). */
 const MAX_DECIMALS = 10;
 
-/** Najmanje decimala u tabeli kad se ne zna skala kolone. */
+/** The fewest decimals in a table when the scale of the column is not known. */
 const MIN_DECIMALS = 2;
 
 export function isNumberType(columnType?: ColumnType): boolean {
@@ -24,15 +24,15 @@ export function isDecimalType(columnType?: ColumnType): boolean {
   return columnType === "BIGDECIMAL";
 }
 
-/** Decimalni separator jezika, uzet iz samog Intl-a: srpski ",", engleski ".". */
+/** Decimal separator of the language, taken from Intl itself: Serbian ",", English ".". */
 export function decimalSeparator(language: string): string {
   return new Intl.NumberFormat(language).formatToParts(1.1).find((part) => part.type === "decimal")?.value ?? ".";
 }
 
 /**
- * Decimalan broj za prikaz: razdvajanje hiljada i separator po jeziku.
- * decimals je skala kolone kad se zna (forma je dobija sa back-a); bez nje se prikazuje
- * onoliko decimala koliko vrednost ima, ali najmanje dve.
+ * A decimal number for display: thousands separated and the separator of the language.
+ * decimals is the scale of the column when it is known (the form gets it from the server); without it
+ * as many decimals as the value has are shown, but at least two.
  */
 export function formatDecimal(value: any, language: string, decimals?: number | null): string {
   const numberValue = toNumber(value);
@@ -48,7 +48,7 @@ export function formatDecimal(value: any, language: string, decimals?: number | 
   }).format(numberValue);
 }
 
-/** Vrednost sa back-a -> tekst u polju za unos: separator po jeziku, bez razdvajanja hiljada. */
+/** Value from the server -> text in the entry field: the separator of the language, thousands not separated. */
 export function toDecimalText(value: any, language: string): string {
   if (value === null || value === undefined || value === "") {
     return "";
@@ -57,9 +57,9 @@ export function toDecimalText(value: any, language: string): string {
 }
 
 /**
- * Tekst iz polja -> tekst za back, uvek sa tackom i bez razdvajanja hiljada.
- * Prima i zarez i tacku: poslednji separator u tekstu je decimalni, raniji su hiljade
- * ("1.234,56" i "1,234.56" daju isto).
+ * Text from the field -> text for the server, always with a dot and without thousands separated.
+ * It accepts both a comma and a dot: the last separator in the text is the decimal one, earlier ones are thousands
+ * ("1.234,56" and "1,234.56" give the same).
  */
 export function parseDecimalText(text: string): string {
   const value = (text ?? "").trim().replace(/\s/g, "");
@@ -77,7 +77,7 @@ export function parseDecimalText(text: string): string {
   return fraction === "" ? whole : `${whole}.${fraction}`;
 }
 
-/** Da li je uneti tekst broj koji back moze da primi. */
+/** Whether the entered text is a number the server can take. */
 export function isNumberText(text: string, columnType?: ColumnType): boolean {
   const value = isDecimalType(columnType) ? parseDecimalText(text) : (text ?? "").trim();
   if (value === "") {

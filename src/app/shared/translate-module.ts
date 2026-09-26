@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { TranslatePipe } from "./translate-pipe";
 
-/** Samo pipe za prevode — da AppModule ne povlaci tabelu i paginator u pocetni paket. */
+/** Only the translation pipe — so AppModule does not pull the table and the paginator into the initial bundle. */
 @NgModule({
   declarations: [TranslatePipe],
   exports: [TranslatePipe],

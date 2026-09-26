@@ -9,12 +9,12 @@ import { SelectOption } from "../../shared/search-select/search-select";
 import { DIALOG_DEFAULTS, DIALOG_LIMITS, ModelNode, ModelType, TABLE_CODE_PATTERN } from "../model";
 
 export interface ModelDialogData {
-  /** Cvor koji se menja; za nov cvor undefined. */
+  /** The node being edited; undefined for a new node. */
   node?: ModelNode;
-  /** Nadredjeni cvor za nov cvor (koren za meni). */
+  /** Parent node of a new node (the root for a menu). */
   parent?: ModelNode;
   type: ModelType;
-  /** Sve uloge, sa GET /api/appuser/all-roles. */
+  /** Every role, from GET /api/appuser/all-roles. */
   roles: Role[];
 }
 
@@ -59,7 +59,7 @@ export class ModelDialog implements OnInit {
     return this.data.type === "TABLE";
   }
 
-  // Model nema tabelu sa allColumns, pa su nazivi polja na frontu (ui.model.*).
+  // The model has no table with allColumns, so the field names live on the client (ui.model.*).
   label(fieldName: string): string {
     return this.translate.get("ui.model." + fieldName);
   }
@@ -68,13 +68,13 @@ export class ModelDialog implements OnInit {
     this.data.roles.map((role) => ({ value: role.id, label: role.description || role.code })));
 
   readonly limits = DIALOG_LIMITS;
-  /** Najmanja dozvoljena mreza: onoliko koliko polja forme vec zauzimaju (back proverava isto). */
+  /** Smallest grid allowed: as much as the fields of the form already take (the server checks the same). */
   readonly minColumns = signal(1);
   readonly minRows = signal(1);
-  /** Dok se kolone ne ucitaju, granice nisu poznate pa se ne moze snimiti (inace bi ih back odbio). */
+  /** Until the columns are loaded the limits are unknown, so nothing can be saved (the server would refuse it). */
   readonly loadingColumns = signal(false);
 
-  /** Vrednost van granica sa back-a (prazno se proverava posebno, kao obavezno polje). */
+  /** Value outside the limits from the server (an empty value is checked separately, as a required field). */
   ngOnInit(): void {
     const id = this.data.node?.id;
     if (!id || !this.isTable) {
@@ -87,7 +87,7 @@ export class ModelDialog implements OnInit {
     }).finally(() => this.loadingColumns.set(false));
   }
 
-  /** Mreza ne sme da se smanji ispod onoga sto polja vec zauzimaju. */
+  /** The grid must not shrink below what the fields already take. */
   tooSmall(field: "columnNumber" | "rowNumber"): boolean {
     const value = Number(this.model[field]);
     const min = field === "columnNumber" ? this.minColumns() : this.minRows();
@@ -109,7 +109,7 @@ export class ModelDialog implements OnInit {
       && !this.tooSmall("columnNumber") && !this.tooSmall("rowNumber");
   }
 
-  /** Pregled rasporeda: celije mreze kolone x redovi (za prikaz ispod polja). */
+  /** Preview of the layout: grid cells, columns x rows (shown under the fields). */
   layoutCells(): number[] {
     const columns = Math.min(Math.max(Number(this.model.columnNumber) || 0, 0), 12);
     const rows = Math.min(Math.max(Number(this.model.rowNumber) || 0, 0), 20);
@@ -138,7 +138,7 @@ export class ModelDialog implements OnInit {
     this.saving.set(true);
     const { children, ...body } = this.model;
     if (!this.isTable) {
-      // meni nema dijalog za unos
+      // a menu has no entry dialog
       delete body.dialogWidth;
       delete body.rowNumber;
       delete body.columnNumber;

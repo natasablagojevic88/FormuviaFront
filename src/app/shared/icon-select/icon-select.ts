@@ -3,7 +3,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { IconPickerDialog, IconPickerData } from "../icon-picker-dialog/icon-picker-dialog";
 
-/** Polje za izbor Font Awesome ikone; vrednost je npr. "fa-solid fa-user-shield". */
+/** Field for choosing a Font Awesome icon; the value is e.g. "fa-solid fa-user-shield". */
 @Component({
   selector: "app-icon-select",
   standalone: false,

@@ -17,7 +17,7 @@
   padding: 24px 0;
 }
 
-/* Mreza dijaloga: broj kolona stize iz rasporeda polja, polje stoji na svom mestu. */
+/* Grid of the dialog: the number of columns comes from the layout of the fields, each field stands in its place. */
 .pf-grid {
   display: grid;
   gap: 18px 16px;
@@ -37,7 +37,7 @@
   box-shadow: 0 0 0 3px var(--c-danger-soft);
 }
 
-/* Polje koje se ne moze menjati: vidi se vrednost, ali se u njega ne unosi */
+/* A field that cannot be changed: the value is visible, but nothing can be typed into it */
 .fd-input:disabled {
   background: var(--c-surface-3);
   color: var(--c-text-muted);
@@ -102,7 +102,7 @@
   cursor: not-allowed;
 }
 
-/* Na telefonu forma ide u jednu kolonu, u redosledu red po red. */
+/* On a phone the form goes into one column, row by row. */
 @media (max-width: 900px) {
   .pf-grid {
     grid-template-columns: 1fr !important;

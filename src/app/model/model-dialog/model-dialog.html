@@ -27,7 +27,7 @@
       @if (isTable) {
         <div class="fd-field">
           <label class="fd-label fd-required" for="code">{{ label('code') }}</label>
-          <!-- sifra je naziv tabele u bazi: posle pravljenja se ne menja, jer back ne preimenuje tabelu -->
+          <!-- the code is the name of the table in the database: it cannot change afterwards, because the server does not rename tables -->
           <input id="code" name="code" class="fd-input code" [(ngModel)]="model.code" autocomplete="off"
             spellcheck="false" [readonly]="!isNew" [class.fd-input-error]="codeInvalid()" required />
           @if (codeInvalid()) {
@@ -51,7 +51,7 @@
       </div>
 
       @if (isTable) {
-        <!-- izgled dijaloga za unos u ovu tabelu -->
+        <!-- look of the entry dialog of this table -->
         <div class="fd-field fd-field-wide section">
           <span class="section-title">{{ 'ui.model.layoutTitle' | t }}</span>
           <span class="fd-help">{{ 'ui.model.layoutHint' | t }}</span>

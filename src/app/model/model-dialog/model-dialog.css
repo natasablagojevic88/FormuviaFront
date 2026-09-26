@@ -31,7 +31,7 @@
   font-weight: 700;
 }
 
-/* Umanjen prikaz rasporeda polja u dijalogu za unos */
+/* Scaled-down preview of the field layout in the entry dialog */
 .layout-preview {
   display: grid;
   gap: 4px;

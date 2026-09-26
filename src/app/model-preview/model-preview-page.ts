@@ -13,9 +13,9 @@ import { PreviewFormDialog, PreviewFormDialogData } from "./preview-form-dialog/
 import { DEFAULT_FORM_WIDTH } from "./preview-form";
 
 /**
- * Tabela napravljena u Modelu. Iz menija stize samo id modela, a naziv, opis, kolone i
- * podaci dolaze sa back-a (POST /api/preview/model/{modelId}). Unos i izmena idu kroz
- * dijalog koji forma sa back-a opisuje (GET /api/preview/form/...).
+ * A table built in the Model. Only the model id comes from the menu; the name, description,
+ * columns and rows come from the server (POST /api/preview/model/{modelId}). Entry and editing
+ * go through the dialog the form from the server describes (GET /api/preview/form/...).
  */
 @Component({
   selector: "app-model-preview-page",
@@ -29,7 +29,7 @@ export class ModelPreviewPage {
   readonly subtitle = signal("");
 
   private readonly modelId = signal("");
-  /** Podtabela: id reda nadredjene tabele; prazno za obicnu tabelu. */
+  /** Subtable: id of the row in the parent table; empty for an ordinary table. */
   private readonly parent = signal<string | null>(null);
 
   private readonly table = viewChild.required(DataTable);
@@ -41,7 +41,7 @@ export class ModelPreviewPage {
     private notify: Notify,
     private translate: Translate
   ) {
-    // Menja se i kad se iz menija predje sa jedne tabele na drugu, bez ponovnog pravljenja strane.
+    // It also changes when the menu moves from one table to another, without building the page again.
     combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(([params, query]) => {
       const modelId = params.get("modelId") ?? "";
       const parent = query.get("parent");
@@ -60,7 +60,7 @@ export class ModelPreviewPage {
     });
   }
 
-  /** Istorija reda: tabele iz modela imaju svoju putanju umesto naziva DTO klase. */
+  /** History of a row: model tables have a path of their own instead of a DTO class name. */
   readonly historyUrl = (id: string) => ApiRoute.modelPreviewHistory(this.modelId(), id);
 
   onLoaded(table: DatabaseTable<any>): void {
@@ -76,7 +76,7 @@ export class ModelPreviewPage {
     this.openForm({ modelId: this.modelId(), title: this.title(), id: row.id, parent: this.parent() });
   }
 
-  /** Brisanje zapisa: trazi se potvrda, jer se sa redom brisu i redovi njegovih podtabela. */
+  /** Deleting a record: it is confirmed first, because the rows of its subtables go with it. */
   remove(row: { id: string }): void {
     const data: ConfirmDialogData = {
       title: this.translate.get("ui.deleteTitle"),
@@ -100,7 +100,7 @@ export class ModelPreviewPage {
 
   private openForm(data: PreviewFormDialogData): void {
     this.dialog
-      // prava sirina se postavlja kad forma stigne, jer zavisi od broja kolona u mrezi
+      // the real width is set when the form arrives, because it depends on the number of columns
       .open(PreviewFormDialog, { width: DEFAULT_FORM_WIDTH + "px", maxWidth: "95vw", data })
       .afterClosed()
       .subscribe((saved?: any | false) => {
@@ -111,7 +111,7 @@ export class ModelPreviewPage {
         if (!saved.id) {
           this.table().reload();
         } else if (data.id) {
-          // izmena: osvezava se samo taj red, tabela se ne ucitava ponovo
+          // edit: only that row is refreshed, the table is not loaded again
           this.table().showChanged(saved);
         } else {
           this.table().showNew(saved.id);

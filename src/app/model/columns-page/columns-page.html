@@ -11,7 +11,7 @@
   @if (loading() && !model()) {
     <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
   } @else if (model()) {
-    <!-- izgled dijaloga se menja odmah ovde, pregled ispod prati unos -->
+    <!-- the look of the dialog changes right here, the preview below follows the input -->
     <div class="settings">
       <div class="setting">
         <span class="setting-label"><i class="fa-solid fa-table-columns"></i> {{ 'ui.column.columns' | t }}</span>
@@ -59,7 +59,7 @@
       <p class="hint">{{ 'ui.column.designerHint' | t }}</p>
     }
 
-    <!-- Mreza je u sirini pravog dijaloga, pa se vidi kako ce forma stvarno izgledati -->
+    <!-- The canvas is as wide as the real dialog, so the form is seen as it will really look -->
     <div class="canvas" [style.max-width.px]="dialogWidth()">
       <div class="canvas-head">
         <i class="fa-regular fa-window-maximize"></i>

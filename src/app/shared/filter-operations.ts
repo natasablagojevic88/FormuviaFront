@@ -1,7 +1,7 @@
 import { DatabaseColumn, DatabaseFilter, SearchOperation } from "./database-table";
 import { isDecimalType, parseDecimalText } from "./number-format";
 
-/** Jedan uslov napredne pretrage, onako kako ga korisnik unese. */
+/** One condition of the advanced search, as the user enters it. */
 export interface Criterion {
   fieldName: string;
   searchOperation: SearchOperation;
@@ -24,8 +24,8 @@ export function isEnum(column: DatabaseColumn): boolean {
 }
 
 /**
- * Operacije koje backend stvarno podrzava za tip kolone (SqlQueryWriterServiceImpl).
- * BETWEEN nije ponudjen za tekst, boolean i UUID jer njihove createXxxParameters metode nemaju tu granu.
+ * Operations the server really supports for a column type (SqlQueryWriterServiceImpl).
+ * BETWEEN is not offered for text, boolean and UUID because their createXxxParameters methods have no such branch.
  */
 export function operationsFor(column: DatabaseColumn): SearchOperation[] {
   if (isEnum(column)) {
@@ -58,29 +58,29 @@ export function inputTypeFor(column: DatabaseColumn): string {
     case "INTEGER":
     case "LONG":
       return "number";
-    // Decimalan broj ide kao tekst: polje type="number" ne prima zarez sa srpske tastature.
+    // A decimal number goes as text: a type="number" field does not accept a comma from a Serbian keyboard.
     default:
       return "text";
   }
 }
 
-/** Tastatura na telefonu: brojcana za cele brojeve, decimalna (sa zarezom) za BIGDECIMAL. */
+/** Keyboard on a phone: numeric for whole numbers, decimal (with a comma) for BIGDECIMAL. */
 export function inputModeFor(column: DatabaseColumn): string | null {
   return isDecimalType(column.columnType) ? "decimal" : null;
 }
 
-/** Filter za polje ispod naziva kolone: enum i boolean EQUALS, tekst CONTAINS, datum-vreme ceo dan. */
+/** Filter under a column name: enum and boolean EQUALS, text CONTAINS, date and time the whole day. */
 export function quickFilter(column: DatabaseColumn, rawValue: string): DatabaseFilter | null {
   const value = rawValue.trim();
   if (value === "") {
     return null;
   }
   if (!isEnum(column) && column.columnType === "LOCALTIME") {
-    // polje daje HH:mm, a u bazi vreme moze imati i sekunde
+    // the field gives HH:mm, and in the database the time may carry seconds
     return toFilter(column, "BETWEEN", `${value}:00`, `${value}:59`);
   }
   if (!isEnum(column) && column.columnType === "LOCALDATETIME") {
-    // uneto samo datum -> ceo taj dan; uneto i vreme -> taj minut
+    // only a date entered -> that whole day; a time entered as well -> that minute
     return value.includes("T")
       ? toFilter(column, "BETWEEN", `${value}:00`, `${value}:59`)
       : toFilter(column, "BETWEEN", `${value}T00:00:00`, `${value}T23:59:59`);
@@ -89,7 +89,7 @@ export function quickFilter(column: DatabaseColumn, rawValue: string): DatabaseF
   return toFilter(column, operation, value, "");
 }
 
-/** Pretvara uslov u DatabaseFilter za backend; vraca null ako uslov nije potpun ili vrednost nije ispravna. */
+/** Turns a condition into a DatabaseFilter for the server; returns null when it is incomplete or the value is wrong. */
 export function toFilter(column: DatabaseColumn, operation: SearchOperation, rawValue1: string, rawValue2: string): DatabaseFilter | null {
   const base = { field: column.fieldName, columnType: column.columnType, searchOperation: operation };
   if (!needsValue(operation)) {
@@ -109,13 +109,13 @@ export function toFilter(column: DatabaseColumn, operation: SearchOperation, raw
 }
 
 /**
- * Backend parsira vrednosti iz stringa: brojeve kao Integer/Long/BigDecimal, datum kao yyyy-MM-dd,
- * datum-vreme kao yyyy-MM-ddTHH:mm:ss. Polje datetime-local vraca yyyy-MM-ddTHH:mm, pa se sekunde dopunjuju.
+ * The server parses values from strings: numbers as Integer/Long/BigDecimal, a date as yyyy-MM-dd,
+ * a date and time as yyyy-MM-ddTHH:mm:ss. A datetime-local field gives yyyy-MM-ddTHH:mm, so the seconds are added.
  */
 function normalize(column: DatabaseColumn, rawValue: string): string {
   const value = (rawValue ?? "").trim();
   if (!isEnum(column) && isDecimalType(column.columnType)) {
-    // uneto sa zarezom ili tackom, back uvek dobija tacku
+    // entered with a comma or a dot, the server always gets a dot
     return parseDecimalText(value);
   }
   if (!isEnum(column) && column.columnType === "LOCALDATETIME") {
@@ -155,7 +155,7 @@ function isValidValue(column: DatabaseColumn, value: string): boolean {
   }
 }
 
-/** Znaci % i _ su dzokeri u SQL LIKE-u; backslash ih pretvara u obicne znakove. */
+/** The signs % and _ are wildcards in SQL LIKE; a backslash turns them into ordinary characters. */
 function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, "\\$&");
 }

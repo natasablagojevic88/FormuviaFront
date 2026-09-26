@@ -187,7 +187,7 @@ app-page-header {
   font-size: 13px;
 }
 
-/* Platno je u sirini pravog dijaloga za unos */
+/* The canvas is as wide as the real entry dialog */
 .canvas {
   margin: 0 auto;
   border: 1px solid var(--c-border);
@@ -314,7 +314,7 @@ app-page-header {
   padding: 0 22px;
   border: 0;
   border-radius: 16px;
-  /* stoji na plavoj traci, pa je uvek belo sa plavim tekstom */
+  /* it sits on the blue bar, so it is always white with blue text */
   background: var(--c-on-dark);
   color: #1f5eff;
   font: inherit;
@@ -349,7 +349,7 @@ app-page-header {
     border-radius: 18px;
   }
 
-  /* Na telefonu mreza ide u jednu kolonu, kao i sam dijalog za unos */
+  /* On a phone the grid goes into one column, like the entry dialog itself */
   .grid {
     grid-template-columns: 1fr !important;
     padding: 12px;

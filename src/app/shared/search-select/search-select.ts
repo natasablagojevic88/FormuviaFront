@@ -11,10 +11,10 @@ export type SelectAppearance = "field" | "compact" | "dark";
 
 let nextId = 0;
 
-// Lista moze biti velika (npr. svi partneri); iscrtava se najvise ovoliko stavki, a pretraga ide kroz sve.
+// The list can be large (e.g. every partner); at most this many items are drawn, while the search goes through all of them.
 const MAX_SHOWN = 200;
 
-// Pretraga ne gleda velika/mala slova ni kvacice: "sifra" nalazi "Šifra", "dorde" nalazi "Đorđe".
+// The search ignores case and diacritics: "sifra" finds "Šifra", "dorde" finds "Đorđe".
 function normalize(text: string): string {
   return text
     .normalize("NFD")
@@ -59,7 +59,7 @@ export class SearchSelect implements ControlValueAccessor {
     const query = normalize(this.query().trim());
     return query ? this.options().filter((option) => normalize(option.label).includes(query)) : this.options();
   });
-  /** Stavke koje se iscrtavaju: prvih MAX_SHOWN pogodaka, uz izabranu vrednost ako je van tog dela. */
+  /** Items that are drawn: the first MAX_SHOWN matches, plus the selected value when it falls outside them. */
   readonly shown = computed(() => {
     const filtered = this.filtered();
     if (filtered.length <= MAX_SHOWN) {
@@ -69,7 +69,7 @@ export class SearchSelect implements ControlValueAccessor {
     const selected = filtered.find((option) => option.value === this.value());
     return selected && !first.includes(selected) ? [selected, ...first] : first;
   });
-  /** Koliko pogodaka nije iscrtano; tada se korisniku kaze da suzi pretragu. */
+  /** How many matches are not drawn; the user is then told to narrow the search. */
   readonly hiddenCount = computed(() => Math.max(this.filtered().length - this.shown().length, 0));
   readonly maxShown = MAX_SHOWN;
 
@@ -160,7 +160,7 @@ export class SearchSelect implements ControlValueAccessor {
       event.preventDefault();
       this.openPanel();
     } else if (event.key.length === 1 && event.key !== " " && !event.ctrlKey && !event.metaKey && !event.altKey) {
-      // Kucanje na zatvorenom polju odmah otvara listu i pocinje pretragu
+      // Typing on a closed field opens the list at once and starts the search
       event.preventDefault();
       this.openPanel(event.key);
     }

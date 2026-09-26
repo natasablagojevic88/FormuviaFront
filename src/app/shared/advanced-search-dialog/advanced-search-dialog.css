@@ -23,7 +23,7 @@
   flex: 1;
 }
 
-/* U jednom redu oba polja dele sirinu; jedno ispod drugog svako uzima celu. */
+/* In one row both fields share the width; one below the other each takes the whole of it. */
 .values > * {
   flex: 1;
   min-width: 0;

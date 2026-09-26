@@ -1,4 +1,4 @@
-/** Tipovi podataka kolone; isti spisak kao ColumnType na back-u. */
+/** Data types of a column; the same list as ColumnType on the server. */
 export type ModelColumnType =
   | "STRING"
   | "BOOLEAN"
@@ -10,40 +10,40 @@ export type ModelColumnType =
   | "LOCALTIME"
   | "UUID";
 
-/** Jedno polje forme, tj. kolona tabele koju model pravi u bazi. */
+/** One field of the form, that is, a column of the table the model creates in the database. */
 export interface ModelColumn {
   id?: string;
   modelId: string;
   code: string;
   name: string;
   columnType: ModelColumnType;
-  /** Broj decimala; back ga trazi samo za decimalan broj. */
+  /** Number of decimals; the server asks for it only for a decimal number. */
   length?: number | null;
-  /** Veza na sifarnik; obavezna kad je tip UUID. */
+  /** Link to a codebook; required when the type is UUID. */
   codebookId?: string | null;
   nullable: boolean;
   showInTable: boolean;
   editable: boolean;
   defaultValueSql?: string | null;
-  /** SELECT sa dve kolone (vrednost, tekst) koji puni listu izbora za ovo polje. */
+  /** A SELECT with two columns (value, text) that fills the list of choices for this field. */
   listOfValuesSql?: string | null;
   textArea: boolean;
-  /** Kad se ova tabela koristi kao sifarnik, vrednost ovog polja ulazi u prikazani naziv. */
+  /** When this table is used as a codebook, the value of this field goes into the label shown. */
   inDescriptionForCodebook: boolean;
-  /** Polozaj u mrezi forme, broji se od 1. */
+  /** Place in the grid of the form, counted from 1. */
   rowIndex: number;
   columnIndex: number;
   colspan: number;
 }
 
-/** Granice iz ModelColumnDTO (@Min/@Max na back-u). */
+/** Limits from ModelColumnDTO (@Min/@Max on the server). */
 export const COLUMN_LIMITS = {
   rowIndex: { min: 1 },
   columnIndex: { min: 1, max: 12 },
   colspan: { min: 1, max: 12 },
 };
 
-/** Sifra kolone: isti obrazac kao na back-u. */
+/** Code of the column: the same pattern as on the server. */
 export const COLUMN_CODE_PATTERN = /^[a-z][a-z0-9_]{0,62}$/;
 
 export function newColumn(modelId: string, rowIndex: number, columnIndex: number): ModelColumn {

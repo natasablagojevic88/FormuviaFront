@@ -21,7 +21,7 @@ export class IconPickerDialog implements OnInit {
 
   private readonly icons = signal<IconOption[]>([]);
 
-  /** Trazi se po nazivu, prevodu naziva sa FA i po pojmovima (npr. "korpa" -> cart nije, ali "cart" jeste). */
+  /** Searched by name, by the translated name from FA and by keywords. */
   readonly found = computed(() => {
     const query = this.query().trim().toLowerCase();
     if (!query) {

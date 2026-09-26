@@ -27,7 +27,7 @@ export class AdvancedSearchDialog {
   readonly isDate = (column: { columnType: string }) =>
     column.columnType === "LOCALDATE" || column.columnType === "LOCALDATETIME";
 
-  // Opcije za padajuce liste; racunaju se jednom po otvaranju dijaloga
+  // Options for the dropdowns; worked out once per opening of the dialog
   readonly columnOptions: SelectOption[];
   readonly operationOptions = new Map<string, SelectOption[]>();
   readonly valueOptions = new Map<string, SelectOption[]>();

@@ -4,13 +4,13 @@ import { Language } from "../../services/language";
 import { datePattern, dateToText, maskDateText, textToDate, TimeMode } from "../date-format";
 
 /**
- * Polje za unos datuma (i vremena) koje prati jezik aplikacije.
+ * A field for entering a date (and a time) that follows the language of the application.
  *
- * Nativni <input type="date"> pise datum po jeziku browsera, pa bi korisnik sa engleskim
- * browserom i srpskim izborom u aplikaciji unosio mesec pre dana. Zato se datum kuca u
- * obicno tekstualno polje, a kalendar se otvara dugmetom pored (nativni birac, sakriven).
+ * A native <input type="date"> writes the date by the language of the browser, so a user with an English
+ * browser and Serbian chosen in the application would enter the month before the day. The date is therefore
+ * typed into an ordinary text field, and the calendar opens from the button beside it (the native picker, hidden).
  *
- * Vrednost napolju je uvek ISO, onakva kakvu back trazi: "2026-09-23" ili "2026-09-23T16:50".
+ * The value outside is always ISO, the way the server wants it: "2026-09-23" or "2026-09-23T16:50".
  */
 @Component({
   selector: "app-date-field",
@@ -23,20 +23,20 @@ import { datePattern, dateToText, maskDateText, textToDate, TimeMode } from "../
   },
 })
 export class DateField implements ControlValueAccessor {
-  /** true: polje nosi i vreme (LOCALDATETIME). */
+  /** true: the field carries a time as well (LOCALDATETIME). */
   readonly withTime = input(false);
-  /** true: vreme se kuca ali ne mora - filter po danu ili po minutu. */
+  /** true: a time may be typed but is not required - a filter by day or by minute. */
   readonly timeOptional = input(false);
-  /** Manji oblik, za red tabele i polje za filter. */
+  /** Smaller form, for a table row and a filter field. */
   readonly compact = input(false);
   readonly ariaLabel = input("");
   readonly placeholder = input("");
-  /** Datum je izabran iz kalendara; tabela po tome zna da je izmena celije gotova. */
+  /** A date was chosen from the calendar; the table knows by it that editing the cell is done. */
   readonly picked = output<string>();
 
   readonly text = signal("");
   readonly disabled = signal(false);
-  /** Nesto je ukucano, ali to nije datum. */
+  /** Something is typed, but it is not a date. */
   readonly invalid = signal(false);
 
   private readonly picker = viewChild.required<ElementRef<HTMLInputElement>>("picker");
@@ -47,13 +47,13 @@ export class DateField implements ControlValueAccessor {
 
   constructor(private language: Language) {}
 
-  /** Tekst u praznom polju: dd.mm.yyyy na srpskom, mm/dd/yyyy na engleskom. */
+  /** Text of an empty field: dd.mm.yyyy in Serbian, mm/dd/yyyy in English. */
   get mask(): string {
     const pattern = datePattern(this.language.current());
     return this.withTime() ? `${pattern.mask} ${pattern.hour12 ? "hh:mm AM" : "hh:mm"}` : pattern.mask;
   }
 
-  /** Da li rezultat nosi vreme: uvek, samo kad je ukucano, ili nikad. */
+  /** Whether the result carries a time: always, only when typed, or never. */
   private get timeMode(): TimeMode {
     if (!this.withTime()) {
       return "no";
@@ -88,9 +88,9 @@ export class DateField implements ControlValueAccessor {
   }
 
   /**
-   * Dok se kuca: razdvajaci se ubacuju sami (22052026 -> 22.05.2026), a cim tekst postane
-   * datum, vrednost ide napolje. Maska se primenjuje samo kad je kursor na kraju, da ne
-   * pomera tekst dok se ispravlja nesto u sredini.
+   * While typing: the separators are inserted on their own (22052026 -> 22.05.2026), and as soon as the
+   * text becomes a date the value goes out. The mask is applied only when the caret is at the end, so it
+   * does not move the text while something in the middle is being corrected.
    */
   onText(target: HTMLInputElement): void {
     const typed = target.value;
@@ -114,7 +114,7 @@ export class DateField implements ControlValueAccessor {
     this.setValue(iso);
   }
 
-  /** Po izlasku iz polja ispravan datum se prepise u puni oblik (3.9.26 -> 03.09.2026). */
+  /** On leaving the field a correct date is written out in full (3.9.26 -> 03.09.2026). */
   onBlur(): void {
     this.onTouched();
     if (this.value !== "") {
@@ -123,7 +123,7 @@ export class DateField implements ControlValueAccessor {
     }
   }
 
-  /** Kalendar: otvara se nativni birac, koji je jedini deo koji ostaje na jeziku browsera. */
+  /** Calendar: the native picker opens, the only part that stays in the language of the browser. */
   openPicker(): void {
     if (this.disabled()) {
       return;

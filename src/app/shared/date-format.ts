@@ -1,9 +1,9 @@
 /**
- * Datum i vreme za prikaz. Back salje ISO oblik (2026-09-23, 2026-09-23T16:50:00),
- * a prikazuje se po izabranom jeziku: srpski 23.09.2026. 16:50, engleski 09/23/2026, 04:50 PM.
+ * Dates and times for display. The server sends the ISO form (2026-09-23, 2026-09-23T16:50:00),
+ * and it is shown the way the chosen language writes it: Serbian 23.09.2026 16:50, English 09/23/2026 04:50 PM.
  */
 
-/** Intl formatter se pravi jednom po jeziku - u tabeli se poziva za svaku celiju. */
+/** The Intl formatter is built once per language - in a table it is called for every cell. */
 const formatters = new Map<string, Intl.DateTimeFormat>();
 
 const DATE_OPTIONS: Intl.DateTimeFormatOptions = { year: "numeric", month: "2-digit", day: "2-digit" };
@@ -20,8 +20,8 @@ function formatter(language: string, withTime: boolean): Intl.DateTimeFormat {
 }
 
 /**
- * ISO tekst -> Date u lokalnoj zoni. Delovi se citaju iz teksta, a ne kroz new Date(tekst),
- * jer bi datum bez vremena bio protumacen kao UTC i u minusnim zonama pao na dan ranije.
+ * ISO text -> Date in the local zone. The parts are read out of the text instead of through new Date(text),
+ * because a date without a time would be read as UTC and fall on the day before in negative offsets.
  */
 function toDate(value: any): Date | null {
   const match = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?/.exec(String(value ?? "").trim());
@@ -38,8 +38,8 @@ function toDate(value: any): Date | null {
 }
 
 /**
- * Prikaz datuma i datuma sa vremenom. Isti je oblik kao u polju za unos, da bi korisnik
- * video tacno ono sto i kuca: 23.09.2026, 23.09.2026 16:50 na srpskom.
+ * Display of a date and of a date with a time. It is the same form as in the entry field, so the user
+ * sees exactly what they type: 23.09.2026, 23.09.2026 16:50 in Serbian.
  */
 export function formatDate(value: any, language: string): string {
   const text = dateToText(value, language);
@@ -48,13 +48,13 @@ export function formatDate(value: any, language: string): string {
 
 export const formatDateTime = formatDate;
 
-/** Redosled delova datuma na jednom jeziku, sa separatorom i tekstom za prazno polje. */
+/** Order of the parts of a date in one language, with the separator and the text of an empty field. */
 export interface DatePattern {
   order: ("day" | "month" | "year")[];
   separator: string;
-  /** dd.mm.yyyy na srpskom, mm/dd/yyyy na engleskom. */
+  /** dd.mm.yyyy in Serbian, mm/dd/yyyy in English. */
   mask: string;
-  /** true kad jezik pise vreme sa AM/PM. */
+  /** true when the language writes the time with AM/PM. */
   hour12: boolean;
 }
 
@@ -62,7 +62,7 @@ const patterns = new Map<string, DatePattern>();
 
 const MASK_PART: Record<string, string> = { day: "dd", month: "mm", year: "yyyy" };
 
-/** Kako se datum pise na tom jeziku; cita se iz samog Intl-a, pa nema spiska jezika u kodu. */
+/** How a date is written in that language; read from Intl itself, so there is no list of languages in the code. */
 export function datePattern(language: string): DatePattern {
   let found = patterns.get(language);
   if (found) {
@@ -85,7 +85,7 @@ export function datePattern(language: string): DatePattern {
   return found;
 }
 
-/** ISO datum -> tekst u polju za unos (bez tacke na kraju, da se ne smeta kucanju). */
+/** ISO date -> text in the entry field (without the trailing dot, so it does not get in the way of typing). */
 export function dateToText(value: string, language: string): string {
   const date = toDate(value);
   if (!date) {
@@ -115,16 +115,16 @@ function timeToText(date: Date, pattern: DatePattern): string {
 }
 
 /**
- * Kako se postupa sa vremenom pri citanju teksta:
- * "no" - vreme se ne uzima (kolona je samo datum),
- * "yes" - rezultat uvek nosi vreme (neukucano je 00:00),
- * "optional" - vreme je u rezultatu samo ako ga je korisnik ukucao (filter po danu ili po minutu).
+ * How the time is treated when the text is read:
+ * "no" - the time is ignored (the column is a date only),
+ * "yes" - the result always carries a time (00:00 when none was typed),
+ * "optional" - the result carries a time only when the user typed one (filter by day or by minute).
  */
 export type TimeMode = "no" | "optional" | "yes";
 
 /**
- * Tekst iz polja -> ISO za back ("" kad tekst nije datum). Prima bilo koji razdvajac
- * (23.09.2026, 23/09/2026, 23-9-2026) i vreme na kraju, sa ili bez AM/PM.
+ * Text from the field -> ISO for the server ("" when the text is not a date). It accepts any separator
+ * (23.09.2026, 23/09/2026, 23-9-2026) and a time at the end, with or without AM/PM.
  */
 export function textToDate(text: string, language: string, time: TimeMode = "no"): string {
   let rest = (text ?? "").trim();
@@ -161,7 +161,7 @@ export function textToDate(text: string, language: string, time: TimeMode = "no"
   }
 
   const date = new Date(parts["year"], parts["month"] - 1, parts["day"], hours, minutes);
-  // 31.02. i slicni datumi se u Date prelivaju u sledeci mesec, pa se delovi proveravaju nazad
+  // 31.02. and dates like it spill into the next month in Date, so the parts are checked back
   if (
     date.getFullYear() !== parts["year"] ||
     date.getMonth() !== parts["month"] - 1 ||
@@ -176,8 +176,8 @@ export function textToDate(text: string, language: string, time: TimeMode = "no"
 }
 
 /**
- * Ubacuje razdvajace dok se kuca: 22052026 postaje 22.05.2026, a kod datuma sa vremenom
- * 220520261650 postaje 22.05.2026 16:50. Tekst sa slovima (AM/PM) se ne dira.
+ * Inserts the separators while typing: 22052026 becomes 22.05.2026, and for a date with a time
+ * 220520261650 becomes 22.05.2026 16:50. Text with letters (AM/PM) is left alone.
  */
 export function maskDateText(text: string, language: string, withTime = false): string {
   const raw = text ?? "";
@@ -212,7 +212,7 @@ export function maskDateText(text: string, language: string, withTime = false): 
   return index < digits.length ? `${result}:${digits.substring(index, index + 2)}` : result;
 }
 
-/** Vreme (16:50 ili 16:50:00) za prikaz: 24 sata na srpskom, 04:50 PM na engleskom. */
+/** Time (16:50 or 16:50:00) for display: 24 hours in Serbian, 04:50 PM in English. */
 export function formatTime(value: any, language: string): string {
   const match = /^(\d{1,2}):(\d{2})/.exec(String(value ?? "").trim());
   if (!match) {

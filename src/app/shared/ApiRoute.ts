@@ -35,37 +35,37 @@
         return `/api/preview/model/${modelId}`;
     }
 
-    /** Tabela podredjenog modela: samo redovi koji pripadaju redu nadredjene tabele. */
+    /** Table of a child model: only the rows that belong to a row of the parent table. */
     static modelPreviewTableWithParent(modelId: string, parentId: string): string {
         return `/api/preview/model/${modelId}/${parentId}`;
     }
 
-    /** Forma za nov zapis. */
+    /** Form for a new record. */
     static modelPreviewForm(modelId: string): string {
         return `/api/preview/form/${modelId}`;
     }
 
-    /** Forma postojeceg zapisa (izmena). */
+    /** Form of an existing record (edit). */
     static modelPreviewFormWithId(modelId: string, id: string): string {
         return `/api/preview/form/${modelId}/${id}`;
     }
 
-    /** Forma za nov zapis u podtabeli: prazna forma sa vezom na red nadredjene tabele. */
+    /** Form for a new record in a subtable: an empty form with the link to the parent row. */
     static modelPreviewFormWithParent(modelId: string, parent: string): string {
         return `/api/preview/form/${modelId}/parent/${parent}`;
     }
 
-    /** Istorija zapisa tabele iz modela (nema className kao ugradjene tabele). */
+    /** History of a record of a model table (it has no className like the built-in tables). */
     static modelPreviewHistory(modelId: string, id: string): string {
         return `/api/preview/history/${modelId}/${id}`;
     }
 
-    /** Brisanje zapisa tabele iz modela; redovi podtabela idu sa njim (cascade). */
+    /** Deleting a record of a model table; the rows of its subtables go with it (cascade). */
     static modelPreviewDelete(modelId: string, id: string): string {
         return `/api/preview/delete/${modelId}/${id}`;
     }
 
-    /** Snimanje zapisa tabele iz modela (insert kad je id prazan, inace update). */
+    /** Saving a record of a model table (insert when the id is empty, otherwise update). */
     static modelPreviewUpdate(modelId: string): string {
         return `/api/preview/update/${modelId}`;
     }

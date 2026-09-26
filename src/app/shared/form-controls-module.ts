@@ -4,7 +4,7 @@ import { TranslateModule } from "./translate-module";
 import { SearchSelect } from "./search-select/search-select";
 import { DateField } from "./date-field/date-field";
 
-// Kontrole forme koje koriste i AppModule (header) i feature moduli (preko SharedModule).
+// Form controls used by AppModule (the header) and by feature modules (through SharedModule).
 @NgModule({
   declarations: [SearchSelect, DateField],
   imports: [OverlayModule, TranslateModule],

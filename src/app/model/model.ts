@@ -1,6 +1,6 @@
 export type ModelType = "MENU" | "TABLE";
 
-/** Cvor drveta modela; koren nema id ni tip (samo naziv, preveden na back-u). */
+/** A node of the model tree; the root has no id and no type (only a name, translated on the server). */
 export interface ModelNode {
   id?: string;
   parentId?: string;
@@ -9,7 +9,7 @@ export interface ModelNode {
   name: string;
   description?: string;
   icon?: string;
-  /** Izgled dijaloga za unos u tabelu: sirina u px i raspored polja (kolone x redovi). */
+  /** Look of the entry dialog: width in px and the layout of the fields (columns x rows). */
   dialogWidth?: number;
   rowNumber?: number;
   columnNumber?: number;
@@ -21,24 +21,24 @@ export interface ModelNode {
 }
 
 /**
- * Pravila sa back-a (CreateModel):
- * - ispod korena ide samo MENU, a MENU nema nadredjeni cvor,
- * - ispod MENU i ispod TABLE ide TABLE (pravi se tabela u bazi, podtabela dobija kolonu parent),
- * - TABLE mora imati sifru i sve cetiri uloge.
+ * Rules from the server (CreateModel):
+ * - only a MENU goes under the root, and a MENU has no parent node,
+ * - a TABLE goes under a MENU and under a TABLE (a table is created in the database, a subtable gets a parent column),
+ * - a TABLE must have a code and all four roles.
  */
 export function childTypeOf(node: ModelNode): ModelType {
   return node.type ? "TABLE" : "MENU";
 }
 
-/** Granice iz ModelDTO (@Min/@Max na back-u). */
+/** Limits from ModelDTO (@Min/@Max on the server). */
 export const DIALOG_LIMITS = {
   dialogWidth: { min: 400 },
   rowNumber: { min: 1 },
   columnNumber: { min: 1, max: 12 },
 };
 
-/** Pocetne vrednosti za novu tabelu. */
+/** Starting values for a new table. */
 export const DIALOG_DEFAULTS = { dialogWidth: 800, columnNumber: 2, rowNumber: 5 };
 
-/** Sifra tabele: mala slova, cifre i donja crta, pocinje slovom, najvise 56 znakova (isto kao UpdateModel.NAME_PARENT). */
+/** Code of the table: lowercase letters, digits and underscore, starting with a letter, at most 56 characters (as UpdateModel.NAME_PARENT). */
 export const TABLE_CODE_PATTERN = /^[a-z][a-z0-9_]{0,55}$/;

@@ -11,7 +11,7 @@ import { COLUMN_CODE_PATTERN, COLUMN_LIMITS, ModelColumn, ModelColumnType } from
 
 export interface ColumnDialogData {
   column: ModelColumn;
-  /** Sva polja te forme; sluzi za proveru da mesto u mrezi nije vec zauzeto. */
+  /** Every field of that form; used to check that a place in the grid is not taken already. */
   columns: ModelColumn[];
   columnNumber: number;
   rowNumber: number;
@@ -50,7 +50,7 @@ export class ColumnDialog implements OnInit {
   }
 
   ngOnInit(): void {
-    // sifarnik moze biti bilo koja tabela iz modela
+    // any table of the model can be a codebook
     this.sendRequest.get(ApiRoute.modelTree).then((root: ModelNode) => this.codebooks.set(this.tables(root, [])));
   }
 
@@ -78,7 +78,7 @@ export class ColumnDialog implements OnInit {
     return this.column.columnType === "STRING";
   }
 
-  /** Da/ne polje nema listu vrednosti - vrednosti su vec da i ne (back to isto prazni). */
+  /** A yes/no field has no list of values - its values are already yes and no (the server clears it too). */
   get isBoolean(): boolean {
     return this.column.columnType === "BOOLEAN";
   }
@@ -87,7 +87,7 @@ export class ColumnDialog implements OnInit {
     return this.translate.get("ui.column." + fieldName);
   }
 
-  /** Back prima samo SELECT upit (JSqlParser), pa se to proverava i ovde. */
+  /** The server accepts only a SELECT query (JSqlParser), so it is checked here as well. */
   defaultSqlInvalid(): boolean {
     return this.notSelect(this.column.defaultValueSql);
   }
@@ -105,13 +105,13 @@ export class ColumnDialog implements OnInit {
     return !!this.column.code && !COLUMN_CODE_PATTERN.test(this.column.code);
   }
 
-  /** Polje mora da stane u mrezu forme (back proverava isto). */
+  /** The field must fit into the grid of the form (the server checks the same). */
   placeInvalid(): boolean {
     return this.column.columnIndex + this.column.colspan - 1 > this.data.columnNumber
       || this.column.rowIndex > this.data.rowNumber;
   }
 
-  /** Na tom mestu ne sme da stoji drugo polje (back proverava isto). */
+  /** No other field may stand in that place (the server checks the same). */
   placeTaken(): boolean {
     const from = Number(this.column.columnIndex);
     const to = from + Number(this.column.colspan) - 1;
@@ -141,11 +141,11 @@ export class ColumnDialog implements OnInit {
       return;
     }
     if (this.isCodebook) {
-      // veza na sifarnik ne moze i sama da ulazi u naziv sifarnika
+      // a link to a codebook cannot itself be part of the codebook label
       this.column.inDescriptionForCodebook = false;
     }
     if (this.isBoolean) {
-      // da/ne nema svoju listu vrednosti
+      // yes/no has no list of values of its own
       this.column.listOfValuesSql = null;
     }
     this.saving.set(true);
@@ -155,8 +155,8 @@ export class ColumnDialog implements OnInit {
   }
 
   /**
-   * Brisanje polja: uklanja i kolonu iz baze sa svim podacima u njoj,
-   * pa se trazi izricita potvrda i jasno se kaze da povratka nema.
+   * Deleting a field: it also removes the column from the database with all the data in it,
+   * so it asks for an explicit confirmation and says plainly that there is no way back.
    */
   remove(): void {
     if (this.isNew || this.saving()) {

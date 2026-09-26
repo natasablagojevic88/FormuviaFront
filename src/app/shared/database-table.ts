@@ -32,59 +32,59 @@ export interface DatabaseColumn {
   fieldName: string;
   description: string;
   columnType: ColumnType;
-  /** Popunjeno samo za enum kolone: vrednost (ime konstante) i prevedeni naziv. */
+  /** Filled only for enum columns: the value (name of the constant) and the translated text. */
   listOfValues?: ComboOption[];
-  /** Ako backend posalje false, kolona se ne nudi u naprednoj pretrazi. */
+  /** When the server sends false, the column is not offered in the advanced search. */
   searchable?: boolean;
-  /** false: kolona se ne moze menjati direktno u tabeli (@NotEditableInTable na back-u). */
+  /** false: the column cannot be changed directly in the table (@NotEditableInTable on the server). */
   editable?: boolean;
-  /** true: polje je obavezno (@NotNull na back-u) - bez njega se red ne moze snimiti. */
+  /** true: the field is required (@NotNull on the server) - without it the row cannot be saved. */
   required?: boolean;
-  /** Broj decimala kolone; kad ga back posalje, decimalan broj se prikazuje bas sa toliko decimala. */
+  /** Number of decimals of the column; when the server sends it, a decimal number is shown with exactly that many. */
   length?: number;
 }
 
 export interface DatabaseTable<T> {
   name: string;
-  /** Opis tabele sa back-a; strana ga prikazuje kao podnaslov. */
+  /** Description of the table from the server; the page shows it as a subtitle. */
   description?: string;
-  /** Kolone koje se prikazuju u tabeli. */
+  /** Columns shown in the table. */
   column: DatabaseColumn[];
-  /** Sve kolone DTO-a, i one skrivene u tabeli; izvor prevoda za forme i naprednu pretragu. */
+  /** Every column of the DTO, including those hidden in the table; the source of labels for forms and the advanced search. */
   allColumns: DatabaseColumn[];
   list: T[];
   total: number;
   numberOfPages: number;
-  /** Putanja za snimanje reda bez /api prefiksa (npr. "/appuser"); bez nje tabela je samo za citanje. */
+  /** Path for saving a row, without the /api prefix (e.g. "/appuser"); without it the table is read-only. */
   saveUrl?: string;
-  /** Naziv DTO klase (npr. "AppUserDTO"); koristi se za istoriju reda. */
+  /** Name of the DTO class (e.g. "AppUserDTO"); used for the history of a row. */
   className?: string;
-  /** Podredjene tabele; iz menija reda se otvara tabela deteta filtrirana po tom redu. */
+  /** Subtables; the row menu opens the child table filtered by that row. */
   children?: TableChild[];
 }
 
-/** Podredjena tabela jedne tabele (nadredjeni -> podredjeni). */
+/** A subtable of one table (parent -> child). */
 export interface TableChild {
   className: string;
-  /** Vec preveden naziv, npr. "Partneri". */
+  /** Already translated name, e.g. "Partners". */
   title: string;
-  /** Putanja tabele deteta bez /api prefiksa, npr. "/partner/table". */
+  /** Path of the child table without the /api prefix, e.g. "/partner/table". */
   tableUrl: string;
-  /** Polje u detetu koje drzi id nadredjenog reda, npr. "tipPartneraId". */
+  /** Field in the child that holds the id of the parent row, e.g. "tipPartneraId". */
   parentField: string;
   icon?: string;
 }
 
-/** Jedna izmena u istoriji reda; fieldName je vec preveden na back-u. */
+/** One change in the history of a row; fieldName is already translated on the server. */
 export interface HistoryChange {
   fieldName: string;
-  /** Tip kolone sa back-a; po njemu se vrednost formatira u istoriji. */
+  /** Column type from the server; the value is formatted by it in the history. */
   columnType?: ColumnType;
   oldData?: any;
   newData?: any;
 }
 
-/** Jedan zapis istorije: ko je, kada i sta promenio. */
+/** One history entry: who changed what, and when. */
 export interface HistoryEntry {
   appUserUsername?: string;
   appUserName?: string;

@@ -10,7 +10,7 @@ import { ModelColumn, newColumn } from "../model-column";
 import { DIALOG_LIMITS } from "../model";
 import { ColumnDialog, ColumnDialogData } from "../column-dialog/column-dialog";
 
-/** Jedna celija mreze: ili polje forme, ili prazno mesto na koje se dodaje novo. */
+/** One cell of the grid: either a field of the form, or an empty place a new one is added to. */
 interface Cell {
   row: number;
   column: number;
@@ -30,7 +30,7 @@ export class ColumnsPage {
   readonly loading = signal(false);
   readonly selectedId = signal<string | null>(null);
 
-  // Izgled dijaloga se menja odmah ovde; snimanje ide na model (POST /api/model).
+  // The look of the dialog changes right here; saving goes to the model (POST /api/model).
   readonly limits = DIALOG_LIMITS;
   readonly columnCount = signal(1);
   readonly rowCount = signal(1);
@@ -43,7 +43,7 @@ export class ColumnsPage {
       || model.dialogWidth !== this.dialogWidth());
   });
 
-  /** Polja koja bi ostala van manje mreze; dok ih ima, izmena se ne moze snimiti. */
+  /** Fields that would fall outside a smaller grid; while there are any, the change cannot be saved. */
   readonly outsideColumns = computed(() => this.columns().filter((column) =>
     column.rowIndex > this.rowCount() || column.columnIndex + column.colspan - 1 > this.columnCount()));
 
@@ -58,7 +58,7 @@ export class ColumnsPage {
   });
   readonly freePlaces = computed(() => this.cells().filter((cell) => !cell.column_).length);
 
-  /** Mreza forme: polja na svom mestu, ostalo prazna mesta. */
+  /** Grid of the form: fields in their places, the rest empty. */
   readonly cells = computed<Cell[]>(() => {
     const columns = this.columns();
     const cells: Cell[] = [];
@@ -111,7 +111,7 @@ export class ColumnsPage {
     this.dialogWidth.set(model?.dialogWidth ?? 800);
   }
 
-  /** Cita model po id-u, menja tri parametra izgleda i snima ga. */
+  /** Reads the model by id, changes the three layout settings and saves it. */
   saveLayout(): void {
     const model = this.model();
     if (!model?.id || !this.layoutValid() || !this.layoutChanged() || this.savingLayout()) {
@@ -164,7 +164,7 @@ export class ColumnsPage {
       columns: this.columns(),
       columnNumber: model.columnNumber ?? 1,
       rowNumber: model.rowNumber ?? 1,
-      /** Sifarnici za vezu: sve tabele modela. */
+      /** Codebooks for a link: every table of the model. */
       modelId: model.id!,
     };
     this.dialog.open(ColumnDialog, { width: "720px", data, autoFocus: "#name" })

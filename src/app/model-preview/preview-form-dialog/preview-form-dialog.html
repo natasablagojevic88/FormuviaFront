@@ -15,7 +15,7 @@
     } @else if (!fields().length) {
       <p class="empty">{{ 'ui.preview.noFields' | t }}</p>
     } @else {
-      <!-- mreza je ista kao u dizajnu forme: polje stoji u svom redu i koloni -->
+      <!-- the grid is the same as in the form design: a field stands in its own row and column -->
       <div class="pf-grid" [style.grid-template-columns]="'repeat(' + layout().columnNumber + ', minmax(0, 1fr))'">
         @for (column of fields(); track column.code) {
           <div class="fd-field" [style.grid-column]="gridColumn(column)" [style.grid-row]="gridRow(column)">

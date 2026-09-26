@@ -1,8 +1,8 @@
-/* Panel istorije: izvlaci se sa desne strane, na telefonu preko cele sirine */
+/* History panel: it slides in from the right, on a phone across the whole width */
 .history-backdrop {
   position: fixed;
   inset: 0;
-  /* iznad sticky zaglavlja tabele (Material mu daje z-index oko 100) */
+  /* above the sticky table header (Material gives it a z-index around 100) */
   z-index: 1000;
   background: rgba(3, 8, 23, 0.45);
   opacity: 0;

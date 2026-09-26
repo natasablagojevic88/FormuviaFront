@@ -22,24 +22,24 @@ import {
 
 export interface PreviewFormDialogData {
   modelId: string;
-  /** Naziv tabele sa back-a; stoji u zaglavlju dijaloga. */
+  /** Name of the table from the server; it stands in the dialog header. */
   title: string;
-  /** Izmena: id zapisa. Prazno znaci unos novog zapisa. */
+  /** Edit: id of the record. Empty means a new record. */
   id?: string | null;
-  /** Podtabela: id reda nadredjene tabele. */
+  /** Subtable: id of the row in the parent table. */
   parent?: string | null;
 }
 
 /**
- * Unos i izmena zapisa u tabeli napravljenoj u Modelu.
+ * Entering and editing a record of a table built in the Model.
  *
- * Polja, njihove nazive, tipove i mesto u mrezi vraca back:
- * - unos: GET /api/preview/form/{modelId}
- * - izmena: GET /api/preview/form/{modelId}/{id}
- * - unos u podtabeli: GET /api/preview/form/{modelId}/parent/{parent}
+ * The fields, their names, types and place in the grid come from the server:
+ * - entry: GET /api/preview/form/{modelId}
+ * - edit: GET /api/preview/form/{modelId}/{id}
+ * - entry in a subtable: GET /api/preview/form/{modelId}/parent/{parent}
  *
- * Forma se iscrtava tacno po rasporedu iz dizajna forme (rowIndex, columnIndex, colspan),
- * pa dijalog izgleda kao pregled u dizajneru.
+ * The form is drawn exactly by the layout from the form design (rowIndex, columnIndex, colspan),
+ * so the dialog looks like the preview in the designer.
  */
 @Component({
   selector: "app-preview-form-dialog",
@@ -51,16 +51,16 @@ export class PreviewFormDialog implements OnInit {
   readonly loading = signal(false);
   readonly saving = signal(false);
 
-  /** Polja koja korisnik popunjava: ona koja imaju mesto u mrezi forme. */
+  /** Fields the user fills in: those that have a place in the grid of the form. */
   readonly fields = signal<PreviewColumn[]>([]);
   readonly layout = computed(() => layoutOf(this.fields()));
 
-  /** Vrednosti polja po sifri kolone. */
+  /** Values of the fields by column code. */
   values: Record<string, any> = {};
 
   /**
-   * Polja bez mesta u mrezi (id, veza na nadredjeni red...) se ne prikazuju, ali njihove
-   * vrednosti ostaju u zapisu i salju se onakve kakve su stigle sa back-a.
+   * Fields without a place in the grid (id, the link to the parent row...) are not shown, but their
+   * values stay in the record and are sent back as they came from the server.
    */
   private hiddenValues: Record<string, any> = {};
 
@@ -94,7 +94,7 @@ export class PreviewFormDialog implements OnInit {
     if (id) {
       return ApiRoute.modelPreviewFormWithId(modelId, id);
     }
-    // nov zapis u podtabeli: forma odmah nosi vezu na red nadredjene tabele
+    // a new record in a subtable: the form already carries the link to the parent row
     return parent ? ApiRoute.modelPreviewFormWithParent(modelId, parent) : ApiRoute.modelPreviewForm(modelId);
   }
 
@@ -112,7 +112,7 @@ export class PreviewFormDialog implements OnInit {
       .filter((column) => !hasPlace(column))
       .forEach((column) => (this.hiddenValues[column.code] = column.value ?? null));
 
-    // Sirina dijaloga zavisi od broja kolona u mrezi, a zna se tek kad forma stigne.
+    // The width of the dialog depends on the number of columns, which is known only once the form arrives.
     this.dialogRef.updateSize(this.layout().width + "px");
   }
 
@@ -120,7 +120,7 @@ export class PreviewFormDialog implements OnInit {
     return (column.listOfValues ?? []).map((option) => ({ value: String(option.value), label: option.option }));
   }
 
-  /** Mesto polja u mrezi; bez rasporeda polja idu jedno za drugim. */
+  /** Place of the field in the grid; without a layout the fields follow one another. */
   gridColumn(column: PreviewColumn): string {
     const from = column.columnIndex ?? 0;
     const span = column.colspan ?? 1;
@@ -131,15 +131,15 @@ export class PreviewFormDialog implements OnInit {
     return column.rowIndex && column.rowIndex > 0 ? String(column.rowIndex) : "auto";
   }
 
-/**
-   * Polje koje back oznaci kao neizmenljivo (editable = false) korisnik ne popunjava ni pri
-   * unosu - vrednost mu daje upit za podrazumevanu vrednost ili ostaje prazna.
+  /**
+   * A field the server marks as not editable (editable = false) is not filled in by the user even on
+   * entry - its value comes from the default value query, or stays empty.
    */
   isLocked(column: PreviewColumn): boolean {
     return column.editable === false;
   }
 
-  /** Obavezno polje bez vrednosti; prekidac uvek ima vrednost (da ili ne). */
+  /** A required field with no value; a switch always has a value (yes or no). */
   private isEmpty(column: PreviewColumn): boolean {
     if (column.columnType === "BOOLEAN") {
       return false;
@@ -162,13 +162,13 @@ export class PreviewFormDialog implements OnInit {
       return;
     }
 
-    // Zapis nosi i polja koja se ne vide (id, parent...), pa back dobije celu sliku.
+    // The record carries the fields that are not shown (id, parent...), so the server gets the whole picture.
     const record: Record<string, any> = { ...this.hiddenValues };
     record[PREVIEW_ID_FIELD] = this.data.id ?? this.hiddenValues[PREVIEW_ID_FIELD] ?? null;
     if (this.data.parent) {
       record[PREVIEW_PARENT_FIELD] = this.data.parent;
     }
-    // Zakljucano polje ide nazad onako kako je stiglo, da update ne bi ostao bez njegove vrednosti.
+    // A locked field goes back as it came, so that an update is not left without its value.
     this.fields().forEach(
       (column) =>
         (record[column.code] = this.isLocked(column)

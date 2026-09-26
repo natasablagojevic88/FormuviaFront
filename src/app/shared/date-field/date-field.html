@@ -9,7 +9,7 @@
     <i class="fa-regular fa-calendar"></i>
   </button>
 
-  <!-- Nativni birac stoji sakriven; sluzi samo da se otvori kalendar na dugme. -->
+  <!-- The native picker stands hidden; it only serves to open the calendar from the button. -->
   <input #picker class="picker" tabindex="-1" aria-hidden="true" [type]="pickerType" [value]="pickerValue"
     (change)="onPicked($any($event.target).value)" />
 </div>

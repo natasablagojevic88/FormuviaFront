@@ -21,7 +21,7 @@ const FILTER_DELAY = 350;
 const ID_FIELD = "id";
 const TOUCH_QUERY = window.matchMedia("(hover: none)");
 
-/** Jedan korak u putanji nadredjeni -> podredjeni; route je adresa sa koje se doslo. */
+/** One step in the parent -> child trail; route is the address it came from. */
 export interface TrailCrumb {
   title: string;
   label: string;
@@ -33,12 +33,12 @@ interface CellRef {
   fieldName: string;
 }
 
-/** UUID se menja samo kad ima listu vrednosti (strani kljuc); sam id reda se ne menja. */
+/** A UUID is changed only when it has a list of values (a foreign key); the id of the row itself is never changed. */
 function isEditableType(column: DatabaseColumn): boolean {
   return column.columnType !== "UUID" || isEnum(column);
 }
 
-/** Vrednost reda -> tekst za polje za izmenu (input/select rade sa stringovima). */
+/** Value of a row -> text for the edit field (inputs and selects work with strings). */
 function toEditValue(value: any, column: DatabaseColumn, language: string): string {
   if (value === null || value === undefined) {
     return "";
@@ -47,17 +47,17 @@ function toEditValue(value: any, column: DatabaseColumn, language: string): stri
     return String(value).substring(0, 16);
   }
   if (column.columnType === "LOCALTIME") {
-    // polje type="time" radi sa HH:mm, a baza moze vratiti i sekunde
+    // a type="time" field works with HH:mm, and the database may return seconds
     return String(value).substring(0, 5);
   }
   if (isDecimalType(column.columnType)) {
-    // decimala se kuca separatorom svog jezika, bez razdvajanja hiljada
+    // a decimal is typed with the separator of that language, thousands not separated
     return toDecimalText(value, language);
   }
   return String(value);
 }
 
-/** Tekst iz polja za izmenu -> vrednost koja se salje back-u. */
+/** Text from the edit field -> value sent to the server. */
 function fromEditValue(text: string, column: DatabaseColumn): any {
   if (column.columnType === "BOOLEAN") {
     return text === "true";
@@ -86,15 +86,15 @@ function fromEditValue(text: string, column: DatabaseColumn): any {
 })
 export class DataTable {
   readonly url = input.required<string>();
-  /** Stalni filter (npr. tabela deteta po nadredjenom redu); korisnik ga ne moze skinuti. */
+  /** A permanent filter (e.g. a child table by its parent row); the user cannot remove it. */
   readonly parentFilter = input<{ field: string; value: string } | null>(null);
-  /** Putanja do ove tabele, za dugmad povratka u tabeli deteta. */
+  /** Path to this table, for the back buttons in a child table. */
   readonly trail = input<TrailCrumb[]>([]);
-  /** Tabela samo za citanje: bez kolone sa akcijama (izmena, istorija, brisanje). */
+  /** Read-only table: no actions column (edit, history, delete). */
   readonly readOnly = input(false);
-  /** false: red se ne moze brisati, pa u meniju reda nema stavke "Obrisi". */
+  /** false: the row cannot be deleted, so the row menu has no "Delete" item. */
   readonly canDelete = input(true);
-  /** Putanja istorije reda za tabele koje nemaju className (tabele iz modela). */
+  /** Path to the history of a row for tables without a className (tables from the model). */
   readonly historyUrl = input<((id: string) => string) | null>(null);
   readonly edit = output<any>();
   readonly remove = output<any>();
@@ -107,7 +107,7 @@ export class DataTable {
   readonly inputType = inputTypeFor;
   readonly inputMode = inputModeFor;
   readonly isNumber = isNumberType;
-  /** Datum i datum-vreme stoje centralno, kao i da/ne. */
+  /** Dates and dates with a time stand centred, like yes/no. */
   readonly isCentered = (columnType?: string) =>
     columnType === "BOOLEAN" || columnType === "LOCALDATE" || columnType === "LOCALDATETIME" ||
     columnType === "LOCALTIME";
@@ -118,35 +118,35 @@ export class DataTable {
   readonly total = signal(0);
   readonly loading = signal(false);
   readonly exporting = signal(false);
-  // Izmena u tabeli: saveUrl stize sa back-a uz tabelu, izmenljive kolone imaju editable != false.
+  // Editing in the table: saveUrl comes from the server with the table, editable columns have editable != false.
   readonly saveUrl = signal<string | null>(null);
   readonly editing = signal<CellRef | null>(null);
   readonly savingCell = signal<CellRef | null>(null);
   readonly savedCell = signal<CellRef | null>(null);
-  // Istorija reda: naziv DTO klase stize uz tabelu (className), a panel se izvlaci sa desne strane.
+  // History of a row: the DTO class name comes with the table (className), and the panel slides in from the right.
   readonly tableName = signal("");
   readonly className = signal<string | null>(null);
   readonly children = signal<TableChild[]>([]);
-  // Na telefonu nema zaglavlja tabele, pa se sortiranje bira u toolbar-u.
+  // A phone has no table header, so the sorting is chosen in the toolbar.
   readonly sortOptions = computed<SelectOption[]>(() =>
     this.columns().map((column) => ({ value: column.fieldName, label: column.description })));
   readonly sortField = computed(() => this.order()?.fieldName ?? "");
   readonly sortAscending = computed(() => this.order()?.direction !== "DESC");
   editValue = "";
-  // Poseban rezim izmene: ukljucuje se u toolbar-u, prikazuje sve izmenljive kolone i dozvoljava
-  // izmenu reda i unos novog reda u samoj tabeli. Van njega tabela radi kao i do sada (dijalozi).
+  // A separate edit mode: switched on in the toolbar, it shows every editable column and allows
+  // editing a row and entering a new row in the table itself. Outside it the table works as before (dialogs).
   readonly editMode = signal(false);
-  // Red koji je trenutno otvoren za izmenu (editRowId) ili nov prazan red (draftRow).
+  // The row currently open for editing (editRowId) or a new empty row (draftRow).
   readonly editRowId = signal<string | null>(null);
   readonly draftRow = signal<any | null>(null);
   readonly savingRow = signal(false);
   rowValues: Record<string, string> = {};
   readonly rowEditMode = computed(() => this.editRowId() !== null || this.draftRow() !== null);
   readonly canEditMode = computed(() => !!this.saveUrl() && this.editColumns().length > 0);
-  /** Kolone koje se nude u rezimu izmene: sve izmenljive iz allColumns, i one skrivene u tabeli. */
+  /** Columns offered in edit mode: every editable column from allColumns, including those hidden in the table. */
   readonly editColumns = computed(() =>
     this.allColumns().filter((column) => column.editable !== false && isEditableType(column)));
-  /** Definicije celija se prave za uniju: kolone tabele + kolone koje se vide samo u rezimu izmene. */
+  /** Cell definitions are built for the union: table columns + columns seen only in edit mode. */
   readonly cellColumns = computed(() => {
     const columns = this.columns();
     const extra = this.editColumns().filter((column) => !columns.some((item) => item.fieldName === column.fieldName));
@@ -161,10 +161,10 @@ export class DataTable {
   readonly filters = signal<Record<string, string>>({});
   readonly criteria = signal<Criterion[]>([]);
   private readonly order = signal<QueryDatabaseOrder | null>(null);
-  // Red koji je upravo dodat ili izmenjen; oznacen je dok korisnik ne promeni prikaz
-  // Oznacen red (najvise jedan): klik na red ili dugme u redu, ili upravo dodat/izmenjen red.
+  // The row just added or changed; it stays marked until the user changes the view
+  // The marked row (at most one): a click on the row or a button in it, or the row just added or changed.
   readonly highlightedId = signal<string | null>(null);
-  // true samo za dodat/izmenjen red - tada red kratko zablesne
+  // true only for a row just added or changed - then the row flashes briefly
   readonly highlightFlash = signal(false);
 
   private readonly sort = viewChild(MatSort);
@@ -176,7 +176,7 @@ export class DataTable {
   });
   readonly filterColumns = computed(() => this.displayedColumns().map((column) => FILTER_PREFIX + column));
   readonly hasFilters = computed(() => Object.values(this.filters()).some((value) => value !== ""));
-  // Opcije za filtere enum i boolean kolona, sa "Sve" na pocetku
+  // Options for the filters of enum and boolean columns, with "All" first
   readonly filterOptions = computed(() => {
     const all: SelectOption = { value: "", label: this.translate.get("ui.all") };
     const options = new Map<string, SelectOption[]>();
@@ -194,8 +194,8 @@ export class DataTable {
     return options;
   });
   /**
-   * Vrednosti za combobox u izmeni reda i celije. Prazna stavka postoji samo kad polje
-   * nije obavezno, da bi vrednost mogla da se obrise.
+   * Values for the combobox when editing a row or a cell. The empty item is there only when the field
+   * is not required, so that the value can be cleared.
    */
   readonly editorOptions = computed(() => {
     const empty: SelectOption = { value: "", label: "—" };
@@ -218,7 +218,7 @@ export class DataTable {
 
   private requestId = 0;
   private filterTimer?: ReturnType<typeof setTimeout>;
-  /** Tabela koja je poslednja ucitana; po njoj se prepoznaje prelazak na drugu tabelu. */
+  /** The table loaded last; a move to another table is recognised by it. */
   private loadedUrl: string | null = null;
 
   constructor(
@@ -229,16 +229,16 @@ export class DataTable {
     private router: Router,
     private host: ElementRef<HTMLElement>
   ) {
-    // Tabela se moze promeniti bez pravljenja komponente iznova (druga stavka menija nad istom
-    // stranom), pa se ucitavanje vezuje za url umesto za ngOnInit. untracked: reload cita filtere
-    // i stranu, a efekat sme da zavisi samo od url-a.
+    // The table can change without building the component again (another menu item over the same
+    // page), so loading is tied to the url instead of ngOnInit. untracked: reload reads the filters
+    // and the page, and the effect may depend on the url alone.
     effect(() => {
       const url = this.url();
       untracked(() => this.showTable(url));
     });
   }
 
-  /** Druga tabela krece od pocetka: bez filtera i sortiranja prethodne i bez njenih kolona. */
+  /** Another table starts from the beginning: without the filters, sorting and columns of the previous one. */
   private showTable(url: string): void {
     if (!url || this.loadedUrl === url) {
       return;
@@ -327,8 +327,8 @@ export class DataTable {
       });
   }
 
-  // Export uzima u obzir filtere i sort, ali ne i paginaciju: bez pageIndex/pageSize back vraca sve redove.
-  // Dobijena tabela se salje na export-table, koji vraca Excel fajl.
+  // The export takes the filters and the sorting into account, but not the paging: without pageIndex/pageSize the server returns every row.
+  // The table it returns is sent to export-table, which gives back an Excel file.
   exportExcel(): void {
     if (this.exporting()) {
       return;
@@ -345,8 +345,8 @@ export class DataTable {
       .finally(() => this.exporting.set(false));
   }
 
-  // Posle dodavanja: bez filtera, prva strana, najnoviji prvi (id je UUIDv7, pa id DESC
-  // daje redosled nastanka), i novi red oznacen da korisnik vidi sta je dodao.
+  // After adding: no filters, first page, newest first (the id is a UUIDv7, so id DESC
+  // gives the order things were created in), and the new row marked so the user sees what was added.
   showNew(id: string): void {
     clearTimeout(this.filterTimer);
     this.filters.set({});
@@ -362,8 +362,8 @@ export class DataTable {
     this.reload(id);
   }
 
-  // Posle izmene: ista strana i isti filteri, izmenjeni red oznacen.
-  /** Filteri korisnika + stalni filter po nadredjenom redu. */
+  // After editing: the same page and the same filters, with the changed row marked.
+  /** Filters of the user + the permanent filter by the parent row. */
   private allFilters(): DatabaseFilter[] {
     const filters = this.buildFilters();
     const parent = this.parentFilter();
@@ -373,7 +373,7 @@ export class DataTable {
     return filters;
   }
 
-  /** Otvara tabelu deteta kao novu stranu, sa putanjom nazad u zaglavlju. */
+  /** Opens the child table as a new page, with the way back in the header. */
   openChild(child: TableChild, row: any): void {
     this.selectRow(row);
     const trail: TrailCrumb[] = [
@@ -391,12 +391,12 @@ export class DataTable {
     });
   }
 
-  /** ⋯ meni se prikazuje samo kad u njemu ima nesto: istorija, podtabela ili brisanje. */
+  /** The ⋯ menu is shown only when there is something in it: history, a subtable or deleting. */
   readonly hasRowMenu = computed(
     () => !!this.className() || !!this.historyUrl() || this.children().length > 0 || this.canDelete()
   );
 
-  /** Istorija se nudi samo kad back posalje className uz tabelu. */
+  /** History is offered only when the server sends a className with the table. */
   canShowHistory(): boolean {
     return !!this.className() || !!this.historyUrl();
   }
@@ -410,7 +410,7 @@ export class DataTable {
     this.historyPanel()?.open(this.className() ?? "", id, this.rowTitle(row), this.historyUrl()?.(id));
   }
 
-  /** Naslov panela ili stavke u putanji: vrednosti prve dve vidljive kolone reda. */
+  /** Title of the panel or of a step in the trail: the values of the first two visible columns of the row. */
   rowTitle(row: any): string {
     return this.columns()
       .slice(0, 2)
@@ -433,7 +433,7 @@ export class DataTable {
     this.editMode.set(true);
   }
 
-  /** Dugme "Izmeni": u rezimu izmene otvara red u tabeli, inace javlja stranici (dijalog). */
+  /** The "Edit" button: in edit mode it opens the row in the table, otherwise it tells the page (a dialog). */
   editRow(row: any): void {
     if (!this.editMode()) {
       this.edit.emit(row);
@@ -442,7 +442,7 @@ export class DataTable {
     this.startRowEdit(row, row[ID_FIELD]);
   }
 
-  /** Nov red: prazan red na vrhu tabele, u rezimu izmene. */
+  /** New row: an empty row at the top of the table, in edit mode. */
   startNew(): void {
     const draft: Record<string, any> = {};
     this.editColumns().forEach((column) => (draft[column.fieldName] = column.columnType === "BOOLEAN" ? true : null));
@@ -471,7 +471,7 @@ export class DataTable {
     this.rowValues = {};
   }
 
-  /** Obavezna polja (required sa back-a) moraju biti popunjena. */
+  /** Required fields (required from the server) have to be filled in. */
   canSaveRow(): boolean {
     if (this.savingRow()) {
       return false;
@@ -510,13 +510,13 @@ export class DataTable {
       .finally(() => this.savingRow.set(false));
   }
 
-  /** Lozinka se ne prikazuje u tabeli; polje je uvek prazno i menja se samo ako se nesto unese. */
+  /** A password is not shown in the table; the field is always empty and changes only if something is typed. */
   editorType(column: DatabaseColumn): string {
     return column.fieldName.toLowerCase().includes("password") ? "password" : inputTypeFor(column);
   }
 
   canEdit(column: DatabaseColumn): boolean {
-    // Dvoklik radi i u rezimu izmene; iskljucen je samo dok je neki red otvoren za izmenu.
+    // A double click works in edit mode too; it is off only while some row is open for editing.
     return !!this.saveUrl() && !this.rowEditMode() && column.editable !== false && isEditableType(column);
   }
 
@@ -524,8 +524,8 @@ export class DataTable {
     return !!cell && cell.id === row[ID_FIELD] && cell.fieldName === column.fieldName;
   }
 
-  // Na ekranu na dodir nema pouzdanog dvoklika: prvi dodir oznaci red, dodir na celiju oznacenog reda otvara izmenu.
-  // Klik na celiju stize pre klika na red, pa highlightedId jos pokazuje red oznacen pre ovog dodira.
+  // A touch screen has no reliable double click: the first tap marks the row, a tap on a cell of the marked row opens the edit.
+  // The click on the cell arrives before the click on the row, so highlightedId still shows the row marked before this tap.
   onCellClick(row: any, column: DatabaseColumn): void {
     if (TOUCH_QUERY.matches && this.highlightedId() === row[ID_FIELD]) {
       this.startEdit(row, column);
@@ -538,13 +538,13 @@ export class DataTable {
     }
     this.editValue = toEditValue(row[column.fieldName], column, this.language.current());
     this.editing.set({ id: row[ID_FIELD], fieldName: column.fieldName });
-    // dvoklik na celiju sa listom odmah otvara listu, da se ne klikce dva puta
+    // a double click on a cell with a list opens the list at once, so it need not be clicked twice
     this.focusEditor(true);
   }
 
   /**
-   * Fokus na prvo polje za izmenu. Kod combobox-a se fokusira njegovo dugme, a kad je
-   * izmena pokrenuta dvoklikom na tu celiju, lista se i otvori (sa poljem za pretragu).
+   * Focus on the first edit field. For a combobox its button is focused, and when the edit was
+   * started by a double click on that cell, the list is opened as well (with its search field).
    */
   private focusEditor(openList: boolean): void {
     setTimeout(() => {
@@ -573,7 +573,7 @@ export class DataTable {
     this.editing.set(null);
   }
 
-  // Enter, izbor u listi ili izlazak iz polja cuvaju; salje se ceo red sa izmenjenim poljem na saveUrl.
+  // Enter, a choice in the list or leaving the field all save; the whole row with the changed field goes to saveUrl.
   commitEdit(): void {
     const cell = this.editing();
     if (!cell) {
@@ -616,9 +616,9 @@ export class DataTable {
   }
 
   /**
-   * Posle izmene: red se osvezava iz odgovora back-a, bez ponovnog ucitavanja tabele.
-   * Tabela se u medjuvremenu mogla promeniti (drugi korisnik je uneo red), pa se ponovnim
-   * ucitavanjem izmenjeni red lako nadje na drugoj strani. Ako reda nema na strani, ucitava se strana.
+   * After an edit: the row is refreshed from the answer of the server, without loading the table again.
+   * The table may have changed in the meantime (another user added a row), so loading it again would
+   * easily put the changed row on another page. When the row is not on the page, the page is loaded.
    */
   showChanged(saved: any): void {
     const id = saved?.[ID_FIELD];
@@ -729,7 +729,7 @@ export class DataTable {
         return formatDateTime(value, this.language.current());
       case "LOCALTIME":
         return formatTime(value, this.language.current());
-      // Ceo broj se ne formatira; decimalan dobija separatore jezika.
+      // A whole number is not formatted; a decimal one gets the separators of the language.
       case "BIGDECIMAL":
         return formatDecimal(value, this.language.current(), column.length);
       default:

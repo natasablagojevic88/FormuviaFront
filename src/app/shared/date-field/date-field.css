@@ -8,7 +8,7 @@
   align-items: center;
 }
 
-/* Izgled je isti kao kod ostalih polja u dijalogu (fd-input) */
+/* The look is the same as the other fields in a dialog (fd-input) */
 .text {
   width: 100%;
   height: 48px;
@@ -71,7 +71,7 @@
   cursor: not-allowed;
 }
 
-/* Mora da bude iscrtan da bi showPicker() radio, pa se sakriva prozirnoscu */
+/* It has to be rendered for showPicker() to work, so it is hidden with opacity */
 .picker {
   position: absolute;
   right: 12px;
@@ -84,7 +84,7 @@
   pointer-events: none;
 }
 
-/* Manji oblik: red tabele i polje za filter */
+/* Smaller form: a table row and a filter field */
 :host(.compact) .text {
   height: 36px;
   padding: 0 38px 0 12px;

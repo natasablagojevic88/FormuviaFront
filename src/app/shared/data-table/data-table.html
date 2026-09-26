@@ -1,5 +1,5 @@
 <div class="table-card">
-  <!-- Napredna pretraga levo, aktivni kriterijumi u sredini, izvoz u Excel skroz desno -->
+  <!-- Advanced search on the left, the active conditions in the middle, export to Excel on the far right -->
   <div class="toolbar">
     <button type="button" class="advanced-button" (click)="openAdvancedSearch()">
       <i class="fa-solid fa-sliders"></i>
@@ -185,7 +185,7 @@
                 [ngModel]="filterValue(column.fieldName)" (ngModelChange)="onFilter(column.fieldName, $event)"
                 [centered]="column.columnType === 'BOOLEAN'" [ariaLabel]="column.description" />
             } @else if (column.columnType === 'LOCALDATE' || column.columnType === 'LOCALDATETIME') {
-              <!-- datum-vreme: samo datum trazi ceo dan, sa vremenom trazi taj minut -->
+              <!-- date and time: a date alone searches the whole day, with a time it searches that minute -->
               <app-date-field class="filter-date" [compact]="true"
                 [withTime]="column.columnType === 'LOCALDATETIME'" [timeOptional]="true"
                 [ngModel]="filterValue(column.fieldName)"

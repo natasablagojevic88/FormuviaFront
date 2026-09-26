@@ -25,10 +25,9 @@ export class HistoryPanel {
     private language: Language
   ) {}
 
-  /** Otvara panel i ucitava istoriju reda; className je naziv DTO klase sa back-a. */
   /**
-   * Otvara panel i ucitava istoriju reda. Ugradjene tabele se citaju po nazivu DTO klase,
-   * a tabele iz modela svojom putanjom, koju strana prosledi u url.
+   * Opens the panel and loads the history of a row. Built-in tables are read by the name of their DTO
+   * class, and tables from the model by their own path, which the page passes in url.
    */
   open(className: string, id: string, title: string, url?: string): void {
     this.historyTitle.set(title);
@@ -53,7 +52,7 @@ export class HistoryPanel {
     return formatDateTime(value, this.language.current());
   }
 
-  /** Vrednost se formatira po columnType koji back salje uz izmenu. */
+  /** The value is formatted by the columnType the server sends with the change. */
   historyValue(value: any, change: HistoryChange): string {
     if (value === null || value === undefined || value === "") {
       return "—";
@@ -67,7 +66,7 @@ export class HistoryPanel {
         return formatDateTime(value, this.language.current());
       case "LOCALTIME":
         return formatTime(value, this.language.current());
-      // ceo broj ostaje kakav jeste, decimalan dobija separatore jezika
+      // a whole number stays as it is, a decimal one gets the separators of the language
       case "BIGDECIMAL":
         return formatDecimal(value, this.language.current());
       default:

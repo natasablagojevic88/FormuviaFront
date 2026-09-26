@@ -96,7 +96,7 @@
   margin-left: auto;
 }
 
-/* Rezim izmene */
+/* Edit mode */
 .edit-mode-button.mode-on {
   border-color: var(--c-primary);
   background: var(--c-primary-soft);
@@ -128,12 +128,12 @@
   cursor: not-allowed;
 }
 
-/* Na desktopu je dugme za nov red u redu sa filterima; na telefonu tog reda nema, pa ostaje u toolbar-u */
+/* On a desktop the new-row button sits in the filter row; on a phone there is no such row, so it stays in the toolbar */
 .new-row-button {
   display: none;
 }
 
-/* Brojevi stoje desno, da se cifre poklapaju po mestu - i zaglavlje, i celija, i polja */
+/* Numbers stand on the right, so the digits line up - the header, the cell and the fields alike */
 td.cell-number,
 th.cell-number {
   text-align: right;
@@ -153,7 +153,7 @@ th.cell-number .filter-input {
   color: var(--c-danger);
 }
 
-/* Red u izmeni: blaga plava traka, ista logika u svetloj i tamnoj temi */
+/* Row being edited: a soft blue band, the same logic in the light and the dark theme */
 tr.mat-mdc-row.row-editing,
 tr.mat-mdc-row.row-editing:hover {
   background: var(--c-primary-soft);
@@ -168,7 +168,7 @@ tr.mat-mdc-row.row-editing:hover {
   cursor: not-allowed;
 }
 
-/* Izbor sortiranja samo na telefonu (u kartici nema zaglavlja na koje se klikne) */
+/* The sort chooser is for phones only (a card has no header to click) */
 .mobile-sort {
   display: none;
   gap: 8px;
@@ -264,7 +264,7 @@ tr.mat-mdc-row:hover {
   background: var(--c-surface-3);
 }
 
-/* Oznacen red: zeleni ton sa trakom levo; dodat ili izmenjen red jos i kratko zablesne */
+/* Marked row: a green tone with a band on the left; a row just added or changed also flashes briefly */
 tr.mat-mdc-row.row-highlight,
 tr.mat-mdc-row.row-highlight:hover {
   background: var(--c-success-soft);
@@ -274,7 +274,7 @@ tr.mat-mdc-row.row-flash {
   animation: row-highlight 1.6s ease-out;
 }
 
-/* Izmena direktno u tabeli */
+/* Editing straight in the table */
 td.cell-editable:hover {
   box-shadow: inset 0 0 0 1px var(--c-border-strong);
 }
@@ -304,14 +304,14 @@ td.cell-saved {
   min-width: 150px;
 }
 
-/* Combobox u izmeni: sirinu drzi celija, izgled dolazi iz same komponente (appearance="compact") */
+/* Combobox while editing: the cell sets the width, the look comes from the component itself (appearance="compact") */
 .cell-select {
   display: block;
   width: 100%;
   min-width: 140px;
 }
 
-/* Polje za izmenu je mirno dok se ne fokusira - inace ceo red blesti od plavih okvira */
+/* The edit field stays calm until it is focused - otherwise the whole row glares with blue frames */
 .cell-editor {
   width: 100%;
   min-width: 120px;
@@ -387,12 +387,12 @@ tr.mat-mdc-row.row-highlight td:first-child {
   box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.12);
 }
 
-/* Kolone sa kratkim vrednostima (boolean) — zaglavlje, filter i bedž centrirani */
+/* Columns with short values (boolean) — header, filter and badge centred */
 .cell-center {
   text-align: center;
 }
 
-/* Datum i da/ne se centriraju i u samom polju za filter */
+/* Dates and yes/no are centred in the filter field as well */
 .cell-center .filter-input,
 .cell-center .cell-editor {
   text-align: center;
@@ -536,7 +536,7 @@ tr.mat-mdc-row.row-highlight td:first-child {
     border-radius: 18px;
   }
 
-  /* Prvi red: napredna pretraga + ikonica za izvoz; kriterijumi u redu ispod */
+  /* First row: advanced search + the export icon; the conditions go in the row below */
   .toolbar {
     flex-wrap: wrap;
     gap: 8px;
@@ -553,7 +553,7 @@ tr.mat-mdc-row.row-highlight td:first-child {
     justify-content: center;
   }
 
-  /* Na telefonu export ostaje samo ikonica, napredna pretraga zauzima ostatak reda */
+  /* On a phone the export stays an icon only, the advanced search takes the rest of the row */
   .export-button {
     flex: none;
     width: 44px;
@@ -568,7 +568,7 @@ tr.mat-mdc-row.row-highlight td:first-child {
     display: none;
   }
 
-  /* 16px sprecava da iOS zumira stranu kad se fokusira polje */
+  /* 16px stops iOS from zooming the page when a field is focused */
   .cell-editor {
     height: 40px;
     font-size: 16px;
@@ -596,13 +596,13 @@ tr.mat-mdc-row.row-highlight td:first-child {
     display: inline-flex;
   }
 
-  /* Red tabele postaje kartica: labela kolone levo, vrednost desno, akcije u dnu */
+  /* A table row becomes a card: column label on the left, value on the right, actions at the bottom */
   .table-scroll {
     padding: 4px 12px 12px;
     background: var(--c-surface-2);
   }
 
-  /* sam <table> i <tbody> se postavljaju u globalnom styles.css, vidi objasnjenje tamo */
+  /* the <table> and <tbody> themselves are set in the global styles.css, see the explanation there */
   .table td.mat-mdc-cell,
   .table tr.mat-mdc-row {
     box-sizing: border-box;
@@ -613,7 +613,7 @@ tr.mat-mdc-row.row-highlight td:first-child {
     display: none;
   }
 
-  /* Material redu zadaje fiksnu visinu (--mat-table-row-item-container-height); u kartici visina mora da prati sadrzaj */
+  /* Material gives a row a fixed height (--mat-table-row-item-container-height); in a card the height must follow the content */
   table.table tr.mat-mdc-row {
     display: flex;
     flex-direction: column;
@@ -664,7 +664,7 @@ tr.mat-mdc-row.row-highlight td:first-child {
     content: none;
   }
 
-  /* Oznacen red: traka levo ide na celu karticu, a ne na prvu celiju */
+  /* Marked row: the band on the left goes on the whole card, not on the first cell */
   table.table tr.mat-mdc-row.row-highlight td:first-child {
     box-shadow: none;
   }

@@ -91,7 +91,7 @@ app-page-header {
 }
 
 .node-icon.root {
-  /* neutralna plocica koja radi i u svetloj i u tamnoj temi */
+  /* a neutral chip that works in both the light and the dark theme */
   background: var(--c-surface-3);
   color: var(--c-text-muted);
   border: 1px solid var(--c-border);
@@ -196,7 +196,7 @@ app-page-header {
     padding: 8px;
   }
 
-  /* Na telefonu dugme za dodavanje ostaje samo ikonica, da naziv cvora ima mesta */
+  /* On a phone the add button stays an icon only, so the node name has room */
   .add-label {
     display: none;
   }
