@@ -9,7 +9,7 @@ Everything about the **database** happens immediately: adding a field creates th
 
 The fields you add also show up straight away as the columns of the table's list in the menu, in the order and with the labels you gave them, and *Show in the table* decides which of them appear there.
 
-The **entry dialog** you lay out here is now drawn: in a table from the Model, *Add* and *Edit* open a form with your grid, each field in its place, the labels in the language you chose, the lists of values and the default values. The one part still being finished on the server is storing what is entered, so the form opens and fills in but saving does not go through yet.
+The **entry dialog** you lay out here is what people actually get: in a table from the Model, *Add* and *Edit* open a form with your grid, each field in its place, the labels in the language they chose, the lists of values and the default values, and what they enter is stored in the table you defined.
 :::
 
 ## The canvas
@@ -41,6 +41,7 @@ Once the column exists, its name is locked — as is the data type, and the code
 | **Yes / No** | a switch |
 | **Date** | a day |
 | **Date and time** | a day and a time |
+| **Time** | a time of day on its own, without a date |
 | **Link to a codebook** | a value picked from another table |
 
 ### Link to a codebook
@@ -61,7 +62,7 @@ Formuvia will not let you put a field where another one already is, or let one h
 |---|---|
 | **Optional** | the field may be left empty; switch it off and it is required |
 | **Show in the table** | whether the column appears in the list, or only in the form |
-| **Can be changed** | switch it off and the value is read-only once entered |
+| **Can be changed** | switch it off and the field is shown but cannot be typed in, on entry or later; its value comes from the default value query |
 | **Long text** | a multi-line box instead of a single line (text fields only) |
 | **Part of the label in a codebook** | see below |
 
@@ -90,6 +91,8 @@ select now()
 ```sql
 select id, name from partner order by name
 ```
+
+A **Yes / No** field has no list of values — its two values are yes and no — so the field is not offered for that type.
 
 ::: warning Rules for both queries
 - it must be a `SELECT`, nothing else

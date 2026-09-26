@@ -9,7 +9,7 @@ Sve što se tiče **baze** dešava se odmah: dodavanje polja pravi kolonu, izbor
 
 Polja koja dodate odmah se vide i kao kolone liste te tabele u meniju, redosledom i sa nazivima koje ste im dali, a *Prikaži u tabeli* određuje koja se tamo pojavljuju.
 
-**Dijalog za unos** koji ovde složite sada se i iscrtava: u tabeli iz Modela *Dodaj* i *Izmeni* otvaraju formu sa vašom mrežom, svakim poljem na svom mestu, nazivima na jeziku koji ste izabrali, listama vrednosti i podrazumevanim vrednostima. Jedino što se još dovršava na serveru jeste snimanje unetog, pa se forma otvara i popunjava, ali snimanje još ne prolazi.
+**Dijalog za unos** koji ovde složite je ono što korisnici zaista dobiju: u tabeli iz Modela *Dodaj* i *Izmeni* otvaraju formu sa vašom mrežom, svakim poljem na svom mestu, nazivima na jeziku koji su izabrali, listama vrednosti i podrazumevanim vrednostima, a ono što unesu upisuje se u tabelu koju ste definisali.
 :::
 
 ## Radna površina
@@ -41,6 +41,7 @@ Kad kolona jednom postoji, njen naziv je zaključan — kao i tip podatka, i ši
 | **Da / Ne** | prekidač |
 | **Datum** | dan |
 | **Datum i vreme** | dan i vreme |
+| **Vreme** | samo doba dana, bez datuma |
 | **Veza na šifarnik** | vrednost koja se bira iz druge tabele |
 
 ### Veza na šifarnik
@@ -61,7 +62,7 @@ Formuvia neće dozvoliti da postavite polje tamo gde je već drugo, niti da jedn
 |---|---|
 | **Opciono** | polje sme ostati prazno; kad je isključite, polje je obavezno |
 | **Prikaži u tabeli** | da li se kolona vidi u listi, ili samo na formi |
-| **Može se menjati** | kad je isključite, vrednost se posle unosa ne menja |
+| **Može se menjati** | kad je isključite, polje se vidi ali se u njega ne unosi, ni pri unosu ni kasnije; vrednost mu daje upit za podrazumevanu vrednost |
 | **Dugačak tekst** | višered umesto jednog reda (samo za tekstualna polja) |
 | **Deo opisa u šifarniku** | vidi niže |
 
@@ -90,6 +91,8 @@ select now()
 ```sql
 select id, name from partner order by name
 ```
+
+Polje tipa **Da / Ne** nema listu vrednosti — njegove dve vrednosti su da i ne — pa se za taj tip i ne nudi.
 
 ::: warning Pravila za oba upita
 - mora biti `SELECT`, ništa drugo

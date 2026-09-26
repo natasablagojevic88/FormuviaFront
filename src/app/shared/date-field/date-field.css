@@ -1,0 +1,100 @@
+:host {
+  display: block;
+}
+
+.field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Izgled je isti kao kod ostalih polja u dijalogu (fd-input) */
+.text {
+  width: 100%;
+  height: 48px;
+  padding: 0 44px 0 16px;
+  border: 1px solid var(--c-border);
+  border-radius: 14px;
+  background: var(--c-surface-2);
+  color: var(--c-text);
+  font: inherit;
+  font-size: 15px;
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+}
+
+.text:hover:not(:disabled) {
+  border-color: var(--c-border-strong);
+}
+
+.text:focus {
+  outline: none;
+  border-color: var(--c-primary);
+  background: var(--c-surface);
+  box-shadow: 0 0 0 3px var(--c-focus);
+}
+
+.text:disabled {
+  background: var(--c-surface-3);
+  color: var(--c-text-muted);
+  cursor: not-allowed;
+}
+
+.text.invalid,
+.text.invalid:focus {
+  border-color: var(--c-danger);
+  box-shadow: 0 0 0 3px var(--c-danger-soft);
+}
+
+.pick {
+  position: absolute;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--c-text-muted);
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.pick:hover:not(:disabled) {
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+}
+
+.pick:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Mora da bude iscrtan da bi showPicker() radio, pa se sakriva prozirnoscu */
+.picker {
+  position: absolute;
+  right: 12px;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Manji oblik: red tabele i polje za filter */
+:host(.compact) .text {
+  height: 36px;
+  padding: 0 38px 0 12px;
+  border-radius: 10px;
+  background: var(--c-surface);
+  font-size: 13px;
+}
+
+:host(.compact) .pick {
+  width: 28px;
+  height: 28px;
+  font-size: 13px;
+}

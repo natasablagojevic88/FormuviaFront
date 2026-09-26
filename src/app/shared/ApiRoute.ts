@@ -50,17 +50,24 @@
         return `/api/preview/form/${modelId}/${id}`;
     }
 
-    /**
-     * Forma zapisa u podtabeli. Kod unosa id nije poznat, pa u putanju ide "null"
-     * (back tu vrednost cita kao prazan id i vraca praznu formu sa vezom na nadredjeni red).
-     */
-    static modelPreviewFormWithIdAndParent(modelId: string, id: string | null, parent: string): string {
-        return `/api/preview/form/${modelId}/${id ?? "null"}/${parent}`;
+    /** Forma za nov zapis u podtabeli: prazna forma sa vezom na red nadredjene tabele. */
+    static modelPreviewFormWithParent(modelId: string, parent: string): string {
+        return `/api/preview/form/${modelId}/parent/${parent}`;
+    }
+
+    /** Istorija zapisa tabele iz modela (nema className kao ugradjene tabele). */
+    static modelPreviewHistory(modelId: string, id: string): string {
+        return `/api/preview/history/${modelId}/${id}`;
+    }
+
+    /** Brisanje zapisa tabele iz modela; redovi podtabela idu sa njim (cascade). */
+    static modelPreviewDelete(modelId: string, id: string): string {
+        return `/api/preview/delete/${modelId}/${id}`;
     }
 
     /** Snimanje zapisa tabele iz modela (insert kad je id prazan, inace update). */
-    static modelPreviewSave(modelId: string): string {
-        return `/api/preview/save/${modelId}`;
+    static modelPreviewUpdate(modelId: string): string {
+        return `/api/preview/update/${modelId}`;
     }
 
     static modelId(id: string): string {

@@ -4,7 +4,9 @@ import { ActivatedRoute } from "@angular/router";
 import { combineLatest } from "rxjs";
 import { Notify } from "../services/notify";
 import { Translate } from "../services/translate";
+import { SendRequest } from "../services/send-request";
 import { ApiRoute } from "../shared/ApiRoute";
+import { ConfirmDialog, ConfirmDialogData } from "../shared/confirm-dialog/confirm-dialog";
 import { DataTable } from "../shared/data-table/data-table";
 import { DatabaseTable } from "../shared/database-table";
 import { PreviewFormDialog, PreviewFormDialogData } from "./preview-form-dialog/preview-form-dialog";
@@ -35,6 +37,7 @@ export class ModelPreviewPage {
   constructor(
     private route: ActivatedRoute,
     private dialog: MatDialog,
+    private sendRequest: SendRequest,
     private notify: Notify,
     private translate: Translate
   ) {
@@ -57,6 +60,9 @@ export class ModelPreviewPage {
     });
   }
 
+  /** Istorija reda: tabele iz modela imaju svoju putanju umesto naziva DTO klase. */
+  readonly historyUrl = (id: string) => ApiRoute.modelPreviewHistory(this.modelId(), id);
+
   onLoaded(table: DatabaseTable<any>): void {
     this.title.set(table.name ?? "");
     this.subtitle.set(table.description ?? "");
@@ -68,6 +74,28 @@ export class ModelPreviewPage {
 
   edit(row: { id: string }): void {
     this.openForm({ modelId: this.modelId(), title: this.title(), id: row.id, parent: this.parent() });
+  }
+
+  /** Brisanje zapisa: trazi se potvrda, jer se sa redom brisu i redovi njegovih podtabela. */
+  remove(row: { id: string }): void {
+    const data: ConfirmDialogData = {
+      title: this.translate.get("ui.deleteTitle"),
+      message: this.translate.get("ui.deleteConfirm"),
+      confirmText: this.translate.get("ui.delete"),
+      danger: true,
+    };
+    this.dialog.open(ConfirmDialog, { width: "460px", data })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+        this.sendRequest.delete(ApiRoute.modelPreviewDelete(this.modelId(), row.id))
+          .then(() => {
+            this.notify.success(this.translate.get("ui.deleted"));
+            this.table().reload();
+          });
+      });
   }
 
   private openForm(data: PreviewFormDialogData): void {

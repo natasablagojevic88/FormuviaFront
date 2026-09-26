@@ -1,4 +1,5 @@
 import { ColumnType, ComboOption } from "../shared/database-table";
+import { isDecimalType, isNumberText, parseDecimalText, toDecimalText } from "../shared/number-format";
 
 /** Kolona id-a i kolona veze na nadredjeni red; back ih dodaje u formu pre ostalih polja. */
 export const PREVIEW_ID_FIELD = "id";
@@ -80,44 +81,62 @@ export function sortByPlace(columns: PreviewColumn[]): PreviewColumn[] {
   );
 }
 
-/** Tip polja za unos; isti kao u tabeli, da se datum i broj svuda unose na isti nacin. */
+/**
+ * Tip polja za unos; isti kao u tabeli. Decimalan broj ide kao tekst, jer polje
+ * type="number" ne prima zarez sa srpske tastature.
+ */
 export function inputTypeOf(column: PreviewColumn): string {
   switch (column.columnType) {
     case "LOCALDATE":
       return "date";
     case "LOCALDATETIME":
       return "datetime-local";
+    case "LOCALTIME":
+      return "time";
     case "INTEGER":
     case "LONG":
-    case "BIGDECIMAL":
       return "number";
     default:
       return "text";
   }
 }
 
-/** Korak za decimalni broj: length je broj decimala zadat u dizajnu forme. */
-export function stepOf(column: PreviewColumn): string {
-  if (column.columnType !== "BIGDECIMAL") {
-    return "1";
+/** Tastatura na telefonu: decimalna za BIGDECIMAL, brojcana za cele brojeve. */
+export function inputModeOf(column: PreviewColumn): string | null {
+  if (isDecimalType(column.columnType)) {
+    return "decimal";
   }
-  const decimals = column.length ?? 2;
-  return decimals > 0 ? "0." + "0".repeat(decimals - 1) + "1" : "1";
+  return column.columnType === "INTEGER" || column.columnType === "LONG" ? "numeric" : null;
+}
+
+/** Broj nije ispravno ukucan (slovo, dva separatora, samo minus...). */
+export function isWrongNumber(value: any, column: PreviewColumn): boolean {
+  if (column.columnType !== "BIGDECIMAL" && column.columnType !== "INTEGER" && column.columnType !== "LONG") {
+    return false;
+  }
+  return !isNumberText(value === null || value === undefined ? "" : String(value), column.columnType);
 }
 
 /** Vrednost sa back-a -> vrednost u polju (polja rade sa tekstom, prekidac sa boolean-om). */
-export function toFieldValue(value: any, column: PreviewColumn): any {
+export function toFieldValue(value: any, column: PreviewColumn, language: string): any {
   if (column.columnType === "BOOLEAN") {
     return value === true || value === "true";
   }
   if (value === null || value === undefined) {
     return "";
   }
+  if (isDecimalType(column.columnType)) {
+    // decimala se prikazuje separatorom jezika: srpski 12,5 - engleski 12.5
+    return toDecimalText(value, language);
+  }
   if (column.columnType === "LOCALDATETIME") {
     return String(value).substring(0, 16);
   }
   if (column.columnType === "LOCALDATE") {
     return String(value).substring(0, 10);
+  }
+  if (column.columnType === "LOCALTIME") {
+    return String(value).substring(0, 5);
   }
   return String(value);
 }
@@ -134,8 +153,11 @@ export function fromFieldValue(value: any, column: PreviewColumn): any {
   switch (column.columnType) {
     case "INTEGER":
     case "LONG":
-    case "BIGDECIMAL":
       return Number(text);
+    case "BIGDECIMAL": {
+      const number = parseDecimalText(text);
+      return number === "" ? null : Number(number);
+    }
     default:
       return text;
   }

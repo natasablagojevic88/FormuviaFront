@@ -129,44 +129,40 @@
 
       @for (column of cellColumns(); track column.fieldName) {
         <ng-container [matColumnDef]="column.fieldName">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header [class.cell-center]="column.columnType === 'BOOLEAN'">{{ column.description
+          <th mat-header-cell *matHeaderCellDef mat-sort-header [class.cell-center]="isCentered(column.columnType)"
+            [class.cell-number]="isNumber(column.columnType)">{{ column.description
             }}@if (editMode() && column.required) {<span class="required-mark">*</span>}</th>
-          <td mat-cell *matCellDef="let row" [attr.data-label]="column.description" [class.cell-center]="column.columnType === 'BOOLEAN'"
+          <td mat-cell *matCellDef="let row" [attr.data-label]="column.description" [class.cell-center]="isCentered(column.columnType)"
+            [class.cell-number]="isNumber(column.columnType)"
             [class.cell-editable]="canEdit(column)" [class.cell-saving]="isCell(savingCell(), row, column)"
             [class.cell-saved]="isCell(savedCell(), row, column)" [attr.title]="canEdit(column) ? ('ui.cellEditHint' | t) : null"
             (click)="onCellClick(row, column)" (dblclick)="startEdit(row, column)">
             @if (isRowEditing(row)) {
               @if (isEnum(column) || column.columnType === 'BOOLEAN') {
-                <select class="cell-editor" [(ngModel)]="rowValues[column.fieldName]" [attr.aria-label]="column.description">
-                  @if (column.columnType === 'BOOLEAN') {
-                    <option value="true">{{ 'ui.yes' | t }}</option>
-                    <option value="false">{{ 'ui.no' | t }}</option>
-                  } @else {
-                    <option value=""></option>
-                    @for (option of column.listOfValues; track option.value) {
-                      <option [value]="option.value">{{ option.option }}</option>
-                    }
-                  }
-                </select>
+                <app-search-select class="cell-select" appearance="compact"
+                  [options]="editorOptions().get(column.fieldName) ?? []" [(ngModel)]="rowValues[column.fieldName]"
+                  [ngModelOptions]="{ standalone: true }" [ariaLabel]="column.description" />
+              } @else if (column.columnType === 'LOCALDATE' || column.columnType === 'LOCALDATETIME') {
+                <app-date-field class="cell-date" [compact]="true" [withTime]="column.columnType === 'LOCALDATETIME'"
+                  [(ngModel)]="rowValues[column.fieldName]" [ngModelOptions]="{ standalone: true }"
+                  (keydown.enter)="saveRow()" (keydown.escape)="cancelRowEdit()" [ariaLabel]="column.description" />
               } @else {
-                <input class="cell-editor" [type]="editorType(column)" [(ngModel)]="rowValues[column.fieldName]"
+                <input class="cell-editor" [type]="editorType(column)" [attr.inputmode]="inputMode(column)"
+                  [(ngModel)]="rowValues[column.fieldName]"
                   (keydown.enter)="saveRow()" (keydown.escape)="cancelRowEdit()" [attr.aria-label]="column.description" />
               }
             } @else if (isCell(editing(), row, column)) {
               @if (isEnum(column) || column.columnType === 'BOOLEAN') {
-                <select class="cell-editor" [ngModel]="editValue" (ngModelChange)="editValue = $event; commitEdit()" (blur)="cancelEdit()"
-                  (keydown.escape)="cancelEdit()" [attr.aria-label]="column.description">
-                  @if (column.columnType === 'BOOLEAN') {
-                    <option value="true">{{ 'ui.yes' | t }}</option>
-                    <option value="false">{{ 'ui.no' | t }}</option>
-                  } @else {
-                    @for (option of column.listOfValues; track option.value) {
-                      <option [value]="option.value">{{ option.option }}</option>
-                    }
-                  }
-                </select>
+                <app-search-select class="cell-select" appearance="compact"
+                  [options]="editorOptions().get(column.fieldName) ?? []" [ngModel]="editValue"
+                  (ngModelChange)="editValue = $event; commitEdit()" [ngModelOptions]="{ standalone: true }"
+                  (keydown.escape)="cancelEdit()" [ariaLabel]="column.description" />
+              } @else if (column.columnType === 'LOCALDATE' || column.columnType === 'LOCALDATETIME') {
+                <app-date-field class="cell-date" [compact]="true" [withTime]="column.columnType === 'LOCALDATETIME'"
+                  [(ngModel)]="editValue" [ngModelOptions]="{ standalone: true }" (picked)="commitEdit()"
+                  (keydown.enter)="commitEdit()" (keydown.escape)="cancelEdit()" [ariaLabel]="column.description" />
               } @else {
-                <input class="cell-editor" [type]="editorType(column)" [(ngModel)]="editValue"
+                <input class="cell-editor" [type]="editorType(column)" [attr.inputmode]="inputMode(column)" [(ngModel)]="editValue"
                   (keydown.enter)="commitEdit()" (keydown.escape)="cancelEdit()" (blur)="commitEdit()"
                   [attr.aria-label]="column.description" />
               }
@@ -183,13 +179,21 @@
         </ng-container>
 
         <ng-container [matColumnDef]="filterPrefix + column.fieldName">
-          <th mat-header-cell *matHeaderCellDef class="filter-cell" [class.cell-center]="column.columnType === 'BOOLEAN'">
+          <th mat-header-cell *matHeaderCellDef class="filter-cell" [class.cell-center]="isCentered(column.columnType)">
             @if (isEnum(column) || column.columnType === 'BOOLEAN') {
               <app-search-select class="filter-select" appearance="compact" [options]="filterOptions().get(column.fieldName) ?? []"
                 [ngModel]="filterValue(column.fieldName)" (ngModelChange)="onFilter(column.fieldName, $event)"
                 [centered]="column.columnType === 'BOOLEAN'" [ariaLabel]="column.description" />
+            } @else if (column.columnType === 'LOCALDATE' || column.columnType === 'LOCALDATETIME') {
+              <!-- datum-vreme: samo datum trazi ceo dan, sa vremenom trazi taj minut -->
+              <app-date-field class="filter-date" [compact]="true"
+                [withTime]="column.columnType === 'LOCALDATETIME'" [timeOptional]="true"
+                [ngModel]="filterValue(column.fieldName)"
+                (ngModelChange)="onFilter(column.fieldName, $event)" [ngModelOptions]="{ standalone: true }"
+                [ariaLabel]="column.description" />
             } @else if (column.columnType !== 'UUID') {
-              <input class="filter-input" [type]="column.columnType === 'LOCALDATETIME' ? 'date' : inputType(column)" [value]="filterValue(column.fieldName)"
+              <input class="filter-input" [type]="inputType(column)"
+                [attr.inputmode]="inputMode(column)" [value]="filterValue(column.fieldName)"
                 (input)="onFilter(column.fieldName, $any($event.target).value)"
                 [placeholder]="'ui.search' | t" [attr.aria-label]="column.description" />
             }

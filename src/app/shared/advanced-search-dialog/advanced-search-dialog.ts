@@ -2,7 +2,7 @@ import { Component, Inject } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { DatabaseColumn } from "../database-table";
 import { Translate } from "../../services/translate";
-import { Criterion, inputTypeFor, isEnum, needsValue, operationsFor, toFilter } from "../filter-operations";
+import { Criterion, inputModeFor, inputTypeFor, isEnum, needsValue, operationsFor, toFilter } from "../filter-operations";
 import { SelectOption } from "../search-select/search-select";
 
 export interface AdvancedSearchDialogData {
@@ -23,6 +23,9 @@ export class AdvancedSearchDialog {
   readonly needsValue = needsValue;
   readonly isEnum = isEnum;
   readonly inputType = inputTypeFor;
+  readonly inputMode = inputModeFor;
+  readonly isDate = (column: { columnType: string }) =>
+    column.columnType === "LOCALDATE" || column.columnType === "LOCALDATETIME";
 
   // Opcije za padajuce liste; racunaju se jednom po otvaranju dijaloga
   readonly columnOptions: SelectOption[];

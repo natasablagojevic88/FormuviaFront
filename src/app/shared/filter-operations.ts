@@ -1,4 +1,5 @@
 import { DatabaseColumn, DatabaseFilter, SearchOperation } from "./database-table";
+import { isDecimalType, parseDecimalText } from "./number-format";
 
 /** Jedan uslov napredne pretrage, onako kako ga korisnik unese. */
 export interface Criterion {
@@ -52,13 +53,20 @@ export function inputTypeFor(column: DatabaseColumn): string {
       return "date";
     case "LOCALDATETIME":
       return "datetime-local";
+    case "LOCALTIME":
+      return "time";
     case "INTEGER":
     case "LONG":
-    case "BIGDECIMAL":
       return "number";
+    // Decimalan broj ide kao tekst: polje type="number" ne prima zarez sa srpske tastature.
     default:
       return "text";
   }
+}
+
+/** Tastatura na telefonu: brojcana za cele brojeve, decimalna (sa zarezom) za BIGDECIMAL. */
+export function inputModeFor(column: DatabaseColumn): string | null {
+  return isDecimalType(column.columnType) ? "decimal" : null;
 }
 
 /** Filter za polje ispod naziva kolone: enum i boolean EQUALS, tekst CONTAINS, datum-vreme ceo dan. */
@@ -67,8 +75,15 @@ export function quickFilter(column: DatabaseColumn, rawValue: string): DatabaseF
   if (value === "") {
     return null;
   }
+  if (!isEnum(column) && column.columnType === "LOCALTIME") {
+    // polje daje HH:mm, a u bazi vreme moze imati i sekunde
+    return toFilter(column, "BETWEEN", `${value}:00`, `${value}:59`);
+  }
   if (!isEnum(column) && column.columnType === "LOCALDATETIME") {
-    return toFilter(column, "BETWEEN", `${value}T00:00:00`, `${value}T23:59:59`);
+    // uneto samo datum -> ceo taj dan; uneto i vreme -> taj minut
+    return value.includes("T")
+      ? toFilter(column, "BETWEEN", `${value}:00`, `${value}:59`)
+      : toFilter(column, "BETWEEN", `${value}T00:00:00`, `${value}T23:59:59`);
   }
   const operation: SearchOperation = !isEnum(column) && column.columnType === "STRING" ? "CONTAINS" : "EQUALS";
   return toFilter(column, operation, value, "");
@@ -99,6 +114,10 @@ export function toFilter(column: DatabaseColumn, operation: SearchOperation, raw
  */
 function normalize(column: DatabaseColumn, rawValue: string): string {
   const value = (rawValue ?? "").trim();
+  if (!isEnum(column) && isDecimalType(column.columnType)) {
+    // uneto sa zarezom ili tackom, back uvek dobija tacku
+    return parseDecimalText(value);
+  }
   if (!isEnum(column) && column.columnType === "LOCALDATETIME") {
     if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) {
       return `${value}:00`;
@@ -127,6 +146,8 @@ function isValidValue(column: DatabaseColumn, value: string): boolean {
       return /^\d{4}-\d{2}-\d{2}$/.test(value);
     case "LOCALDATETIME":
       return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(value);
+    case "LOCALTIME":
+      return /^\d{2}:\d{2}(:\d{2})?$/.test(value);
     case "UUID":
       return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
     default:

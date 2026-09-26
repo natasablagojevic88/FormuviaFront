@@ -1,0 +1,15 @@
+<div class="field">
+  <input type="text" class="text" [class.invalid]="invalid()" [value]="text()" [disabled]="disabled()"
+    (input)="onText($any($event.target))" (blur)="onBlur()"
+    [placeholder]="placeholder() || mask" [attr.aria-label]="ariaLabel() || null"
+    autocomplete="off" spellcheck="false" inputmode="numeric" />
+
+  <button type="button" class="pick" (click)="openPicker()" [disabled]="disabled()"
+    [title]="'ui.date.pick' | t" [attr.aria-label]="'ui.date.pick' | t">
+    <i class="fa-regular fa-calendar"></i>
+  </button>
+
+  <!-- Nativni birac stoji sakriven; sluzi samo da se otvori kalendar na dugme. -->
+  <input #picker class="picker" tabindex="-1" aria-hidden="true" [type]="pickerType" [value]="pickerValue"
+    (change)="onPicked($any($event.target).value)" />
+</div>

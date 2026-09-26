@@ -3,7 +3,7 @@
 Svaki ekran sa tabelom u Formuvii radi isto. Naučite jednom i važi za sve: **Korisnike**, **Uloge** i podtabele do kojih se stiže iz ⋯ menija reda.
 
 ::: info Tabele iz Modela
-Tabele koje sami definišete u [Modelu](/sr/model) pojavljuju se u meniju i otvaraju ekran kakav je ovde opisan. Pronalaženje zapisa, sortiranje, straničenje i export u Excel rade, a *Dodaj* i *Izmeni* otvaraju formu za unos tačno onako kako ste je složili u [Dizajnu forme](/sr/form-design). Dve stvari još nedostaju: **snimanje onoga što unesete**, koje se dovršava na serveru, i brisanje zapisa. Izmena u samoj tabeli i *Brza izmena* za sada ostaju na ugrađenim ekranima. Vidi [Dokle je Formuvia stigla](/sr/#dokle-je-formuvia-stigla).
+Tabele koje sami definišete u [Modelu](/sr/model) pojavljuju se u meniju i otvaraju ekran kakav je ovde opisan. Pronalaženje zapisa, sortiranje, straničenje, export u Excel, kao i unos, izmena i brisanje zapisa kroz formu — sve radi. Dugme ⋯ na redu nudi i istoriju zapisa, isto kao na ugrađenim ekranima. Ono što takva tabela još nema jeste izmena u samoj listi — dvoklik i *Brza izmena*. Vidi [Dokle je Formuvia stigla](/sr/#dokle-je-formuvia-stigla).
 :::
 
 Ekran sa tabelom ima tri dela: **zaglavlje** sa naslovom i dugmetom *Dodaj*, **traku** sa pretragom i exportom, i samu **listu** sa straničenjem na dnu.
@@ -73,6 +73,26 @@ Dugme ⋯ pored *Izmeni* nosi sve ostalo:
 **Export u Excel** preuzima listu kao `.xlsx` fajl.
 
 Dobijate tačno ono što filteri i redosled sortiranja opisuju, a **ne** samo stranu koja je na ekranu: suzite na prošli mesec, sortirajte po iznosu, i fajl sadrži sve te redove, tim redosledom, sa prevedenim nazivima kolona.
+
+## Brojevi
+
+Ceo broj se prikazuje onako kako je upisan, bez razdvajanja hiljada — šifra, godina ili broj računa treba da se čitaju kako su uneti.
+
+Decimalan broj prati jezik koji ste izabrali: na srpskom `1.234,56`, na engleskom `1,234.56`.
+
+Isto važi i za unos. Kad je izabran srpski, decimalu kucate zarezom, na engleskom tačkom, a i polja na formi i polja za pretragu primaju oba — srpska tastatura vas ni u čemu ne ograničava.
+
+Brojevi su poravnati desno, pa se cifre u koloni poklapaju i vrednosti se lako porede.
+
+## Datumi
+
+Datum se piše onako kako ga piše vaš jezik: na srpskom `23.09.2026`, na engleskom `09/23/2026`. Datum i vreme dodaju i vreme — `23.09.2026 16:50`, odnosno `09/23/2026 04:50 PM` na engleskom.
+
+Kucate samo cifre: `23092026` se u hodu pretvara u `23.09.2026`, a datum sa vremenom ide istim putem — `230920261650` postaje `23.09.2026 16:50`. Možete i sami da kucate tačke, kao i skraćeno `23/9/26`, što se pri izlasku iz polja ispiše u punom obliku. Dugme sa kalendarom na desnom kraju polja otvara birač, a datum koji ne postoji — `31.02.` — polje oboji crveno.
+
+Kolona tipa **vreme** prikazuje se onako kako jezik piše vreme — na srpskom `16:50`, na engleskom `04:50 PM` — a unosi se kroz nativno polje za vreme.
+
+U filteru ispod kolone sa **datumom i vremenom** vreme nije obavezno: unesete samo datum i dobijete sve iz tog dana, dodate i vreme i dobijete baš taj minut.
 
 ## Tabele na telefonu
 

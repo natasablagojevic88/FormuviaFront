@@ -5,5 +5,5 @@
   </button>
 </app-page-header>
 
-<!-- Brisanje zapisa tabele iz modela za sada ne postoji na back-u, pa se ne nudi u meniju reda. -->
-<app-data-table [url]="tableUrl()" [canDelete]="false" (loaded)="onLoaded($event)" (edit)="edit($event)"></app-data-table>
+<app-data-table [url]="tableUrl()" [historyUrl]="historyUrl" (loaded)="onLoaded($event)"
+  (edit)="edit($event)" (remove)="remove($event)"></app-data-table>

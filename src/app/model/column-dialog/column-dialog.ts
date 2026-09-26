@@ -19,7 +19,7 @@ export interface ColumnDialogData {
 }
 
 const TYPES: ModelColumnType[] = [
-  "STRING", "BOOLEAN", "INTEGER", "LONG", "BIGDECIMAL", "LOCALDATE", "LOCALDATETIME", "UUID",
+  "STRING", "BOOLEAN", "INTEGER", "LONG", "BIGDECIMAL", "LOCALDATE", "LOCALDATETIME", "LOCALTIME", "UUID",
 ];
 
 @Component({
@@ -78,6 +78,11 @@ export class ColumnDialog implements OnInit {
     return this.column.columnType === "STRING";
   }
 
+  /** Da/ne polje nema listu vrednosti - vrednosti su vec da i ne (back to isto prazni). */
+  get isBoolean(): boolean {
+    return this.column.columnType === "BOOLEAN";
+  }
+
   label(fieldName: string): string {
     return this.translate.get("ui.column." + fieldName);
   }
@@ -88,7 +93,7 @@ export class ColumnDialog implements OnInit {
   }
 
   listSqlInvalid(): boolean {
-    return this.notSelect(this.column.listOfValuesSql);
+    return !this.isBoolean && this.notSelect(this.column.listOfValuesSql);
   }
 
   private notSelect(sql?: string | null): boolean {
@@ -138,6 +143,10 @@ export class ColumnDialog implements OnInit {
     if (this.isCodebook) {
       // veza na sifarnik ne moze i sama da ulazi u naziv sifarnika
       this.column.inDescriptionForCodebook = false;
+    }
+    if (this.isBoolean) {
+      // da/ne nema svoju listu vrednosti
+      this.column.listOfValuesSql = null;
     }
     this.saving.set(true);
     this.sendRequest.post(ApiRoute.modelColumn, this.column)

@@ -224,12 +224,21 @@ body {
 
 /* ---------- Meni reda u tabeli (mat-menu se crta van komponente) ---------- */
 .row-menu.mat-mdc-menu-panel {
+  /* Material boje menija idu kroz svoje promenljive, pa prate temu kao i ostatak aplikacije */
+  --mat-menu-container-color: var(--c-surface);
+  --mat-menu-item-label-text-color: var(--c-text);
+  --mat-menu-item-icon-color: var(--c-text-muted);
   min-width: 200px;
   padding: 6px;
-  border: 1px solid #eef2f7;
+  border: 1px solid var(--c-border-soft);
   border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 18px 40px rgba(3, 8, 23, 0.16);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-2);
+}
+
+.row-menu .mat-mdc-menu-item .mat-mdc-menu-item-text,
+.row-menu .mat-mdc-menu-item span {
+  color: inherit;
 }
 
 .row-menu .mat-mdc-menu-content {
@@ -244,11 +253,11 @@ body {
 }
 
 .row-menu .mat-mdc-menu-item:hover:not(:disabled) {
-  background: #f1f5f9;
+  background: var(--c-surface-3);
 }
 
 .row-menu .menu-danger:hover:not(:disabled) {
-  background: #fef2f2;
+  background: var(--c-danger-soft);
 }
 
 .formuvia-toast {

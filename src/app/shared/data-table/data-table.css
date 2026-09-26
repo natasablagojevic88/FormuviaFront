@@ -39,8 +39,8 @@
   max-width: 100%;
   padding: 4px 4px 4px 12px;
   border-radius: 999px;
-  background: #e5edff;
-  color: #1d4ed8;
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
   font-size: 13px;
   font-weight: 600;
 }
@@ -66,7 +66,7 @@
 }
 
 .chip-remove:hover {
-  background: #d3e0ff;
+  background: var(--c-primary-softer);
 }
 
 .advanced-button {
@@ -99,7 +99,7 @@
 /* Rezim izmene */
 .edit-mode-button.mode-on {
   border-color: var(--c-primary);
-  background: #eef4ff;
+  background: var(--c-primary-soft);
   color: var(--c-primary);
 }
 
@@ -133,14 +133,31 @@
   display: none;
 }
 
+/* Brojevi stoje desno, da se cifre poklapaju po mestu - i zaglavlje, i celija, i polja */
+td.cell-number,
+th.cell-number {
+  text-align: right;
+}
+
+th.cell-number ::ng-deep .mat-sort-header-container {
+  justify-content: flex-end;
+}
+
+td.cell-number .cell-editor,
+th.cell-number .filter-input {
+  text-align: right;
+}
+
 .required-mark {
   margin-left: 2px;
   color: var(--c-danger);
 }
 
+/* Red u izmeni: blaga plava traka, ista logika u svetloj i tamnoj temi */
 tr.mat-mdc-row.row-editing,
 tr.mat-mdc-row.row-editing:hover {
-  background: #f8fbff;
+  background: var(--c-primary-soft);
+  box-shadow: inset 0 0 0 1px var(--c-primary-softer);
 }
 
 .save-row-button:disabled,
@@ -280,18 +297,43 @@ td.cell-saved {
   }
 }
 
+.cell-date,
+.filter-date {
+  display: block;
+  width: 100%;
+  min-width: 150px;
+}
+
+/* Combobox u izmeni: sirinu drzi celija, izgled dolazi iz same komponente (appearance="compact") */
+.cell-select {
+  display: block;
+  width: 100%;
+  min-width: 140px;
+}
+
+/* Polje za izmenu je mirno dok se ne fokusira - inace ceo red blesti od plavih okvira */
 .cell-editor {
   width: 100%;
   min-width: 120px;
   height: 36px;
   padding: 0 10px;
-  border: 1px solid var(--c-primary);
+  border: 1px solid var(--c-border-strong);
   border-radius: 10px;
-  background: var(--c-surface);
+  background: var(--c-surface-2);
   color: var(--c-text);
   font: inherit;
   font-size: 14px;
   outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+}
+
+.cell-editor:hover {
+  border-color: var(--c-primary);
+}
+
+.cell-editor:focus {
+  border-color: var(--c-primary);
+  background: var(--c-surface);
   box-shadow: 0 0 0 3px var(--c-focus);
 }
 
@@ -347,6 +389,12 @@ tr.mat-mdc-row.row-highlight td:first-child {
 
 /* Kolone sa kratkim vrednostima (boolean) — zaglavlje, filter i bedž centrirani */
 .cell-center {
+  text-align: center;
+}
+
+/* Datum i da/ne se centriraju i u samom polju za filter */
+.cell-center .filter-input,
+.cell-center .cell-editor {
   text-align: center;
 }
 

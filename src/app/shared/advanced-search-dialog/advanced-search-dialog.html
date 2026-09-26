@@ -20,21 +20,34 @@
         <app-search-select [options]="operationOptions.get(column.fieldName) ?? []" [(ngModel)]="criterion.searchOperation"
           [ngModelOptions]="{ standalone: true }" [ariaLabel]="'ui.operation' | t" />
 
-        <div class="values">
+        <!-- kod "izmedju" polja Od i Do idu jedno ispod drugog, da ne budu preuska -->
+        <div class="values" [class.stacked]="criterion.searchOperation === 'BETWEEN'">
           @if (needsValue(criterion.searchOperation)) {
             @if (valueOptions.has(column.fieldName)) {
               <app-search-select class="value-select" [options]="valueOptions.get(column.fieldName) ?? []"
                 [(ngModel)]="criterion.value1" [ngModelOptions]="{ standalone: true }"
                 [placeholder]="'ui.value' | t" [ariaLabel]="'ui.value' | t" />
             } @else {
-              <input class="fd-input" [type]="inputType(column)" [(ngModel)]="criterion.value1"
-                [ngModelOptions]="{ standalone: true }" [class.fd-invalid]="isInvalid(criterion)"
-                [placeholder]="(criterion.searchOperation === 'BETWEEN' ? 'ui.from' : 'ui.value') | t"
-                [attr.aria-label]="(criterion.searchOperation === 'BETWEEN' ? 'ui.from' : 'ui.value') | t" />
+              @if (isDate(column)) {
+                <app-date-field [withTime]="column.columnType === 'LOCALDATETIME'" [(ngModel)]="criterion.value1"
+                  [ngModelOptions]="{ standalone: true }"
+                  [placeholder]="(criterion.searchOperation === 'BETWEEN' ? 'ui.from' : 'ui.value') | t"
+                  [ariaLabel]="(criterion.searchOperation === 'BETWEEN' ? 'ui.from' : 'ui.value') | t" />
+              } @else {
+                <input class="fd-input" [type]="inputType(column)" [attr.inputmode]="inputMode(column)"
+                  [(ngModel)]="criterion.value1" [ngModelOptions]="{ standalone: true }" [class.fd-invalid]="isInvalid(criterion)"
+                  [placeholder]="(criterion.searchOperation === 'BETWEEN' ? 'ui.from' : 'ui.value') | t"
+                  [attr.aria-label]="(criterion.searchOperation === 'BETWEEN' ? 'ui.from' : 'ui.value') | t" />
+              }
               @if (criterion.searchOperation === 'BETWEEN') {
-                <input class="fd-input" [type]="inputType(column)" [(ngModel)]="criterion.value2"
-                  [ngModelOptions]="{ standalone: true }" [class.fd-invalid]="isInvalid(criterion)"
-                  [placeholder]="'ui.to' | t" [attr.aria-label]="'ui.to' | t" />
+                @if (isDate(column)) {
+                  <app-date-field [withTime]="column.columnType === 'LOCALDATETIME'" [(ngModel)]="criterion.value2"
+                    [ngModelOptions]="{ standalone: true }" [placeholder]="'ui.to' | t" [ariaLabel]="'ui.to' | t" />
+                } @else {
+                  <input class="fd-input" [type]="inputType(column)" [attr.inputmode]="inputMode(column)"
+                    [(ngModel)]="criterion.value2" [ngModelOptions]="{ standalone: true }" [class.fd-invalid]="isInvalid(criterion)"
+                    [placeholder]="'ui.to' | t" [attr.aria-label]="'ui.to' | t" />
+                }
               }
             }
           }

@@ -1,8 +1,11 @@
 import { Component, signal } from "@angular/core";
+import { Language } from "../../services/language";
 import { SendRequest } from "../../services/send-request";
 import { Translate } from "../../services/translate";
 import { ApiRoute } from "../ApiRoute";
 import { ColumnType, HistoryChange, HistoryEntry } from "../database-table";
+import { formatDate, formatDateTime, formatTime } from "../date-format";
+import { formatDecimal } from "../number-format";
 
 @Component({
   selector: "app-history-panel",
@@ -18,16 +21,21 @@ export class HistoryPanel {
 
   constructor(
     private sendRequest: SendRequest,
-    private translate: Translate
+    private translate: Translate,
+    private language: Language
   ) {}
 
   /** Otvara panel i ucitava istoriju reda; className je naziv DTO klase sa back-a. */
-  open(className: string, id: string, title: string): void {
+  /**
+   * Otvara panel i ucitava istoriju reda. Ugradjene tabele se citaju po nazivu DTO klase,
+   * a tabele iz modela svojom putanjom, koju strana prosledi u url.
+   */
+  open(className: string, id: string, title: string, url?: string): void {
     this.historyTitle.set(title);
     this.historyRows.set([]);
     this.historyOpen.set(true);
     this.historyLoading.set(true);
-    this.sendRequest.get(ApiRoute.history(className, id))
+    this.sendRequest.get(url || ApiRoute.history(className, id))
       .then((rows: HistoryEntry[]) => this.historyRows.set(rows ?? []))
       .finally(() => this.historyLoading.set(false));
   }
@@ -42,7 +50,7 @@ export class HistoryPanel {
   }
 
   historyTime(value: string): string {
-    return this.formatDateTime(value);
+    return formatDateTime(value, this.language.current());
   }
 
   /** Vrednost se formatira po columnType koji back salje uz izmenu. */
@@ -54,24 +62,18 @@ export class HistoryPanel {
       case "BOOLEAN":
         return this.translate.get(value === true || value === "true" ? "ui.yes" : "ui.no");
       case "LOCALDATE":
-        return this.formatDate(String(value));
+        return formatDate(value, this.language.current());
       case "LOCALDATETIME":
-        return this.formatDateTime(String(value));
+        return formatDateTime(value, this.language.current());
+      case "LOCALTIME":
+        return formatTime(value, this.language.current());
+      // ceo broj ostaje kakav jeste, decimalan dobija separatore jezika
+      case "BIGDECIMAL":
+        return formatDecimal(value, this.language.current());
       default:
         return String(value);
     }
   }
 
-  private formatDate(value: string): string {
-    const [year, month, day] = value.split("-");
-    return day ? `${day}.${month}.${year}.` : value;
-  }
 
-  private formatDateTime(value: string): string {
-    if (!value) {
-      return "";
-    }
-    const [date, time] = value.split("T");
-    return `${this.formatDate(date ?? "")} ${(time ?? "").substring(0, 5)}`.trim();
-  }
 }

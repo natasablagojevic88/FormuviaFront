@@ -1,5 +1,6 @@
 import { Component, computed, Inject, OnInit, signal } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { Language } from "../../services/language";
 import { SendRequest } from "../../services/send-request";
 import { ApiRoute } from "../../shared/ApiRoute";
 import { SelectOption } from "../../shared/search-select/search-select";
@@ -7,14 +8,15 @@ import {
   fromFieldValue,
   hasOptions,
   hasPlace,
+  inputModeOf,
   inputTypeOf,
   isRequired,
+  isWrongNumber,
   layoutOf,
   PREVIEW_ID_FIELD,
   PREVIEW_PARENT_FIELD,
   PreviewColumn,
   sortByPlace,
-  stepOf,
   toFieldValue,
 } from "../preview-form";
 
@@ -34,7 +36,7 @@ export interface PreviewFormDialogData {
  * Polja, njihove nazive, tipove i mesto u mrezi vraca back:
  * - unos: GET /api/preview/form/{modelId}
  * - izmena: GET /api/preview/form/{modelId}/{id}
- * - unos u podtabeli: GET /api/preview/form/{modelId}/null/{parent}
+ * - unos u podtabeli: GET /api/preview/form/{modelId}/parent/{parent}
  *
  * Forma se iscrtava tacno po rasporedu iz dizajna forme (rowIndex, columnIndex, colspan),
  * pa dijalog izgleda kao pregled u dizajneru.
@@ -65,12 +67,14 @@ export class PreviewFormDialog implements OnInit {
   readonly isRequired = isRequired;
   readonly hasOptions = hasOptions;
   readonly inputType = inputTypeOf;
-  readonly step = stepOf;
+  readonly inputMode = inputModeOf;
+  readonly wrongNumber = (column: PreviewColumn) => isWrongNumber(this.values[column.code], column);
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: PreviewFormDialogData,
     private dialogRef: MatDialogRef<PreviewFormDialog, any | false>,
-    private sendRequest: SendRequest
+    private sendRequest: SendRequest,
+    private language: Language
   ) {}
 
   get isNew(): boolean {
@@ -87,17 +91,20 @@ export class PreviewFormDialog implements OnInit {
 
   private formUrl(): string {
     const { modelId, id, parent } = this.data;
-    if (parent) {
-      return ApiRoute.modelPreviewFormWithIdAndParent(modelId, id ?? null, parent);
+    if (id) {
+      return ApiRoute.modelPreviewFormWithId(modelId, id);
     }
-    return id ? ApiRoute.modelPreviewFormWithId(modelId, id) : ApiRoute.modelPreviewForm(modelId);
+    // nov zapis u podtabeli: forma odmah nosi vezu na red nadredjene tabele
+    return parent ? ApiRoute.modelPreviewFormWithParent(modelId, parent) : ApiRoute.modelPreviewForm(modelId);
   }
 
   private showForm(columns: PreviewColumn[]): void {
     const fields = sortByPlace(columns.filter((column) => hasPlace(column)));
 
     this.values = {};
-    fields.forEach((column) => (this.values[column.code] = toFieldValue(column.value, column)));
+    fields.forEach(
+      (column) => (this.values[column.code] = toFieldValue(column.value, column, this.language.current()))
+    );
     this.fields.set(fields);
 
     this.hiddenValues = {};
@@ -124,12 +131,12 @@ export class PreviewFormDialog implements OnInit {
     return column.rowIndex && column.rowIndex > 0 ? String(column.rowIndex) : "auto";
   }
 
-  /**
-   * Polja koja back oznaci kao neizmenljiva (editable = false) zakljucana su samo pri izmeni;
-   * pri unosu se popunjavaju, jer se posle vise ne mogu promeniti.
+/**
+   * Polje koje back oznaci kao neizmenljivo (editable = false) korisnik ne popunjava ni pri
+   * unosu - vrednost mu daje upit za podrazumevanu vrednost ili ostaje prazna.
    */
   isLocked(column: PreviewColumn): boolean {
-    return !this.isNew && column.editable === false;
+    return column.editable === false;
   }
 
   /** Obavezno polje bez vrednosti; prekidac uvek ima vrednost (da ili ne). */
@@ -147,7 +154,7 @@ export class PreviewFormDialog implements OnInit {
 
   canSave(): boolean {
     return !this.loading() && !this.saving() && this.fields().length > 0
-      && !this.fields().some((column) => this.missing(column));
+      && !this.fields().some((column) => this.missing(column) || this.wrongNumber(column));
   }
 
   save(): void {
@@ -171,7 +178,7 @@ export class PreviewFormDialog implements OnInit {
 
     this.saving.set(true);
     this.sendRequest
-      .post(ApiRoute.modelPreviewSave(this.data.modelId), record)
+      .post(ApiRoute.modelPreviewUpdate(this.data.modelId), record)
       .then((saved: any) => this.dialogRef.close(saved ?? record))
       .catch(() => this.saving.set(false));
   }

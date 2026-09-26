@@ -32,19 +32,27 @@
               <app-search-select [options]="options(column)" [(ngModel)]="values[column.code]"
                 [ngModelOptions]="{ standalone: true }" [disabled]="isLocked(column)"
                 icon="fa-solid fa-list" [placeholder]="'ui.preview.choose' | t" [ariaLabel]="column.name" />
+            } @else if (column.columnType === 'LOCALDATE' || column.columnType === 'LOCALDATETIME') {
+              <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
+              <app-date-field [withTime]="column.columnType === 'LOCALDATETIME'" [(ngModel)]="values[column.code]"
+                [ngModelOptions]="{ standalone: true }" [disabled]="isLocked(column)" [ariaLabel]="column.name" />
             } @else if (column.textArea) {
               <label class="fd-label" [class.fd-required]="isRequired(column)" [for]="'pf-' + column.code">{{ column.name }}</label>
               <textarea [id]="'pf-' + column.code" class="fd-input area" rows="3"
                 [(ngModel)]="values[column.code]" [ngModelOptions]="{ standalone: true }"
-                [readonly]="isLocked(column)" [attr.maxlength]="column.length || null"
+                [disabled]="isLocked(column)" [attr.maxlength]="column.length || null"
                 autocomplete="off"></textarea>
             } @else {
               <label class="fd-label" [class.fd-required]="isRequired(column)" [for]="'pf-' + column.code">{{ column.name }}</label>
               <input [id]="'pf-' + column.code" class="fd-input" [type]="inputType(column)"
                 [(ngModel)]="values[column.code]" [ngModelOptions]="{ standalone: true }"
-                [readonly]="isLocked(column)" [attr.step]="inputType(column) === 'number' ? step(column) : null"
+                [disabled]="isLocked(column)" [attr.inputmode]="inputMode(column)"
+                [class.fd-input-error]="wrongNumber(column)"
                 [attr.maxlength]="column.columnType === 'STRING' ? (column.length || null) : null"
                 autocomplete="off" />
+              @if (wrongNumber(column)) {
+                <span class="fd-field-error">{{ 'ui.preview.invalidNumber' | t }}</span>
+              }
             }
 
             @if (isLocked(column)) {

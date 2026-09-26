@@ -145,17 +145,19 @@
         }
       </div>
 
-      <div class="fd-field fd-field-wide">
-        <label class="fd-label" for="listOfValuesSql">{{ label('listOfValuesSql') }}</label>
-        <textarea id="listOfValuesSql" name="listOfValuesSql" class="fd-input code sql" rows="2"
-          [(ngModel)]="column.listOfValuesSql" autocomplete="off" spellcheck="false"
-          [class.fd-input-error]="listSqlInvalid()" [placeholder]="'ui.column.listHint' | t"></textarea>
-        @if (listSqlInvalid()) {
-          <span class="fd-field-error">{{ 'ui.column.defaultInvalid' | t }}</span>
-        } @else {
-          <span class="fd-help">{{ 'ui.column.listHelp' | t }}</span>
-        }
-      </div>
+      @if (!isBoolean) {
+        <div class="fd-field fd-field-wide">
+          <label class="fd-label" for="listOfValuesSql">{{ label('listOfValuesSql') }}</label>
+          <textarea id="listOfValuesSql" name="listOfValuesSql" class="fd-input code sql" rows="2"
+            [(ngModel)]="column.listOfValuesSql" autocomplete="off" spellcheck="false"
+            [class.fd-input-error]="listSqlInvalid()" [placeholder]="'ui.column.listHint' | t"></textarea>
+          @if (listSqlInvalid()) {
+            <span class="fd-field-error">{{ 'ui.column.defaultInvalid' | t }}</span>
+          } @else {
+            <span class="fd-help">{{ 'ui.column.listHelp' | t }}</span>
+          }
+        </div>
+      }
     </div>
   </div>
 

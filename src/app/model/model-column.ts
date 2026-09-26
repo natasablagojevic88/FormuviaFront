@@ -7,6 +7,7 @@ export type ModelColumnType =
   | "INTEGER"
   | "LOCALDATE"
   | "LOCALDATETIME"
+  | "LOCALTIME"
   | "UUID";
 
 /** Jedno polje forme, tj. kolona tabele koju model pravi u bazi. */

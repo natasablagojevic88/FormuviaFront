@@ -6,10 +6,13 @@ import { Router } from "@angular/router";
 import { SendRequest } from "../../services/send-request";
 import { ApiRoute } from "../ApiRoute";
 import { Translate } from "../../services/translate";
+import { Language } from "../../services/language";
 import { AdvancedSearchDialog, AdvancedSearchDialogData } from "../advanced-search-dialog/advanced-search-dialog";
 import { DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, QueryDatabaseOrder, TableChild } from "../database-table";
 import { HistoryPanel } from "../history-panel/history-panel";
-import { Criterion, inputTypeFor, isEnum, needsValue, quickFilter, toFilter } from "../filter-operations";
+import { Criterion, inputModeFor, inputTypeFor, isEnum, needsValue, quickFilter, toFilter } from "../filter-operations";
+import { formatDate, formatDateTime, formatTime } from "../date-format";
+import { formatDecimal, isDecimalType, isNumberType, parseDecimalText, toDecimalText } from "../number-format";
 import { SelectOption } from "../search-select/search-select";
 
 const ACTIONS_COLUMN = "actions";
@@ -36,12 +39,20 @@ function isEditableType(column: DatabaseColumn): boolean {
 }
 
 /** Vrednost reda -> tekst za polje za izmenu (input/select rade sa stringovima). */
-function toEditValue(value: any, column: DatabaseColumn): string {
+function toEditValue(value: any, column: DatabaseColumn, language: string): string {
   if (value === null || value === undefined) {
     return "";
   }
   if (column.columnType === "LOCALDATETIME") {
     return String(value).substring(0, 16);
+  }
+  if (column.columnType === "LOCALTIME") {
+    // polje type="time" radi sa HH:mm, a baza moze vratiti i sekunde
+    return String(value).substring(0, 5);
+  }
+  if (isDecimalType(column.columnType)) {
+    // decimala se kuca separatorom svog jezika, bez razdvajanja hiljada
+    return toDecimalText(value, language);
   }
   return String(value);
 }
@@ -57,8 +68,11 @@ function fromEditValue(text: string, column: DatabaseColumn): any {
   switch (column.columnType) {
     case "INTEGER":
     case "LONG":
-    case "BIGDECIMAL":
       return Number(text);
+    case "BIGDECIMAL": {
+      const value = parseDecimalText(text);
+      return value === "" ? null : Number(value);
+    }
     default:
       return text;
   }
@@ -80,6 +94,8 @@ export class DataTable {
   readonly readOnly = input(false);
   /** false: red se ne moze brisati, pa u meniju reda nema stavke "Obrisi". */
   readonly canDelete = input(true);
+  /** Putanja istorije reda za tabele koje nemaju className (tabele iz modela). */
+  readonly historyUrl = input<((id: string) => string) | null>(null);
   readonly edit = output<any>();
   readonly remove = output<any>();
   readonly loaded = output<DatabaseTable<any>>();
@@ -89,6 +105,12 @@ export class DataTable {
   readonly filterPrefix = FILTER_PREFIX;
   readonly isEnum = isEnum;
   readonly inputType = inputTypeFor;
+  readonly inputMode = inputModeFor;
+  readonly isNumber = isNumberType;
+  /** Datum i datum-vreme stoje centralno, kao i da/ne. */
+  readonly isCentered = (columnType?: string) =>
+    columnType === "BOOLEAN" || columnType === "LOCALDATE" || columnType === "LOCALDATETIME" ||
+    columnType === "LOCALTIME";
 
   readonly columns = signal<DatabaseColumn[]>([]);
   readonly allColumns = signal<DatabaseColumn[]>([]);
@@ -171,6 +193,27 @@ export class DataTable {
     }
     return options;
   });
+  /**
+   * Vrednosti za combobox u izmeni reda i celije. Prazna stavka postoji samo kad polje
+   * nije obavezno, da bi vrednost mogla da se obrise.
+   */
+  readonly editorOptions = computed(() => {
+    const empty: SelectOption = { value: "", label: "—" };
+    const options = new Map<string, SelectOption[]>();
+    for (const column of this.allColumns()) {
+      if (column.columnType === "BOOLEAN") {
+        options.set(column.fieldName, [
+          { value: "true", label: this.translate.get("ui.yes") },
+          { value: "false", label: this.translate.get("ui.no") },
+        ]);
+      } else if (isEnum(column)) {
+        const values = column.listOfValues!.map((option) => ({ value: option.value, label: option.option }));
+        options.set(column.fieldName, column.required ? values : [empty, ...values]);
+      }
+    }
+    return options;
+  });
+
   readonly searchableColumns = computed(() => this.allColumns().filter((column) => column.searchable !== false));
 
   private requestId = 0;
@@ -181,6 +224,7 @@ export class DataTable {
   constructor(
     private sendRequest: SendRequest,
     private translate: Translate,
+    private language: Language,
     private dialog: MatDialog,
     private router: Router,
     private host: ElementRef<HTMLElement>
@@ -349,21 +393,21 @@ export class DataTable {
 
   /** ⋯ meni se prikazuje samo kad u njemu ima nesto: istorija, podtabela ili brisanje. */
   readonly hasRowMenu = computed(
-    () => !!this.className() || this.children().length > 0 || this.canDelete()
+    () => !!this.className() || !!this.historyUrl() || this.children().length > 0 || this.canDelete()
   );
 
   /** Istorija se nudi samo kad back posalje className uz tabelu. */
   canShowHistory(): boolean {
-    return !!this.className();
+    return !!this.className() || !!this.historyUrl();
   }
 
   openHistory(row: any): void {
-    const className = this.className();
-    if (!className) {
+    if (!this.canShowHistory()) {
       return;
     }
     this.selectRow(row);
-    this.historyPanel()?.open(className, row[ID_FIELD], this.rowTitle(row));
+    const id = row[ID_FIELD];
+    this.historyPanel()?.open(this.className() ?? "", id, this.rowTitle(row), this.historyUrl()?.(id));
   }
 
   /** Naslov panela ili stavke u putanji: vrednosti prve dve vidljive kolone reda. */
@@ -404,7 +448,7 @@ export class DataTable {
     this.editColumns().forEach((column) => (draft[column.fieldName] = column.columnType === "BOOLEAN" ? true : null));
     this.draftRow.set(draft);
     this.startRowEdit(draft, null);
-    setTimeout(() => this.host.nativeElement.querySelector<HTMLElement>(".cell-editor")?.focus());
+    this.focusEditor(false);
   }
 
   private startRowEdit(row: any, id: string | null): void {
@@ -414,7 +458,9 @@ export class DataTable {
       this.draftRow.set(null);
     }
     this.rowValues = {};
-    this.editColumns().forEach((column) => (this.rowValues[column.fieldName] = toEditValue(row[column.fieldName], column)));
+    this.editColumns().forEach(
+      (column) => (this.rowValues[column.fieldName] = toEditValue(row[column.fieldName], column, this.language.current()))
+    );
     this.highlightedId.set(id);
     this.highlightFlash.set(false);
   }
@@ -490,9 +536,37 @@ export class DataTable {
     if (!this.canEdit(column) || this.isCell(this.editing(), row, column) || this.isCell(this.savingCell(), row, column)) {
       return;
     }
-    this.editValue = toEditValue(row[column.fieldName], column);
+    this.editValue = toEditValue(row[column.fieldName], column, this.language.current());
     this.editing.set({ id: row[ID_FIELD], fieldName: column.fieldName });
-    setTimeout(() => this.host.nativeElement.querySelector<HTMLElement>(".cell-editor")?.focus());
+    // dvoklik na celiju sa listom odmah otvara listu, da se ne klikce dva puta
+    this.focusEditor(true);
+  }
+
+  /**
+   * Fokus na prvo polje za izmenu. Kod combobox-a se fokusira njegovo dugme, a kad je
+   * izmena pokrenuta dvoklikom na tu celiju, lista se i otvori (sa poljem za pretragu).
+   */
+  private focusEditor(openList: boolean): void {
+    setTimeout(() => {
+      const editor = this.host.nativeElement.querySelector<HTMLElement>(".cell-editor, .cell-select, .cell-date");
+      if (!editor) {
+        return;
+      }
+      if (editor.classList.contains("cell-date")) {
+        editor.querySelector<HTMLElement>("input")?.focus();
+        return;
+      }
+      if (editor.classList.contains("cell-select")) {
+        const trigger = editor.querySelector<HTMLElement>(".trigger");
+        if (openList) {
+          trigger?.click();
+        } else {
+          trigger?.focus();
+        }
+        return;
+      }
+      editor.focus();
+    });
   }
 
   cancelEdit(): void {
@@ -650,11 +724,14 @@ export class DataTable {
       case "BOOLEAN":
         return this.translate.get(value === "true" ? "ui.yes" : "ui.no");
       case "LOCALDATE":
-        return this.formatDate(value);
-      case "LOCALDATETIME": {
-        const [date, time] = value.split("T");
-        return `${this.formatDate(date)} ${(time ?? "").substring(0, 5)}`;
-      }
+        return formatDate(value, this.language.current());
+      case "LOCALDATETIME":
+        return formatDateTime(value, this.language.current());
+      case "LOCALTIME":
+        return formatTime(value, this.language.current());
+      // Ceo broj se ne formatira; decimalan dobija separatore jezika.
+      case "BIGDECIMAL":
+        return formatDecimal(value, this.language.current(), column.length);
       default:
         return value;
     }
@@ -662,11 +739,6 @@ export class DataTable {
 
   private scrollToHighlighted(): void {
     this.host.nativeElement.querySelector(".row-highlight")?.scrollIntoView({ block: "nearest", behavior: "smooth" });
-  }
-
-  private formatDate(value: string): string {
-    const [year, month, day] = value.split("-");
-    return day && month ? `${day}.${month}.${year}.` : value;
   }
 
   private search(): void {

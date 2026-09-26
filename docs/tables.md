@@ -3,7 +3,7 @@
 Every table screen in Formuvia works the same way. Learn it once and it applies to all of them: **Users**, **Roles**, and the subtables you reach from a row's ⋯ menu.
 
 ::: info Tables from the Model
-Tables you define yourself in the [Model](/model) appear in the menu and open a screen like the ones described here. Finding a record, sorting, paging and the Excel export all work, and *Add* and *Edit* open the entry form exactly as you laid it out in [Form design](/form-design). Two things are still missing: **storing what you enter**, which is being finished on the server, and deleting a record. Editing straight in the table and *Quick edit* stay with the built-in screens for now. See [Where Formuvia is today](/#where-formuvia-is-today).
+Tables you define yourself in the [Model](/model) appear in the menu and open a screen like the ones described here. Finding a record, sorting, paging, the Excel export, and adding, changing and deleting records through the form all work. The ⋯ button on a row holds the history of the record, just like on the built-in screens. What such a table does not have yet is editing straight in the list — double-click and *Quick edit*. See [Where Formuvia is today](/#where-formuvia-is-today).
 :::
 
 A table screen has three parts: a **header** with the title and the *Add* button, a **toolbar** with search and export, and the **list** itself with a paginator at the bottom.
@@ -73,6 +73,26 @@ The ⋯ button next to *Edit* holds everything else:
 **Export to Excel** downloads the list as an `.xlsx` file.
 
 What you get is exactly what the filters and the sort order describe, **not** just the page on the screen: filter down to last month's records, sort them by amount, and the file contains all of them, in that order, with the translated column headers.
+
+## Numbers
+
+A whole number is shown exactly as it is stored, without thousands separators — a code, a year or an invoice number should read the way it was entered.
+
+A decimal number follows the language you chose: `1.234,56` in Serbian, `1,234.56` in English.
+
+Typing follows the same rule. With Serbian chosen you enter the decimal with a comma, with English with a dot, and both the form fields and the search fields accept either, so nothing stops you from typing on a Serbian keyboard.
+
+Numbers are aligned to the right, so the digits of one column line up and the values are easy to compare.
+
+## Dates
+
+A date is written the way your language writes it: `23.09.2026` in Serbian, `09/23/2026` in English. A date and time adds the time — `23.09.2026 16:50`, or `09/23/2026 04:50 PM` in English.
+
+You only type the digits: `23092026` turns into `23.09.2026` by itself as you go, and a date and time carries on the same way — `230920261650` becomes `23.09.2026 16:50`. Typing the separators yourself works too, and so does a short form like `23/9/26`, which is written out in full when you leave the field. The calendar button at the right end of the field opens a picker, and a date that does not exist — `31.02.` — is marked in red.
+
+A **time** column is shown the same way the language writes the time — `16:50` in Serbian, `04:50 PM` in English — and is entered through the browser's own time field.
+
+In the filter under a **date and time** column the time is optional: enter only the date and you get everything that happened that day, add the time and you get that exact minute.
 
 ## Tables on a phone
 

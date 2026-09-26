@@ -15,8 +15,18 @@
   min-width: 0;
 }
 
+.values.stacked {
+  flex-direction: column;
+}
+
 .value-select {
   flex: 1;
+}
+
+/* U jednom redu oba polja dele sirinu; jedno ispod drugog svako uzima celu. */
+.values > * {
+  flex: 1;
+  min-width: 0;
 }
 
 .remove {

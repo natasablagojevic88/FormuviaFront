@@ -31,7 +31,14 @@
   resize: vertical;
 }
 
-.fd-input[readonly] {
+.fd-input-error,
+.fd-input-error:focus {
+  border-color: var(--c-danger);
+  box-shadow: 0 0 0 3px var(--c-danger-soft);
+}
+
+/* Polje koje se ne moze menjati: vidi se vrednost, ali se u njega ne unosi */
+.fd-input:disabled {
   background: var(--c-surface-3);
   color: var(--c-text-muted);
   cursor: not-allowed;

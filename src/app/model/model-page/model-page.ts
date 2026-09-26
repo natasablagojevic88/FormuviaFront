@@ -1,4 +1,4 @@
-import { Component, signal, viewChild } from "@angular/core";
+import { Component, ElementRef, OnDestroy, signal, viewChild } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatTree } from "@angular/material/tree";
 import { Router } from "@angular/router";
@@ -13,8 +13,15 @@ import { ModelDialog, ModelDialogData } from "../model-dialog/model-dialog";
 import { childTypeOf, ModelNode } from "../model";
 
 const ROOT_KEY = "root";
+/** Otvoreni cvorovi i izabrani cvor se pamte dok traje kartica browsera. */
+const STATE_KEY = "formuvia.model.tree";
 /** Naziv DTO klase modela za istoriju (GET /api/history/{className}/{id}). */
 const HISTORY_CLASS = "ModelDTO";
+
+interface TreeState {
+  expanded: string[];
+  selected: string | null;
+}
 
 @Component({
   selector: "app-model-page",
@@ -22,7 +29,7 @@ const HISTORY_CLASS = "ModelDTO";
   templateUrl: "./model-page.html",
   styleUrl: "./model-page.css",
 })
-export class ModelPage {
+export class ModelPage implements OnDestroy {
   readonly roots = signal<ModelNode[]>([]);
   readonly loading = signal(false);
   readonly selectedKey = signal<string | null>(null);
@@ -41,7 +48,8 @@ export class ModelPage {
     private router: Router,
     private sendRequest: SendRequest,
     private notify: Notify,
-    private translate: Translate
+    private translate: Translate,
+    private host: ElementRef<HTMLElement>
   ) {
     this.loadRoles();
     this.load();
@@ -52,14 +60,79 @@ export class ModelPage {
     this.sendRequest.get(ApiRoute.appuserAllRoles).then((roles: Role[]) => (this.roles = roles ?? []));
   }
 
+  /** Izlazak sa strane (npr. u dizajn forme): pamti se sta je bilo otvoreno. */
+  ngOnDestroy(): void {
+    this.saveState();
+  }
+
   load(): void {
     this.loading.set(true);
     this.sendRequest.get(ApiRoute.modelTree)
       .then((root: ModelNode) => {
         this.roots.set([root]);
-        setTimeout(() => this.tree()?.expand(root));
+        setTimeout(() => this.restoreState(root));
       })
       .finally(() => this.loading.set(false));
+  }
+
+  private saveState(): void {
+    const tree = this.tree();
+    if (!tree) {
+      return;
+    }
+    const expanded: string[] = [];
+    this.walk(this.roots(), (node) => {
+      if (tree.isExpanded(node)) {
+        expanded.push(this.key(node));
+      }
+    });
+
+    try {
+      sessionStorage.setItem(STATE_KEY, JSON.stringify({ expanded, selected: this.selectedKey() } as TreeState));
+    } catch {
+      // bez sessionStorage se drvo posle povratka otvara od korena
+    }
+  }
+
+  /** Povratak na stranu: drvo se vraca onako kako je ostalo, i izabrani cvor se dovodi u vidno polje. */
+  private restoreState(root: ModelNode): void {
+    const tree = this.tree();
+    if (!tree) {
+      return;
+    }
+    tree.expand(root);
+
+    const state = this.readState();
+    if (!state) {
+      return;
+    }
+    const expanded = new Set(state.expanded);
+    this.walk(this.roots(), (node) => {
+      if (expanded.has(this.key(node))) {
+        tree.expand(node);
+      }
+    });
+
+    if (state.selected) {
+      this.selectedKey.set(state.selected);
+      setTimeout(() => this.host.nativeElement.querySelector(".node.selected")?.scrollIntoView({ block: "center" }));
+    }
+  }
+
+  private readState(): TreeState | null {
+    try {
+      const stored = sessionStorage.getItem(STATE_KEY);
+      return stored ? (JSON.parse(stored) as TreeState) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private walk(nodes: ModelNode[], visit: (node: ModelNode) => void): void {
+    nodes.forEach((node) => {
+      visit(node);
+      this.walk(node.children ?? [], visit);
+    });
   }
 
   key(node: ModelNode): string {
@@ -104,6 +177,8 @@ export class ModelPage {
 
   /** Dizajn forme te tabele: raspored polja u mrezi. */
   columns(node: ModelNode): void {
+    this.select(node);
+    this.saveState();
     this.router.navigate(["/model/columns", node.id]);
   }
 

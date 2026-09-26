@@ -6,6 +6,7 @@ export type ColumnType =
   | "INTEGER"
   | "LOCALDATE"
   | "LOCALDATETIME"
+  | "LOCALTIME"
   | "UUID";
 
 export type SearchOperation =
@@ -39,6 +40,8 @@ export interface DatabaseColumn {
   editable?: boolean;
   /** true: polje je obavezno (@NotNull na back-u) - bez njega se red ne moze snimiti. */
   required?: boolean;
+  /** Broj decimala kolone; kad ga back posalje, decimalan broj se prikazuje bas sa toliko decimala. */
+  length?: number;
 }
 
 export interface DatabaseTable<T> {
