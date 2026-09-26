@@ -1,4 +1,4 @@
-/* Login strana ima svoj izgled, uvek tamna pozadina i svetla kartica, pa ne koristi tokene teme. */
+/* The login page has a look of its own, always a dark background and a light card, so it uses no theme tokens. */
 .login-wrapper {
   min-height: 100vh;
   background-color: #0f172a;

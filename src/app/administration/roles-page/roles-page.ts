@@ -45,7 +45,7 @@ export class RolesPage {
   remove(row: { id: string }): void {
     const data: ConfirmDialogData = {
       title: this.translate.get("ui.deleteTitle"),
-      // Brisanje uloge je skida i svim korisnicima koji su je imali (ON DELETE CASCADE na back-u).
+      // Deleting a role takes it away from every user that had it (ON DELETE CASCADE on the server).
       message: this.translate.get("ui.roles.deleteConfirm"),
       confirmText: this.translate.get("ui.delete"),
       danger: true,
@@ -73,7 +73,7 @@ export class RolesPage {
         }
         this.notify.success(this.translate.get("ui.saved"));
         if (data.id) {
-          // izmena: samo taj red se osvezava, tabela se ne ucitava ponovo
+          // edit: only that row is refreshed, the table is not loaded again
           this.table().showChanged(saved);
         } else {
           this.table().showNew(saved.id);

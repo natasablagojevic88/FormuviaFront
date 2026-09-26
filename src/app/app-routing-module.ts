@@ -15,7 +15,7 @@ const routes: Routes = [
     loadChildren: () => import('./table-page/table-page-module').then(m => m.TablePageModule)
   },
   {
-    // putanja je ista kao u meniju sa back-a (MenuDTO.url za tabelu iz modela)
+    // the path is the same as in the menu from the server (MenuDTO.url of a model table)
     path: 'preview/model',
     loadChildren: () => import('./model-preview/model-preview-module').then(m => m.ModelPreviewModule)
   },

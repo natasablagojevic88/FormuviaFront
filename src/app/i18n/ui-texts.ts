@@ -1,5 +1,5 @@
-// Tekstovi interfejsa (dugmad, poruke, naslovi dijaloga) po jeziku.
-// Back prevodi samo ono sto stize u odgovorima: kolone i naslov tabele, meni i greske.
+// Interface texts (buttons, messages, dialog titles) by language.
+// The server translates only what its responses carry: columns and table title, the menu and errors.
 export const UI_TEXTS: Record<string, Record<string, string>> = {
   "en-US": {
     "ui.noResults": "No results.",

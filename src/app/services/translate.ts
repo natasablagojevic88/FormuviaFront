@@ -11,8 +11,8 @@ export class Translate {
 
   constructor(private language: Language) {}
 
-  // Svi tekstovi interfejsa su na frontu (i18n/ui-texts.ts); sa back-a vec prevedeni
-  // stizu samo nazivi kolona i naslov tabele, meni i poruke gresaka.
+  // Every interface text lives on the client (i18n/ui-texts.ts); from the server come only
+  // the already translated column names and table title, the menu and the error messages.
   load(): void {
     this.textsSignal.set(UI_TEXTS[this.language.current()] ?? UI_TEXTS["en-US"]);
   }

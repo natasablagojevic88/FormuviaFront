@@ -1,4 +1,5 @@
 import { Injectable, signal } from "@angular/core";
+import { environment } from "../../environments/environment";
 
 export interface LanguageOption {
   tag: string;
@@ -6,7 +7,8 @@ export interface LanguageOption {
 }
 
 const STORAGE_KEY = "formuvia.language";
-const DEFAULT_LANGUAGE = "en-US";
+/** Fallback language when the environment holds an unknown value. */
+const FALLBACK_LANGUAGE = "en-US";
 
 @Injectable({
   providedIn: "root",
@@ -27,9 +29,15 @@ export class Language {
     try {
       localStorage.setItem(STORAGE_KEY, tag);
     } catch {
-      // bez localStorage jezik vazi samo do osvezavanja
+      // without localStorage the language lasts only until the page is reloaded
     }
     window.location.reload();
+  }
+
+  /** Language of a first visit; it is set in the environment (defaultLanguage). */
+  private defaultLanguage(): string {
+    const configured = environment.defaultLanguage;
+    return this.options.some((option) => option.tag === configured) ? configured : FALLBACK_LANGUAGE;
   }
 
   private read(): string {
@@ -39,8 +47,8 @@ export class Language {
         return stored;
       }
     } catch {
-      // localStorage nije dostupan (privatni rezim, blokirani podaci sajta)
+      // localStorage is not available (private mode, site data blocked)
     }
-    return DEFAULT_LANGUAGE;
+    return this.defaultLanguage();
   }
 }

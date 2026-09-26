@@ -5,8 +5,8 @@ export type ThemeMode = "system" | "light" | "dark";
 const STORAGE_KEY = "formuvia-theme";
 
 /**
- * Tema aplikacije: "system" prati podesavanje operativnog sistema,
- * a izbor korisnika se upisuje kao data-theme na <html> i pamti u browseru.
+ * Theme of the application: "system" follows the operating system setting,
+ * and the choice of the user is written as data-theme on <html> and kept in the browser.
  */
 @Injectable({
   providedIn: "root",
@@ -24,11 +24,11 @@ export class Theme {
     try {
       localStorage.setItem(STORAGE_KEY, mode);
     } catch {
-      // bez localStorage izbor vazi samo do osvezavanja
+      // without localStorage the choice lasts only until the page is reloaded
     }
   }
 
-  /** Prekidac u zaglavlju: svetla -> tamna -> po sistemu. */
+  /** The switch in the header: light -> dark -> follow the system. */
   next(): void {
     const order: ThemeMode[] = ["light", "dark", "system"];
     this.set(order[(order.indexOf(this.mode()) + 1) % order.length]);

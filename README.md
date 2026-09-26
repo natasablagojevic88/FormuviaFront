@@ -50,16 +50,22 @@ npm install
 
 3. Open `http://localhost:4200` and log in (first login: user `admin`, password from the backend setting `admin.default.password`).
 
-The backend address for development is set in `src/environments/environment.development.ts` (`apiUrl`). The backend must allow this origin in its `cors.url` setting (`http://localhost:4200` by default).
+Development settings are in `src/environments/environment.development.ts`:
+
+| Key | Meaning |
+|---|---|
+| `apiUrl` | address of the backend; it must allow this origin in its `cors.url` setting (`http://localhost:4200` by default) |
+| `defaultLanguage` | language a visitor gets before choosing one: `en-US`, `sr-Latn-RS` or `sr-RS`; the choice they make is kept in the browser |
 
 ## Building for production
 
-1. Set the backend address in `src/environments/environment.ts`:
+1. Set the backend address and the starting language in `src/environments/environment.ts`:
 
    ```ts
    export const environment = {
      production: true,
-     apiUrl: 'https://api.example.com/Formuvia'
+     apiUrl: 'https://api.example.com/Formuvia',
+     defaultLanguage: 'sr-Latn-RS'
    };
    ```
 
@@ -77,7 +83,7 @@ On the backend, set `cors.url` to the address where the client is served. The cl
 
 This is a quick reference. The full guide, with the model and the form designer explained step by step, is at **[https://natasablagojevic88.github.io/FormuviaFront/](https://natasablagojevic88.github.io/FormuviaFront/)**.
 
-- **Language** – choose it in the top bar; the choice is remembered in the browser.
+- **Language** – choose it in the top bar; the choice is remembered in the browser. Which language a new visitor starts with is set in the environment file (`defaultLanguage`).
 - **Theme** – the button next to the language switches light → dark → follow the system.
 - **Menu** – on the left; on phones open it with the menu button in the top bar.
 - **Tables on a phone** – each row is shown as a card; choose the sort column in the toolbar above the list and filter through *Advanced search*.

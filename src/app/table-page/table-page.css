@@ -21,7 +21,7 @@ app-data-table {
   padding: 0 22px;
   border: 0;
   border-radius: 16px;
-  /* stoji na plavoj traci, pa je uvek belo sa plavim tekstom */
+  /* it sits on the blue bar, so it is always white with blue text */
   background: var(--c-on-dark);
   color: #1f5eff;
   font: inherit;

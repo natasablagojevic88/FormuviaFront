@@ -10,8 +10,8 @@ import { viewChild } from "@angular/core";
 import { DatabaseTable } from "../shared/database-table";
 
 /**
- * Genericka strana za podredjenu tabelu (nadredjeni -> podredjeni).
- * Sve stize kroz parametre rute: putanja tabele, polje i id nadredjenog reda i putanja nazad.
+ * Generic page for a subtable (parent -> child).
+ * Everything arrives through route parameters: the table path, the field and id of the parent row, and the way back.
  */
 @Component({
   selector: "app-table-page",
@@ -61,7 +61,7 @@ export class TablePage {
     }
   }
 
-  /** Povratak na nivo iz putanje: svaki korak pamti adresu sa koje se doslo. */
+  /** Back to a level from the trail: every step remembers the address it came from. */
   back(index: number): void {
     const crumb = this.trail()[index];
     if (crumb) {

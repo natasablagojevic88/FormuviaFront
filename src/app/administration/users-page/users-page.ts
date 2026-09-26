@@ -72,7 +72,7 @@ export class UsersPage {
         }
         this.notify.success(this.translate.get("ui.saved"));
         if (data.id) {
-          // izmena: samo taj red se osvezava, tabela se ne ucitava ponovo
+          // edit: only that row is refreshed, the table is not loaded again
           this.table().showChanged(saved);
         } else {
           this.table().showNew(saved.id);

@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Notify } from "./notify";
 import { Translate } from "./translate";
 
-/** Jedna ikona u jednom stilu, npr. "fa-solid fa-user-shield". */
+/** One icon in one style, e.g. "fa-solid fa-user-shield". */
 export interface IconOption {
   classes: string;
   name: string;
@@ -18,9 +18,9 @@ interface FaIcon {
 }
 
 /**
- * Spisak Font Awesome ikona iz assets/fa-icons.json (pravi ga `npm run icons`).
- * Uvozi se kao deo aplikacije (poseban lazy chunk), a ne kao fajl preko mreze:
- * tako se ucitava tek pri prvom otvaranju biraca i ne zavisi od serviranja assets foldera.
+ * The list of Font Awesome icons from assets/fa-icons.json (built by `npm run icons`).
+ * It is imported as part of the application (a separate lazy chunk) instead of being fetched:
+ * that way it loads on the first opening of the picker and does not depend on serving the assets folder.
  */
 @Injectable({
   providedIn: "root",
@@ -39,7 +39,7 @@ export class Icons {
         (module.default as FaIcon[]).flatMap((icon) =>
           icon.classes.map((classes) => ({ classes, name: icon.name, label: icon.label, terms: icon.terms }))))
       .catch(() => {
-        // sledece otvaranje biraca pokusava ponovo
+        // the next opening of the picker tries again
         this.icons = undefined;
         this.notify.error(this.translate.get("ui.icon.loadError"));
         return [];

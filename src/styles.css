@@ -1,6 +1,6 @@
 @import '@angular/material/prebuilt-themes/azure-blue.css';
 
-/* ---------- Tokeni izgleda ----------
+/* ---------- Design tokens ----------
    Sve boje, zaobljenja i senke aplikacije su ovde. Komponente koriste var(--...),
    pa se izgled menja na jednom mestu, a tamna tema je samo drugi skup vrednosti. */
 :root {
@@ -16,7 +16,7 @@
   --c-text-muted: #64748b;
   --c-text-faint: #94a3b8;
   --c-text-on-primary: #fff;
-  /* Tekst na uvek tamnoj ili plavoj podlozi (meni, zaglavlje, traka strane) - isti u obe teme */
+  /* Text on a surface that is always dark or blue (menu, header, page bar) - the same in both themes */
   --c-on-dark: #fff;
   --c-on-dark-muted: #cbd5e1;
   --c-on-dark-faint: #94a3b8;
@@ -32,7 +32,7 @@
   --c-danger-strong: #b91c1c;
   --c-danger-soft: #fef2f2;
   --c-danger-softer: #fee2e2;
-  /* podloga crvenog dugmeta; mora da nosi beo tekst u obe teme */
+  /* background of the red button; it must carry white text in both themes */
   --c-danger-bg: #dc2626;
   --c-danger-bg-hover: #b91c1c;
 
@@ -61,7 +61,7 @@
   --shadow-2: 0 18px 40px var(--c-shadow-strong);
 }
 
-/* Tamna tema: sistemsko podesavanje, osim kad je korisnik izabrao svetlu */
+/* Dark theme: the system setting, unless the user picked the light one */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
@@ -107,7 +107,7 @@
   }
 }
 
-/* Izbor korisnika ima prednost nad sistemskim podesavanjem */
+/* The choice of the user wins over the system setting */
 :root[data-theme="dark"] {
   color-scheme: dark;
 
@@ -159,7 +159,7 @@ body {
 }
 
 .formuvia-dialog .mat-mdc-dialog-surface {
-  /* Material sam postavlja boju teksta iz svetle teme, pa je ovde vezujemo za tokene */
+  /* Material sets the text colour from the light theme, so here it is tied to the tokens */
   background: var(--c-surface);
   color: var(--c-text);
   border-radius: 28px;
@@ -167,12 +167,12 @@ body {
   box-shadow: var(--shadow-2);
 }
 
-/* Bez backdrop-filter: zamucenje se pri svakom kadru animacije iznova crta i oseca se kao sporo otvaranje */
+/* No backdrop-filter: the blur is redrawn on every animation frame and makes opening feel slow */
 .formuvia-backdrop {
   background: var(--c-backdrop);
 }
 
-/* Material komponente koje same crtaju tekst (paginator, select, polja) prate temu */
+/* Material components that draw their own text (paginator, select, fields) follow the theme */
 .mat-mdc-select-value,
 .mat-mdc-select-value-text,
 .mat-mdc-paginator,
@@ -196,7 +196,7 @@ body {
   border-color: var(--c-border);
 }
 
-/* ---------- Lista izbora (mat-select, npr. broj redova u paginatoru) ---------- */
+/* ---------- Option list (mat-select, e.g. rows per page in the paginator) ---------- */
 .cdk-overlay-pane .mat-mdc-select-panel {
   padding: 6px;
   border: 1px solid #eef2f7;
@@ -222,9 +222,9 @@ body {
   color: #1f5eff;
 }
 
-/* ---------- Meni reda u tabeli (mat-menu se crta van komponente) ---------- */
+/* ---------- Row menu in the table (mat-menu is drawn outside the component) ---------- */
 .row-menu.mat-mdc-menu-panel {
-  /* Material boje menija idu kroz svoje promenljive, pa prate temu kao i ostatak aplikacije */
+  /* Material menu colours go through its own variables, so they follow the theme like the rest */
   --mat-menu-container-color: var(--c-surface);
   --mat-menu-item-label-text-color: var(--c-text);
   --mat-menu-item-icon-color: var(--c-text-muted);
@@ -270,8 +270,8 @@ body {
   box-shadow: none;
 }
 
-/* ---------- Dijalozi (MatDialog) ---------- */
-/* Zajednicki izgled svih dijaloga. Klase imaju prefiks fd- da se ne sudare sa klasama komponenti. */
+/* ---------- Dialogs (MatDialog) ---------- */
+/* The shared look of every dialog. Classes are prefixed with fd- so they cannot clash with component classes. */
 
 .fd {
   display: flex;
@@ -510,7 +510,7 @@ body {
   }
 }
 
-/* ---------- Tabela kao kartice na telefonu ----------
+/* ---------- Table as cards on a phone ----------
    <tbody> i <thead> pravi Angular Material van naseg sablona, pa ta pravila
    ne mogu biti u CSS-u komponente (nemaju oznaku komponente). */
 @media (max-width: 900px) {

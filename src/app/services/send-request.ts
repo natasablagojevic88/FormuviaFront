@@ -8,7 +8,7 @@ import { Notify } from "./notify";
 import { Translate } from "./translate";
 
 export interface RequestOptions {
-  /** false: greska se ne prikazuje u popup-u (npr. provera sesije pri startu). */
+  /** false: the error is not shown in a popup (e.g. the session check at startup). */
   notifyError?: boolean;
 }
 
@@ -19,7 +19,7 @@ export class SendRequest {
   private static readonly LANGUAGE_HEADER = "X-Language";
   private static readonly DEFAULT_FILE_NAME = "download";
 
-  /** Red zahteva: svaki novi poziv se nadovezuje na kraj. */
+  /** Queue of requests: every new call is appended to the end. */
   private queue: Promise<unknown> = Promise.resolve();
 
   constructor(
@@ -30,7 +30,7 @@ export class SendRequest {
     private translate: Translate,
   ) {}
 
-  // Svaka greska sa back-a se prikazuje u crvenom popup-u; poruka je vec prevedena na back-u.
+  // Every error from the server is shown in a red popup; the message is already translated there.
   private handleError(error: HttpErrorResponse, requestOptions?: RequestOptions) {
     if (requestOptions?.notifyError !== false) {
       this.errorMessage(error).then((message) => this.notify.error(message));
@@ -41,7 +41,7 @@ export class SendRequest {
     return throwError(() => error);
   }
 
-  // Kod download-a telo greske stize kao Blob, pa se JSON sa porukom cita iz njega.
+  // On a download the error body arrives as a Blob, so the JSON with the message is read out of it.
   private async errorMessage(error: HttpErrorResponse): Promise<string> {
     let body = error.error;
     if (body instanceof Blob) {
@@ -61,12 +61,12 @@ export class SendRequest {
     };
   }
 
-  // Pozivi se izvrsavaju jedan za drugim: sledeci krece tek kad se prethodni zavrsi.
-  // HttpClient observable je hladan, pa se zahtev zaista salje tek kad dodje na red (firstValueFrom).
+  // Calls run one after another: the next one starts only when the previous one has finished.
+  // An HttpClient observable is cold, so the request is really sent when its turn comes (firstValueFrom).
   private send(request: Observable<any>, requestOptions?: RequestOptions): Promise<any> {
     const run = () => firstValueFrom(request.pipe(catchError((err) => this.handleError(err, requestOptions))));
     const result = this.queue.then(run, run);
-    // Red ne sme da ostane u odbijenom stanju, inace bi greska zaustavila sve sledece pozive.
+    // The queue must not stay rejected, otherwise one error would stop every call after it.
     this.queue = result.catch(() => undefined);
     return result;
   }
@@ -83,7 +83,7 @@ export class SendRequest {
     return this.send(this.http.post(environment.apiUrl + api, body, this.options()), requestOptions);
   }
 
-  /** POST koji vraca fajl; ime fajla se uzima iz Content-Disposition headera odgovora. */
+  /** POST that returns a file; the file name is taken from the Content-Disposition header. */
   download(api: string, body: any, requestOptions?: RequestOptions): Promise<void> {
     const request = this.http.post(environment.apiUrl + api, body, {
       ...this.options(),
@@ -95,14 +95,14 @@ export class SendRequest {
     });
   }
 
-  // Back salje: attachment; filename*=UTF-8''<ime kodirano kao URL>, ponekad sa navodnicima oko vrednosti.
+  // The server sends: attachment; filename*=UTF-8''<name encoded as a URL>, sometimes quoted.
   private static fileName(contentDisposition: string | null): string {
     const encoded = contentDisposition?.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
     if (encoded) {
       try {
         return decodeURIComponent(encoded.replace(/"/g, "").trim());
       } catch {
-        // neispravno kodirano ime - probaj obican filename
+        // the name is not encoded correctly - fall back to the plain filename
       }
     }
     const plain = contentDisposition?.match(/filename="?([^";]+)"?/i)?.[1];

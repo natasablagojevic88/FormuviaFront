@@ -39,7 +39,7 @@ import { AppErrorHandler } from './services/app-error-handler';
     provideBrowserGlobalErrorListeners(),
     { provide: MatPaginatorIntl, useClass: TranslatedPaginatorIntl },
     { provide: ErrorHandler, useClass: AppErrorHandler },
-    // Zajednicka podesavanja svih dijaloga; kratke animacije da se otvaranje ne oseca sporo.
+    // Shared settings of every dialog; short animations so opening does not feel slow.
     {
       provide: MAT_DIALOG_DEFAULT_OPTIONS,
       useValue: {

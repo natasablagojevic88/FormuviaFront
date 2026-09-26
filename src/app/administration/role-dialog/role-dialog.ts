@@ -7,7 +7,7 @@ import { DatabaseColumn } from "../../shared/database-table";
 
 export interface RoleDialogData {
   id?: string;
-  /** allColumns iz odgovora tabele: prevedeni nazivi svih polja RoleDTO-a. */
+  /** allColumns from the table response: translated names of every RoleDTO field. */
   columns: DatabaseColumn[];
 }
 

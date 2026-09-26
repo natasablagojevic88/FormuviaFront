@@ -8,7 +8,7 @@ import { SelectOption } from "../../shared/search-select/search-select";
 
 export interface AppUserDialogData {
   id?: string;
-  /** allColumns iz odgovora tabele: prevedeni nazivi svih polja AppUserDTO-a. */
+  /** allColumns from the table response: translated names of every AppUserDTO field. */
   columns: DatabaseColumn[];
 }
 
@@ -26,9 +26,9 @@ interface AppUser {
   email: string;
   password?: string;
   active: boolean;
-  /** Role koje korisnik ima; back po njima dodeljuje i oduzima role. */
+  /** Roles the user has; the server grants and revokes roles according to them. */
   userRoles?: Role[];
-  /** Sve role u aplikaciji; salje ih back uz korisnika, pri unosu se citaju sa all-roles. */
+  /** Every role in the application; the server sends them with the user, on entry they come from all-roles. */
   allRoles?: Role[];
 }
 
@@ -46,7 +46,7 @@ export class AppUserDialog implements OnInit {
 
   readonly userRoles = signal<Role[]>([]);
   readonly allRoles = signal<Role[]>([]);
-  /** U listi za dodavanje su samo role koje korisnik jos nema. */
+  /** The list to add from holds only the roles the user does not have yet. */
   readonly roleOptions = computed<SelectOption[]>(() => {
     const taken = new Set(this.userRoles().map((role) => role.id));
     return this.allRoles()
@@ -89,7 +89,7 @@ export class AppUserDialog implements OnInit {
 
   ngOnInit(): void {
     this.loading.set(true);
-    // Kod unosa sve role stizu sa all-roles, a kod izmene vec dolaze uz korisnika.
+    // On entry every role comes from all-roles, on edit they already come with the user.
     const request = this.isNew
       ? this.sendRequest.get(ApiRoute.appuserAllRoles).then((roles: Role[]) => this.allRoles.set(roles ?? []))
       : this.sendRequest.get(ApiRoute.appuserId(this.data.id!)).then((user: AppUser) => {
