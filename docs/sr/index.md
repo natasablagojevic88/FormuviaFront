@@ -42,10 +42,10 @@ Oko toga stoji ono što poslovnoj aplikaciji ionako treba: nalozi i uloge, zapis
 
 Formuvia se još razvija, a ovo uputstvo opisuje ono što stvarno radi, ne ono što je planirano. Dve stvari vredi znati pre nego što počnete:
 
-- **Ugrađeni ekrani** — Korisnici, Uloge i Model — su gotovi, kao i podtabele do kojih se stiže iz ⋯ menija reda. Sve iz [Rada sa tabelama](/sr/tables) važi za njih.
-- Tabela koju definišete u **Modelu** zaista se pravi u bazi, sa svojim kolonama, vezama i dozvolama. Ono što još ne postoji jeste njen ekran: ne pojavljuje se u navigaciji, a dijalog za unos koji složite u [Dizajnu forme](/sr/form-design) čuva se, ali se još ne iscrtava. Na tome se radi.
+- **Ugrađeni ekrani** — Korisnici, Uloge i Model — su gotovi, kao i podtabele do kojih se stiže iz ⋯ menija reda.
+- Tabela koju definišete u **Modelu** pravi se u bazi, pojavljuje se u meniju i otvara kao lista koja se filtrira, sortira, straniči i izvozi u Excel. Njena forma za unos sada se iscrtava onako kako ste je složili u [Dizajnu forme](/sr/form-design): **Dodaj** i **Izmeni** otvaraju dijalog sa vašom mrežom, nazivima polja na vašem jeziku i listama vrednosti. Poslednji korak se još dovršava na serveru — snimanje onoga što unesete — pa se forma za sada otvara i popunjava, ali snimanje ne prolazi, a zapis ne može da se obriše. Ni podtabele još nisu u meniju.
 
-Danas, dakle, model i dizajner grade *bazu* umesto vas, a uputstvo na svakoj strani kaže koji delovi onoga što definišete već imaju dejstvo.
+Svaka strana uputstva kaže koji delovi onoga što definišete već imaju dejstvo.
 
 ## Pre nego što počnete
 

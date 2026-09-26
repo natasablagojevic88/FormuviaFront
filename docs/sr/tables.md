@@ -2,8 +2,8 @@
 
 Svaki ekran sa tabelom u Formuvii radi isto. Naučite jednom i važi za sve: **Korisnike**, **Uloge** i podtabele do kojih se stiže iz ⋯ menija reda.
 
-::: info
-Tabele koje sami definišete u [Modelu](/sr/model) prave se u bazi, ali još nemaju svoj ekran, pa se ova strana na njih ne odnosi. Vidi [Dokle je Formuvia stigla](/sr/#dokle-je-formuvia-stigla).
+::: info Tabele iz Modela
+Tabele koje sami definišete u [Modelu](/sr/model) pojavljuju se u meniju i otvaraju ekran kakav je ovde opisan. Pronalaženje zapisa, sortiranje, straničenje i export u Excel rade, a *Dodaj* i *Izmeni* otvaraju formu za unos tačno onako kako ste je složili u [Dizajnu forme](/sr/form-design). Dve stvari još nedostaju: **snimanje onoga što unesete**, koje se dovršava na serveru, i brisanje zapisa. Izmena u samoj tabeli i *Brza izmena* za sada ostaju na ugrađenim ekranima. Vidi [Dokle je Formuvia stigla](/sr/#dokle-je-formuvia-stigla).
 :::
 
 Ekran sa tabelom ima tri dela: **zaglavlje** sa naslovom i dugmetom *Dodaj*, **traku** sa pretragom i exportom, i samu **listu** sa straničenjem na dnu.

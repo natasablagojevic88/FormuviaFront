@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, input, OnInit, output, signal, viewChild } from "@angular/core";
+import { Component, computed, effect, ElementRef, input, output, signal, untracked, viewChild } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { PageEvent } from "@angular/material/paginator";
 import { MatSort, Sort } from "@angular/material/sort";
@@ -70,12 +70,16 @@ function fromEditValue(text: string, column: DatabaseColumn): any {
   templateUrl: "./data-table.html",
   styleUrl: "./data-table.css",
 })
-export class DataTable implements OnInit {
+export class DataTable {
   readonly url = input.required<string>();
   /** Stalni filter (npr. tabela deteta po nadredjenom redu); korisnik ga ne moze skinuti. */
   readonly parentFilter = input<{ field: string; value: string } | null>(null);
   /** Putanja do ove tabele, za dugmad povratka u tabeli deteta. */
   readonly trail = input<TrailCrumb[]>([]);
+  /** Tabela samo za citanje: bez kolone sa akcijama (izmena, istorija, brisanje). */
+  readonly readOnly = input(false);
+  /** false: red se ne moze brisati, pa u meniju reda nema stavke "Obrisi". */
+  readonly canDelete = input(true);
   readonly edit = output<any>();
   readonly remove = output<any>();
   readonly loaded = output<DatabaseTable<any>>();
@@ -144,8 +148,10 @@ export class DataTable implements OnInit {
   private readonly sort = viewChild(MatSort);
   private readonly historyPanel = viewChild(HistoryPanel);
 
-  readonly displayedColumns = computed(() =>
-    [ACTIONS_COLUMN, ...(this.editMode() ? this.editColumns() : this.columns()).map((column) => column.fieldName)]);
+  readonly displayedColumns = computed(() => {
+    const columns = (this.editMode() ? this.editColumns() : this.columns()).map((column) => column.fieldName);
+    return this.readOnly() ? columns : [ACTIONS_COLUMN, ...columns];
+  });
   readonly filterColumns = computed(() => this.displayedColumns().map((column) => FILTER_PREFIX + column));
   readonly hasFilters = computed(() => Object.values(this.filters()).some((value) => value !== ""));
   // Opcije za filtere enum i boolean kolona, sa "Sve" na pocetku
@@ -169,6 +175,8 @@ export class DataTable implements OnInit {
 
   private requestId = 0;
   private filterTimer?: ReturnType<typeof setTimeout>;
+  /** Tabela koja je poslednja ucitana; po njoj se prepoznaje prelazak na drugu tabelu. */
+  private loadedUrl: string | null = null;
 
   constructor(
     private sendRequest: SendRequest,
@@ -176,10 +184,53 @@ export class DataTable implements OnInit {
     private dialog: MatDialog,
     private router: Router,
     private host: ElementRef<HTMLElement>
-  ) {}
+  ) {
+    // Tabela se moze promeniti bez pravljenja komponente iznova (druga stavka menija nad istom
+    // stranom), pa se ucitavanje vezuje za url umesto za ngOnInit. untracked: reload cita filtere
+    // i stranu, a efekat sme da zavisi samo od url-a.
+    effect(() => {
+      const url = this.url();
+      untracked(() => this.showTable(url));
+    });
+  }
 
-  ngOnInit(): void {
+  /** Druga tabela krece od pocetka: bez filtera i sortiranja prethodne i bez njenih kolona. */
+  private showTable(url: string): void {
+    if (!url || this.loadedUrl === url) {
+      return;
+    }
+    if (this.loadedUrl !== null) {
+      this.clearTable();
+    }
+    this.loadedUrl = url;
     this.reload();
+  }
+
+  private clearTable(): void {
+    clearTimeout(this.filterTimer);
+    this.filters.set({});
+    this.criteria.set([]);
+    this.order.set(null);
+    const sort = this.sort();
+    if (sort) {
+      sort.active = "";
+      sort.direction = "";
+      sort._stateChanges.next();
+    }
+    this.pageIndex.set(0);
+    this.editMode.set(false);
+    this.editRowId.set(null);
+    this.draftRow.set(null);
+    this.editing.set(null);
+    this.highlightedId.set(null);
+    this.columns.set([]);
+    this.allColumns.set([]);
+    this.rows.set([]);
+    this.total.set(0);
+    this.saveUrl.set(null);
+    this.className.set(null);
+    this.children.set([]);
+    this.tableName.set("");
   }
 
   reload(highlightId: string | null = null): void {
@@ -295,6 +346,11 @@ export class DataTable implements OnInit {
       },
     });
   }
+
+  /** ⋯ meni se prikazuje samo kad u njemu ima nesto: istorija, podtabela ili brisanje. */
+  readonly hasRowMenu = computed(
+    () => !!this.className() || this.children().length > 0 || this.canDelete()
+  );
 
   /** Istorija se nudi samo kad back posalje className uz tabelu. */
   canShowHistory(): boolean {

@@ -43,6 +43,8 @@ export interface DatabaseColumn {
 
 export interface DatabaseTable<T> {
   name: string;
+  /** Opis tabele sa back-a; strana ga prikazuje kao podnaslov. */
+  description?: string;
   /** Kolone koje se prikazuju u tabeli. */
   column: DatabaseColumn[];
   /** Sve kolone DTO-a, i one skrivene u tabeli; izvor prevoda za forme i naprednu pretragu. */

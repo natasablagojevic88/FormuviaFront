@@ -1,0 +1,9 @@
+<app-page-header [title]="title()" [subtitle]="subtitle()">
+  <button type="button" class="add-button" (click)="add()">
+    <i class="fa-solid fa-plus"></i>
+    {{ 'ui.add' | t }}
+  </button>
+</app-page-header>
+
+<!-- Brisanje zapisa tabele iz modela za sada ne postoji na back-u, pa se ne nudi u meniju reda. -->
+<app-data-table [url]="tableUrl()" [canDelete]="false" (loaded)="onLoaded($event)" (edit)="edit($event)"></app-data-table>

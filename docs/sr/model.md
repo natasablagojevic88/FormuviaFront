@@ -11,7 +11,7 @@ Sve na ovoj strani menja bazu. Dodavanje tabele je pravi, brisanje tabele je bri
 ## Kako se drvo gradi
 
 ::: info Šta danas ima dejstvo
-Tabela dodata ovde zaista se pravi u bazi, sa svojom šifrom, kolonama i dozvolama, i [Dizajn forme](/sr/form-design) radi nad njom. Ono što još nije gotovo jeste sopstveni ekran tabele: ne pojavljuje se u navigaciji, a dijalog za unos se čuva ali se još ne iscrtava. Veličina koju podesite ispod sačuvana je za trenutak kad se to pojavi.
+Tabela dodata ovde zaista se pravi u bazi, sa svojom šifrom, kolonama i dozvolama, i pojavljuje se u meniju ispod svoje nadređene stavke, gde se otvara kao lista. *Dodaj* i *Izmeni* na toj listi otvaraju dijalog za unos u veličini i rasporedu koje zadate ovde i u [Dizajnu forme](/sr/form-design); snimanje unetog se još dovršava na serveru. Podtabele se prave u bazi, ali se još ne pojavljuju u meniju.
 :::
 
 Koren je **Model**. Ispod njega su pravila fiksna:

@@ -7,7 +7,9 @@ Svako polje koje ovde dodate jeste dve stvari odjednom — **kolona u tabeli u b
 ::: info Šta danas ima dejstvo
 Sve što se tiče **baze** dešava se odmah: dodavanje polja pravi kolonu, izbor šifarnika pravi strani ključ, brisanje polja briše kolonu i njene podatke.
 
-Ono što se čuva ali se još ne iscrtava jeste **sama forma** — mreža, položaji, podrazumevana vrednost, lista vrednosti i naziv iz šifarnika se snimaju i proveravaju, ali ih još nijedan generisani dijalog za unos ne čita. Složite formu kako želite; dejstvo dobija kad taj ekran stigne.
+Polja koja dodate odmah se vide i kao kolone liste te tabele u meniju, redosledom i sa nazivima koje ste im dali, a *Prikaži u tabeli* određuje koja se tamo pojavljuju.
+
+**Dijalog za unos** koji ovde složite sada se i iscrtava: u tabeli iz Modela *Dodaj* i *Izmeni* otvaraju formu sa vašom mrežom, svakim poljem na svom mestu, nazivima na jeziku koji ste izabrali, listama vrednosti i podrazumevanim vrednostima. Jedino što se još dovršava na serveru jeste snimanje unetog, pa se forma otvara i popunjava, ali snimanje još ne prolazi.
 :::
 
 ## Radna površina
@@ -71,7 +73,7 @@ Ova opcija se tiče **drugih** tabela, ne ove.
 
 Kad druga tabela poveže ovu kao šifarnik, njen izbor mora da prikaže nešto čitljivo umesto internog identifikatora. Uključite ovu opciju na poljima čije vrednosti treba da čine taj opis. Uključite ih više i vrednosti se spajaju razmakom, redosledom kojim polja stoje na formi — na primer šifra i naziv, što daje `PAR-001 Acme d.o.o.` u svakom izboru koji pokazuje ovamo.
 
-Opis se već gradi i održava na serveru kad god se šifarnik promeni; izbori koji će ga prikazivati deo su generisane forme koja tek dolazi.
+Opis se već gradi i održava na serveru kad god se šifarnik promeni i šalje se uz kolonu; izbori koji će ga prikazivati deo su generisanog dijaloga za unos koji tek dolazi.
 
 ## Podrazumevana vrednost i lista vrednosti
 

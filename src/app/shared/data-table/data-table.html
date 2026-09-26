@@ -77,10 +77,12 @@
                 <i class="fa-solid fa-pen"></i>
                 <span class="edit-label">{{ 'ui.edit' | t }}</span>
               </button>
-              <button type="button" class="more-button" [matMenuTriggerFor]="rowMenu" [disabled]="rowEditMode()"
-                (click)="selectRow(row)" [title]="'ui.moreActions' | t" [attr.aria-label]="'ui.moreActions' | t">
-                <i class="fa-solid fa-ellipsis"></i>
-              </button>
+              @if (hasRowMenu()) {
+                <button type="button" class="more-button" [matMenuTriggerFor]="rowMenu" [disabled]="rowEditMode()"
+                  (click)="selectRow(row)" [title]="'ui.moreActions' | t" [attr.aria-label]="'ui.moreActions' | t">
+                  <i class="fa-solid fa-ellipsis"></i>
+                </button>
+              }
               <mat-menu #rowMenu="matMenu" class="row-menu">
                 @if (canShowHistory()) {
                   <button type="button" mat-menu-item (click)="openHistory(row)">
@@ -94,10 +96,12 @@
                     <span>{{ child.title }}</span>
                   </button>
                 }
-                <button type="button" mat-menu-item class="menu-danger" (click)="remove.emit(row)">
-                  <i class="fa-solid fa-trash-can menu-icon"></i>
-                  <span>{{ 'ui.delete' | t }}</span>
-                </button>
+                @if (canDelete()) {
+                  <button type="button" mat-menu-item class="menu-danger" (click)="remove.emit(row)">
+                    <i class="fa-solid fa-trash-can menu-icon"></i>
+                    <span>{{ 'ui.delete' | t }}</span>
+                  </button>
+                }
               </mat-menu>
             }
           </div>

@@ -42,10 +42,10 @@ Around that sits everything a business application needs anyway: accounts and ro
 
 Formuvia is still being built, and this guide describes what actually works rather than what is planned. Two things are worth knowing before you start:
 
-- The **built-in screens** — Users, Roles and Model — are complete, and so are the subtables you reach from a row's ⋯ menu. Everything in [Working with tables](/tables) applies to them.
-- A table you define in the **Model** is genuinely created in the database, with its columns, its links and its permissions. What does not exist yet is its own screen: it does not appear in the navigation, and the entry dialog you lay out in [Form design](/form-design) is stored but not yet drawn. That part is being worked on.
+- The **built-in screens** — Users, Roles and Model — are complete, and so are the subtables you reach from a row's ⋯ menu.
+- A table you define in the **Model** is created in the database, appears in the menu, and opens as a list you can filter, sort, page through and export. Its entry form is now drawn from what you laid out in [Form design](/form-design): **Add** and **Edit** open a dialog with your grid, the field labels in your language and the lists of values. The last step is still being finished on the server — storing what you enter — so for now the form opens and fills in but saving does not go through, and a record cannot be deleted. Subtables are not in the menu yet either.
 
-So today the model and the designer build the *database* for you, and this guide says on each page which parts of what you define are already in effect.
+Each page of this guide says which parts of what you define are already in effect.
 
 ## Before you start
 

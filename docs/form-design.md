@@ -7,7 +7,9 @@ Each field you add here is two things at once — a **column in the database tab
 ::: info What is in effect today
 Everything about the **database** happens immediately: adding a field creates the column, choosing a codebook creates the foreign key, deleting a field drops the column and its data.
 
-What is stored but not yet drawn is the **form itself** — the grid, the positions, the default value, the list of values and the codebook label are all saved and validated, but no generated entry dialog reads them yet. Lay the form out as you want it; it takes effect when that screen arrives.
+The fields you add also show up straight away as the columns of the table's list in the menu, in the order and with the labels you gave them, and *Show in the table* decides which of them appear there.
+
+The **entry dialog** you lay out here is now drawn: in a table from the Model, *Add* and *Edit* open a form with your grid, each field in its place, the labels in the language you chose, the lists of values and the default values. The one part still being finished on the server is storing what is entered, so the form opens and fills in but saving does not go through yet.
 :::
 
 ## The canvas
@@ -71,7 +73,7 @@ This one is about **other** tables, not this one.
 
 When another table links to this table as a codebook, its picker has to show something readable instead of an internal identifier. Tick this option on the fields whose values should make up that label. Tick several and their values are joined with a space, in the order the fields sit in the form — a code and a name, for example, giving `PAR-001 Acme d.o.o.` in every picker that points here.
 
-The label is already built and kept up to date on the server whenever the codebook changes; the pickers that will show it are part of the generated form still to come.
+The label is already built and kept up to date on the server whenever the codebook changes, and it is sent along with the column; the pickers that will show it are part of the generated entry dialog still to come.
 
 ## Default value and list of values
 

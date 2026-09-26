@@ -1,0 +1,69 @@
+<form class="fd" (ngSubmit)="save()">
+  <header class="fd-header">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ data.title }}</h2>
+      <p class="fd-subtitle">{{ (isNew ? 'ui.preview.addTitle' : 'ui.preview.editTitle') | t }}</p>
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    @if (loading()) {
+      <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    } @else if (!fields().length) {
+      <p class="empty">{{ 'ui.preview.noFields' | t }}</p>
+    } @else {
+      <!-- mreza je ista kao u dizajnu forme: polje stoji u svom redu i koloni -->
+      <div class="pf-grid" [style.grid-template-columns]="'repeat(' + layout().columnNumber + ', minmax(0, 1fr))'">
+        @for (column of fields(); track column.code) {
+          <div class="fd-field" [style.grid-column]="gridColumn(column)" [style.grid-row]="gridRow(column)">
+            @if (column.columnType === 'BOOLEAN') {
+              <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
+              <label class="switch" [class.switch-disabled]="isLocked(column)">
+                <input type="checkbox" [(ngModel)]="values[column.code]" [ngModelOptions]="{ standalone: true }"
+                  [disabled]="isLocked(column)" />
+                <span class="switch-track"><span class="switch-thumb"></span></span>
+                <span class="switch-text">{{ (values[column.code] ? 'ui.yes' : 'ui.no') | t }}</span>
+              </label>
+            } @else if (hasOptions(column)) {
+              <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
+              <app-search-select [options]="options(column)" [(ngModel)]="values[column.code]"
+                [ngModelOptions]="{ standalone: true }" [disabled]="isLocked(column)"
+                icon="fa-solid fa-list" [placeholder]="'ui.preview.choose' | t" [ariaLabel]="column.name" />
+            } @else if (column.textArea) {
+              <label class="fd-label" [class.fd-required]="isRequired(column)" [for]="'pf-' + column.code">{{ column.name }}</label>
+              <textarea [id]="'pf-' + column.code" class="fd-input area" rows="3"
+                [(ngModel)]="values[column.code]" [ngModelOptions]="{ standalone: true }"
+                [readonly]="isLocked(column)" [attr.maxlength]="column.length || null"
+                autocomplete="off"></textarea>
+            } @else {
+              <label class="fd-label" [class.fd-required]="isRequired(column)" [for]="'pf-' + column.code">{{ column.name }}</label>
+              <input [id]="'pf-' + column.code" class="fd-input" [type]="inputType(column)"
+                [(ngModel)]="values[column.code]" [ngModelOptions]="{ standalone: true }"
+                [readonly]="isLocked(column)" [attr.step]="inputType(column) === 'number' ? step(column) : null"
+                [attr.maxlength]="column.columnType === 'STRING' ? (column.length || null) : null"
+                autocomplete="off" />
+            }
+
+            @if (isLocked(column)) {
+              <span class="fd-help">{{ 'ui.preview.locked' | t }}</span>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint">{{ 'ui.requiredFieldsMarked' | t }}</span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.cancel' | t }}</button>
+      <button type="submit" class="fd-button fd-button-primary" [disabled]="!canSave()">
+        <i class="fa-solid" [class.fa-floppy-disk]="!saving()" [class.fa-spinner]="saving()" [class.fa-spin]="saving()"></i>
+        {{ 'ui.save' | t }}
+      </button>
+    </div>
+  </footer>
+</form>

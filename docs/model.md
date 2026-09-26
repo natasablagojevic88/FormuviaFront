@@ -11,7 +11,7 @@ Everything on this page changes the database. Adding a table creates it; deletin
 ## How the tree is built
 
 ::: info What is in effect today
-A table added here is really created in the database, with its code, its columns and its permissions, and [Form design](/form-design) works on it. What is not ready yet is the table's own screen: it does not appear in the navigation and the entry dialog is stored but not yet drawn. The size you set below is kept for when it is.
+A table added here is really created in the database, with its code, its columns and its permissions, and it appears in the menu under its parent item, where it opens as a list. *Add* and *Edit* on that list open the entry dialog laid out as you set it here and in [Form design](/form-design); storing what is entered is still being finished on the server. Subtables are created in the database but do not appear in the menu yet.
 :::
 
 The root is **Model**. Under it the rules are fixed:

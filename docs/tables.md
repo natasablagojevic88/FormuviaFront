@@ -2,8 +2,8 @@
 
 Every table screen in Formuvia works the same way. Learn it once and it applies to all of them: **Users**, **Roles**, and the subtables you reach from a row's ⋯ menu.
 
-::: info
-Tables you define yourself in the [Model](/model) are created in the database, but do not have a screen of their own yet, so this page does not apply to them. See [Where Formuvia is today](/#where-formuvia-is-today).
+::: info Tables from the Model
+Tables you define yourself in the [Model](/model) appear in the menu and open a screen like the ones described here. Finding a record, sorting, paging and the Excel export all work, and *Add* and *Edit* open the entry form exactly as you laid it out in [Form design](/form-design). Two things are still missing: **storing what you enter**, which is being finished on the server, and deleting a record. Editing straight in the table and *Quick edit* stay with the built-in screens for now. See [Where Formuvia is today](/#where-formuvia-is-today).
 :::
 
 A table screen has three parts: a **header** with the title and the *Add* button, a **toolbar** with search and export, and the **list** itself with a paginator at the bottom.

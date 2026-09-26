@@ -1,0 +1,109 @@
+:host {
+  display: block;
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  color: var(--c-primary);
+  font-size: 28px;
+}
+
+.empty {
+  color: var(--c-text-muted);
+  font-size: 14px;
+  text-align: center;
+  padding: 24px 0;
+}
+
+/* Mreza dijaloga: broj kolona stize iz rasporeda polja, polje stoji na svom mestu. */
+.pf-grid {
+  display: grid;
+  gap: 18px 16px;
+  align-items: start;
+}
+
+.fd-input.area {
+  height: auto;
+  padding: 12px 16px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.fd-input[readonly] {
+  background: var(--c-surface-3);
+  color: var(--c-text-muted);
+  cursor: not-allowed;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  cursor: pointer;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.switch-track {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--c-border-strong);
+  transition: background-color 0.2s;
+}
+
+.switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--c-surface);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+  transition: transform 0.2s;
+}
+
+.switch input:checked + .switch-track {
+  background: var(--c-primary);
+}
+
+.switch input:checked + .switch-track .switch-thumb {
+  transform: translateX(20px);
+}
+
+.switch input:focus-visible + .switch-track {
+  box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.25);
+}
+
+.switch-text {
+  color: var(--c-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.switch-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Na telefonu forma ide u jednu kolonu, u redosledu red po red. */
+@media (max-width: 900px) {
+  .pf-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+
+  .fd-field {
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+}
