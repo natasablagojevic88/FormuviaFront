@@ -4,7 +4,7 @@ import { Language } from "../../services/language";
 import { SendRequest } from "../../services/send-request";
 import { ApiRoute } from "../../shared/ApiRoute";
 import { SelectOption } from "../../shared/search-select/search-select";
-import { SubTable } from "../../shared/database-table";
+import { ComboOption, SubTable } from "../../shared/database-table";
 import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
 import { Translate } from "../../services/translate";
 import { Notify } from "../../services/notify";
@@ -21,6 +21,7 @@ import {
   layoutOf,
   PREVIEW_ID_FIELD,
   PREVIEW_PARENT_FIELD,
+  ObjectForm,
   PreviewColumn,
   sortByPlace,
   toFieldValue,
@@ -80,6 +81,9 @@ export class PreviewFormDialog implements OnInit {
   /** The last record stored while the dialog stayed open; the list is refreshed by it on closing. */
   private lastSaved: any = null;
 
+  /** Records of the codebooks above the fields, once per model. */
+  private parentCodebook: Record<string, ComboOption[]> = {};
+
   /**
    * Fields without a place in the grid (id, the link to the parent row...) are not shown, but their
    * values stay in the record and are sent back as they came from the server.
@@ -114,7 +118,7 @@ export class PreviewFormDialog implements OnInit {
     this.loading.set(true);
     this.sendRequest
       .get(this.formUrl())
-      .then((columns: PreviewColumn[]) => this.showForm(columns ?? []))
+      .then((form: ObjectForm) => this.showForm(form?.fields ?? [], form?.parentCodebook ?? {}))
       .finally(() => this.loading.set(false));
   }
 
@@ -127,7 +131,8 @@ export class PreviewFormDialog implements OnInit {
     return parent ? ApiRoute.modelPreviewFormWithParent(modelId, parent) : ApiRoute.modelPreviewForm(modelId);
   }
 
-  private showForm(columns: PreviewColumn[]): void {
+  private showForm(columns: PreviewColumn[], parentCodebook: Record<string, ComboOption[]>): void {
+    this.parentCodebook = parentCodebook;
     const fields = sortByPlace(columns.filter((column) => hasPlace(column)));
 
     this.values = {};
@@ -152,7 +157,11 @@ export class PreviewFormDialog implements OnInit {
   }
 
   levels(column: PreviewColumn): ChainLevel[] {
-    return chainLevels(column.parentListOfValues, { name: column.name, options: column.listOfValues ?? [] });
+    return chainLevels(
+      column.parentListOfValues,
+      { name: column.name, options: column.listOfValues ?? [] },
+      this.parentCodebook
+    );
   }
 
   options(column: PreviewColumn): SelectOption[] {

@@ -270,6 +270,18 @@ body {
   box-shadow: none;
 }
 
+/* A disabled number field cannot be stepped anyway, and the browser draws the arrows as a grey box */
+input[type="number"]:disabled {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+input[type="number"]:disabled::-webkit-outer-spin-button,
+input[type="number"]:disabled::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 /* ---------- Dialogs (MatDialog) ---------- */
 /* The shared look of every dialog. Classes are prefixed with fd- so they cannot clash with component classes. */
 

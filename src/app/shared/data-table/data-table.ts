@@ -8,7 +8,7 @@ import { ApiRoute } from "../ApiRoute";
 import { Translate } from "../../services/translate";
 import { Language } from "../../services/language";
 import { AdvancedSearchDialog, AdvancedSearchDialogData } from "../advanced-search-dialog/advanced-search-dialog";
-import { DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, QueryDatabaseOrder, SubTable, TableChild } from "../database-table";
+import { ComboOption, DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, QueryDatabaseOrder, SubTable, TableChild } from "../database-table";
 import { HistoryPanel } from "../history-panel/history-panel";
 import { Criterion, inputModeFor, inputTypeFor, isEnum, needsValue, quickFilter, toFilter } from "../filter-operations";
 import { chainLevels, ChainLevel } from "../parent-chain";
@@ -30,10 +30,16 @@ interface TableState {
   criteria: Criterion[];
   order: QueryDatabaseOrder | null;
   highlightedId: string | null;
+  /** The page of rows as it was, so coming back shows it without asking the server again. */
+  table: DatabaseTable<any>;
 }
 
-/** The state of a list is kept per table, for as long as the browser tab lives. */
-const STATE_PREFIX = "formuvia.table.";
+/**
+ * Lists left behind when going into a subtable, kept in memory until the page is reloaded.
+ * Coming back draws the same page again and asks the server only for the one row it returns to;
+ * a reload of the browser page empties this, so the list then starts fresh.
+ */
+const TABLE_STATE = new Map<string, TableState>();
 
 /** One step in the parent -> child trail; route is the address it came from. */
 export interface TrailCrumb {
@@ -113,6 +119,11 @@ export class DataTable {
    * it was left. Opening the same table from the menu, or reloading the page, always starts fresh.
    */
   readonly restoreState = input(false);
+  /**
+   * Path to one row of the table. With it, coming back from a subtable refreshes only the row the
+   * user returns to, instead of loading the whole page again.
+   */
+  readonly rowUrl = input<((id: string) => string) | null>(null);
   /** Path to the history of a row for tables without a className (tables from the model). */
   readonly historyUrl = input<((id: string) => string) | null>(null);
   readonly edit = output<any>();
@@ -150,6 +161,13 @@ export class DataTable {
   readonly children = signal<TableChild[]>([]);
   /** Subtables of a model table; the row they are opened from becomes their parent. */
   readonly subTables = signal<SubTable[]>([]);
+  /** Records of the codebooks above the columns, once per model. */
+  readonly parentCodebook = signal<Record<string, ComboOption[]>>({});
+
+  // What the current user may do with this table; the server sends it with every page of rows.
+  readonly hasAdd = signal(true);
+  readonly hasUpdate = signal(true);
+  readonly hasDelete = signal(true);
   // A phone has no table header, so the sorting is chosen in the toolbar.
   readonly sortOptions = computed<SelectOption[]>(() =>
     this.columns().map((column) => ({ value: column.fieldName, label: column.description })));
@@ -165,7 +183,10 @@ export class DataTable {
   readonly savingRow = signal(false);
   rowValues: Record<string, string> = {};
   readonly rowEditMode = computed(() => this.editRowId() !== null || this.draftRow() !== null);
-  readonly canEditMode = computed(() => !!this.saveUrl() && this.editColumns().length > 0);
+  readonly canEditMode = computed(() => this.hasUpdate() && !!this.saveUrl() && this.editColumns().length > 0);
+  /** The row is only shown, not changed: the pencil becomes an eye and the form opens locked. */
+  readonly viewOnly = computed(() => !this.hasUpdate());
+  readonly showDelete = computed(() => this.canDelete() && this.hasDelete());
   /** Columns offered in edit mode: every editable column from allColumns, including those hidden in the table. */
   readonly editColumns = computed(() =>
     this.allColumns().filter((column) => column.editable !== false && isEditableType(column)));
@@ -241,6 +262,8 @@ export class DataTable {
   private filterTimer?: ReturnType<typeof setTimeout>;
   /** The table loaded last; a move to another table is recognised by it. */
   private loadedUrl: string | null = null;
+  /** The last page of rows as the server sent it; kept for the way back from a subtable. */
+  private lastTable: DatabaseTable<any> | null = null;
 
   constructor(
     private sendRequest: SendRequest,
@@ -268,8 +291,39 @@ export class DataTable {
       this.clearTable();
     }
     this.loadedUrl = url;
-    this.readState();
-    this.reload(this.highlightedId(), false);
+
+    const state = this.readState();
+    if (state && this.rowUrl()) {
+      // coming back from a subtable: the same page is drawn again, only the row returned to is read anew
+      this.applyTable(state.table, state.highlightedId, false);
+      this.refreshRow(state.highlightedId);
+      return;
+    }
+    if (state) {
+      // a table without a path for a single row is loaded again, as before
+      this.reload(state.highlightedId, false);
+      return;
+    }
+
+    this.reload();
+  }
+
+  /**
+   * Reads one row from the server and puts it in place of the one held. Without a path for a single
+   * row, or when the row is gone, the page is simply loaded again.
+   */
+  private refreshRow(id: string | null): void {
+    const url = id ? this.rowUrl()?.(id) : null;
+    if (!id || !url) {
+      return;
+    }
+    this.sendRequest.get(url, { notifyError: false })
+      .then((row: any) => {
+        if (row?.[ID_FIELD]) {
+          this.replaceRow(row);
+        }
+      })
+      .catch(() => this.reload(id, false));
   }
 
   /**
@@ -278,49 +332,39 @@ export class DataTable {
    */
   private stateKey(url: string): string {
     const parent = this.parentFilter();
-    return STATE_PREFIX + url + (parent ? "|" + parent.value : "");
+    return url + (parent ? "|" + parent.value : "");
   }
 
   /** Saved only when going into a subtable, so that the way back lands on the same place. */
   private saveState(): void {
-    if (!this.loadedUrl) {
+    if (!this.loadedUrl || !this.lastTable) {
       return;
     }
-    const state: TableState = {
+    TABLE_STATE.set(this.stateKey(this.loadedUrl), {
       pageIndex: this.pageIndex(),
       pageSize: this.pageSize(),
       filters: this.filters(),
       criteria: this.criteria(),
       order: this.order(),
       highlightedId: this.highlightedId(),
-    };
-    try {
-      sessionStorage.setItem(this.stateKey(this.loadedUrl), JSON.stringify(state));
-    } catch {
-      // without sessionStorage the list simply opens from the beginning
-    }
+      table: { ...this.lastTable, list: this.rows() },
+    });
   }
 
   /**
    * Restores the list only on a return from a subtable, and uses the saved state up: a later opening
    * from the menu, or a reload, finds nothing and starts fresh.
    */
-  private readState(): void {
+  private readState(): TableState | null {
     if (!this.restoreState()) {
-      return;
+      return null;
     }
 
-    let state: TableState | null = null;
-    try {
-      const key = this.stateKey(this.url());
-      const stored = sessionStorage.getItem(key);
-      sessionStorage.removeItem(key);
-      state = stored ? (JSON.parse(stored) as TableState) : null;
-    } catch {
-      state = null;
-    }
+    const key = this.stateKey(this.url());
+    const state = TABLE_STATE.get(key) ?? null;
+    TABLE_STATE.delete(key);
     if (!state) {
-      return;
+      return null;
     }
 
     this.pageIndex.set(state.pageIndex ?? 0);
@@ -343,6 +387,8 @@ export class DataTable {
         sort._stateChanges.next();
       });
     }
+
+    return state;
   }
 
   private clearTable(): void {
@@ -369,8 +415,44 @@ export class DataTable {
     this.saveUrl.set(null);
     this.className.set(null);
     this.children.set([]);
+    this.lastTable = null;
     this.subTables.set([]);
+    this.parentCodebook.set({});
+    this.hasAdd.set(true);
+    this.hasUpdate.set(true);
+    this.hasDelete.set(true);
     this.tableName.set("");
+  }
+
+  /** Draws a page of rows, whether it came from the server now or from the way back. */
+  private applyTable(table: DatabaseTable<any>, highlightId: string | null, flash: boolean): void {
+    this.lastTable = table;
+    this.columns.set(table.column);
+    this.saveUrl.set(table.saveUrl || null);
+    this.tableName.set(table.name ?? "");
+    this.className.set(table.className || null);
+    this.children.set(table.children ?? []);
+    this.subTables.set(table.subTables ?? []);
+    this.parentCodebook.set(table.parentCodebook ?? {});
+    this.hasAdd.set(table.hasAdd !== false);
+    this.hasUpdate.set(table.hasUpdate !== false);
+    this.hasDelete.set(table.hasDelete !== false);
+    this.editing.set(null);
+    this.editRowId.set(null);
+    this.draftRow.set(null);
+    if (!this.saveUrl()) {
+      this.editMode.set(false);
+    }
+    this.allColumns.set(table.allColumns ?? table.column);
+    this.rows.set(table.list);
+    this.total.set(table.total);
+    this.loaded.emit(table);
+
+    if (highlightId && table.list.some((row) => row[ID_FIELD] === highlightId)) {
+      this.highlightedId.set(highlightId);
+      this.highlightFlash.set(flash);
+      setTimeout(() => this.scrollToHighlighted());
+    }
   }
 
   reload(highlightId: string | null = null, flash = true): void {
@@ -395,27 +477,7 @@ export class DataTable {
           this.reload(highlightId);
           return;
         }
-        this.columns.set(table.column);
-        this.saveUrl.set(table.saveUrl || null);
-        this.tableName.set(table.name ?? "");
-        this.className.set(table.className || null);
-        this.children.set(table.children ?? []);
-        this.subTables.set(table.subTables ?? []);
-        this.editing.set(null);
-        this.editRowId.set(null);
-        this.draftRow.set(null);
-        if (!this.saveUrl()) {
-          this.editMode.set(false);
-        }
-        this.allColumns.set(table.allColumns ?? table.column);
-        this.rows.set(table.list);
-        this.total.set(table.total);
-        this.loaded.emit(table);
-        if (highlightId && table.list.some((row) => row[ID_FIELD] === highlightId)) {
-          this.highlightedId.set(highlightId);
-          this.highlightFlash.set(flash);
-          setTimeout(() => this.scrollToHighlighted());
-        }
+        this.applyTable(table, highlightId, flash);
       })
       .finally(() => {
         if (requestId === this.requestId) {
@@ -496,7 +558,7 @@ export class DataTable {
       !!this.historyUrl() ||
       this.children().length > 0 ||
       this.subTables().length > 0 ||
-      this.canDelete()
+      this.showDelete()
   );
 
   /**
@@ -538,7 +600,11 @@ export class DataTable {
   }
 
   levels(column: DatabaseColumn): ChainLevel[] {
-    return chainLevels(column.parentList, { name: column.description, options: column.listOfValues ?? [] });
+    return chainLevels(
+      column.parentList,
+      { name: column.description, options: column.listOfValues ?? [] },
+      this.parentCodebook()
+    );
   }
 
   /** History is offered only when the server sends a className with the table. */
@@ -594,6 +660,9 @@ export class DataTable {
 
   /** New row: an empty row at the top of the table, in edit mode. */
   startNew(): void {
+    if (!this.hasAdd()) {
+      return;
+    }
     const draft: Record<string, any> = {};
     this.editColumns().forEach((column) => (draft[column.fieldName] = column.columnType === "BOOLEAN" ? true : null));
     this.draftRow.set(draft);
@@ -667,7 +736,8 @@ export class DataTable {
 
   canEdit(column: DatabaseColumn): boolean {
     // A double click works in edit mode too; it is off only while some row is open for editing.
-    return !!this.saveUrl() && !this.rowEditMode() && column.editable !== false && isEditableType(column);
+    return this.hasUpdate() && !!this.saveUrl() && !this.rowEditMode() && column.editable !== false
+      && isEditableType(column);
   }
 
   isCell(cell: CellRef | null, row: any, column: DatabaseColumn): boolean {

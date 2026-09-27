@@ -40,6 +40,10 @@ Filtering, sorting and paging all happen on the server, so a table with a lot of
 
 ## Adding and changing data
 
+::: tip What you see depends on your roles
+A table from the Model is opened with four separate rights: viewing, adding, changing and deleting. Without the right to add, the **Add** button is not there; without the right to change, the pencil on a row becomes an **eye** and the record opens as a form you can read but not edit; without the right to delete, the ⋯ menu has no *Delete*.
+:::
+
 ### Through the form
 
 **Add** in the page header opens the entry form. **Edit** on a row opens the same form with that record in it. Fields marked with `*` have to be filled in before the form will save.

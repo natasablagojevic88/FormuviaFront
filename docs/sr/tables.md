@@ -40,6 +40,10 @@ Filtriranje, sortiranje i straničenje rade na serveru, pa tabela sa mnogo redov
 
 ## Unos i izmena podataka
 
+::: tip Šta vidite zavisi od vaših uloga
+Tabela iz Modela ima četiri odvojena prava: pregled, unos, izmena i brisanje. Bez prava na unos nema dugmeta **Dodaj**; bez prava na izmenu se olovka na redu pretvara u **oko**, pa se zapis otvara kao forma koja se čita ali ne menja; bez prava na brisanje u ⋯ meniju nema stavke *Obriši*.
+:::
+
 ### Kroz formu
 
 **Dodaj** u zaglavlju strane otvara formu za unos. **Izmeni** na redu otvara istu formu sa tim zapisom u njoj. Polja označena sa `*` moraju biti popunjena da bi forma mogla da se snimi.

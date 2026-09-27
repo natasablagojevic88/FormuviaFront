@@ -51,7 +51,8 @@ export class SendRequest {
         body = null;
       }
     }
-    return body?.message ?? this.translate.get("ui.unexpectedError");
+    // an empty message is as good as none: the server sends "" for an exception without a message
+    return body?.message || this.translate.get("ui.unexpectedError");
   }
 
   private options() {

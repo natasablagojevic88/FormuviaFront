@@ -33,15 +33,15 @@ export interface ComboOption {
 /**
  * One level above a codebook column. The server sends the chain bottom-up: the first entry is the
  * direct parent of the codebook, the last one is the root. Only the column itself holds a value;
- * the levels above are there to narrow the choice down to it.
+ * the levels above are there to narrow the choice down to it. The records of a level are not here
+ * but in parentCodebook, once per model, so a table with several such columns does not repeat them.
  */
 export interface ParentLevel {
   /** Translated name of the parent table. */
   name: string;
   child: string;
+  /** Model of that parent table; its records are under this key in parentCodebook. */
   parent: string;
-  /** Records of that parent table, each with the record of its own parent. */
-  comboboxDTO: ComboOption[];
 }
 
 export interface DatabaseColumn {
@@ -81,10 +81,18 @@ export interface DatabaseTable<T> {
   list: T[];
   total: number;
   numberOfPages: number;
+  /** false: the current user may not add to this table, so nothing offers it. */
+  hasAdd?: boolean;
+  /** false: the user may only look at a record - the row opens the form locked. */
+  hasUpdate?: boolean;
+  /** false: the row cannot be deleted, so the row menu does not offer it. */
+  hasDelete?: boolean;
   /** Path for saving a row, without the /api prefix (e.g. "/appuser"); without it the table is read-only. */
   saveUrl?: string;
   /** Name of the DTO class (e.g. "AppUserDTO"); used for the history of a row. */
   className?: string;
+  /** Records of every codebook above a column, once per model; the chain reads its levels from here. */
+  parentCodebook?: Record<string, ComboOption[]>;
   /** Subtables of a model table; the row menu opens one of them for that row (parent). */
   subTables?: SubTable[];
   /** Subtables; the row menu opens the child table filtered by that row. */

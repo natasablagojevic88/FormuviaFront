@@ -29,6 +29,15 @@ export interface PreviewColumn {
   colspan?: number;
 }
 
+/**
+ * What GET /api/preview/form/... returns: the fields of the form, and the records of every codebook
+ * above them, sent once per model instead of once per field.
+ */
+export interface ObjectForm {
+  fields: PreviewColumn[];
+  parentCodebook?: Record<string, ComboOption[]>;
+}
+
 /** Starting width of the dialog, until the layout of the fields is known. */
 export const DEFAULT_FORM_WIDTH = 800;
 

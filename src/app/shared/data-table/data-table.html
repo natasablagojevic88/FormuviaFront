@@ -73,9 +73,11 @@
                 <i class="fa-solid fa-xmark"></i>
               </button>
             } @else {
-              <button type="button" class="edit-button" (click)="editRow(row)" [disabled]="rowEditMode()" [title]="'ui.edit' | t">
-                <i class="fa-solid fa-pen"></i>
-                <span class="edit-label">{{ 'ui.edit' | t }}</span>
+              <!-- without the right to change, the row is only shown: an eye instead of the pencil -->
+              <button type="button" class="edit-button" (click)="editRow(row)" [disabled]="rowEditMode()"
+                [title]="(viewOnly() ? 'ui.view' : 'ui.edit') | t">
+                <i class="fa-solid" [class.fa-pen]="!viewOnly()" [class.fa-eye]="viewOnly()"></i>
+                <span class="edit-label">{{ (viewOnly() ? 'ui.view' : 'ui.edit') | t }}</span>
               </button>
               @if (hasRowMenu()) {
                 <button type="button" class="more-button" [matMenuTriggerFor]="rowMenu" [disabled]="rowEditMode()"
@@ -102,7 +104,7 @@
                     <span>{{ child.title }}</span>
                   </button>
                 }
-                @if (canDelete()) {
+                @if (showDelete()) {
                   <button type="button" mat-menu-item class="menu-danger" (click)="remove.emit(row)">
                     <i class="fa-solid fa-trash-can menu-icon"></i>
                     <span>{{ 'ui.delete' | t }}</span>
@@ -117,7 +119,7 @@
       <ng-container [matColumnDef]="filterPrefix + actionsColumn">
         <th mat-header-cell *matHeaderCellDef class="filter-cell actions-cell">
           <div class="row-actions">
-            @if (editMode()) {
+            @if (editMode() && hasAdd()) {
               <button type="button" class="new-row-cell-button" (click)="startNew()" [disabled]="rowEditMode()"
                 [title]="'ui.newRow' | t" [attr.aria-label]="'ui.newRow' | t">
                 <i class="fa-solid fa-plus"></i>

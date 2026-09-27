@@ -56,6 +56,11 @@
     }
 
     /** History of a record of a model table (it has no className like the built-in tables). */
+    /** One row of a model table; read when coming back from a subtable, so the page is not loaded again. */
+    static modelPreviewRow(modelId: string, id: string): string {
+        return `/api/preview/row/${modelId}/${id}`;
+    }
+
     static modelPreviewHistory(modelId: string, id: string): string {
         return `/api/preview/history/${modelId}/${id}`;
     }

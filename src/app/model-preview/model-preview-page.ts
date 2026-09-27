@@ -3,6 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, Router } from "@angular/router";
 import { combineLatest } from "rxjs";
 import { Notify } from "../services/notify";
+import { Session } from "../services/session";
 import { Translate } from "../services/translate";
 import { SendRequest } from "../services/send-request";
 import { ApiRoute } from "../shared/ApiRoute";
@@ -27,6 +28,10 @@ export class ModelPreviewPage {
   readonly tableUrl = signal("");
   /** Subtables of this table; the entry dialog offers to save and open one of them. */
   private readonly subTables = signal<SubTable[]>([]);
+
+  /** What the user may do here; the server sends it with the table. */
+  readonly canAdd = signal(true);
+  private readonly canUpdate = signal(true);
   readonly title = signal("");
   readonly subtitle = signal("");
 
@@ -39,8 +44,16 @@ export class ModelPreviewPage {
 
   /** The way back: every step knows the table it came from and the row that was open. */
   readonly trail = signal<TrailCrumb[]>([]);
-  readonly breadcrumb = computed(() =>
-    [...this.trail().map((crumb) => `${crumb.title}: ${crumb.label}`), this.title()].join(" / "));
+  /**
+   * The trail starts with the menu the table sits under, as on the built-in pages. A subtable is not
+   * in the menu itself, so its start is taken from the table it was opened from.
+   */
+  readonly breadcrumb = computed(() => {
+    const first = this.trail()[0];
+    const menu = this.session.menuPathOf(first ? first.route : this.router.url);
+    const steps = this.trail().map((crumb) => `${crumb.title}: ${crumb.label}`);
+    return [...menu, ...steps, this.title()].filter((step) => !!step).join(" / ");
+  });
 
   private readonly table = viewChild.required(DataTable);
 
@@ -50,7 +63,8 @@ export class ModelPreviewPage {
     private dialog: MatDialog,
     private sendRequest: SendRequest,
     private notify: Notify,
-    private translate: Translate
+    private translate: Translate,
+    private session: Session
   ) {
     // It also changes when the menu moves from one table to another, without building the page again.
     combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(([params, query]) => {
@@ -76,6 +90,9 @@ export class ModelPreviewPage {
   /** History of a row: model tables have a path of their own instead of a DTO class name. */
   readonly historyUrl = (id: string) => ApiRoute.modelPreviewHistory(this.modelId(), id);
 
+  /** One row, read when coming back from a subtable so the list itself is not loaded again. */
+  readonly rowUrl = (id: string) => ApiRoute.modelPreviewRow(this.modelId(), id);
+
   private readTrail(value: string | null): TrailCrumb[] {
     try {
       return value ? JSON.parse(value) : [];
@@ -99,6 +116,8 @@ export class ModelPreviewPage {
     this.title.set(table.name ?? "");
     this.subtitle.set(table.description ?? "");
     this.subTables.set(table.subTables ?? []);
+    this.canAdd.set(table.hasAdd !== false);
+    this.canUpdate.set(table.hasUpdate !== false);
   }
 
   add(): void {
@@ -117,6 +136,8 @@ export class ModelPreviewPage {
       id: row.id,
       parent: this.parent(),
       subTables: this.subTables(),
+      // without the right to change, the record is only shown
+      readOnly: !this.canUpdate(),
     });
   }
 

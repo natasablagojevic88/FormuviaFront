@@ -13,11 +13,16 @@ export interface ChainLevel {
 
 /**
  * The chain for display. The server sends the levels above bottom-up (direct parent first), so they
- * are turned around, and the column itself is added as the last level.
+ * are turned around, and the column itself is added as the last level. The records of each level
+ * come from parentCodebook, where they are sent once per model.
  */
-export function chainLevels(parents: ParentLevel[] | undefined, own: ChainLevel): ChainLevel[] {
+export function chainLevels(
+  parents: ParentLevel[] | undefined,
+  own: ChainLevel,
+  codebook: Record<string, ComboOption[]> | undefined
+): ChainLevel[] {
   const levels = (parents ?? [])
-    .map((parent) => ({ name: parent.name, options: parent.comboboxDTO ?? [] }))
+    .map((parent) => ({ name: parent.name, options: codebook?.[parent.parent] ?? [] }))
     .reverse();
   return [...levels, own];
 }
