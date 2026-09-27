@@ -44,6 +44,8 @@ export class SearchSelect implements ControlValueAccessor {
   readonly ariaLabel = input("");
   readonly appearance = input<SelectAppearance>("field");
   readonly icon = input("");
+  /** false: the chosen value cannot be cleared (a list where empty makes no sense). */
+  readonly clearable = input(true);
   readonly centered = input(false);
 
   readonly value = signal("");
@@ -101,6 +103,18 @@ export class SearchSelect implements ControlValueAccessor {
 
   setDisabledState(disabled: boolean): void {
     this.disabled.set(disabled);
+  }
+
+  /** The x in the field: back to no value, without opening the list. */
+  clear(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    if (this.disabled()) {
+      return;
+    }
+    this.value.set("");
+    this.onChange("");
+    this.onTouched();
   }
 
   toggle(): void {

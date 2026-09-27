@@ -2,7 +2,7 @@
   <header class="fd-header">
     <div class="fd-titles">
       <h2 class="fd-title">{{ data.title }}</h2>
-      <p class="fd-subtitle">{{ (isNew ? 'ui.preview.addTitle' : 'ui.preview.editTitle') | t }}</p>
+      <p class="fd-subtitle">{{ (data.readOnly ? 'ui.preview.viewTitle' : isNew ? 'ui.preview.addTitle' : 'ui.preview.editTitle') | t }}</p>
     </div>
     <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
       <i class="fa-solid fa-xmark"></i>
@@ -27,8 +27,28 @@
                 <span class="switch-track"><span class="switch-thumb"></span></span>
                 <span class="switch-text">{{ (values[column.code] ? 'ui.yes' : 'ui.no') | t }}</span>
               </label>
+            } @else if (hasChain(column)) {
+              <span class="fd-label-row">
+                <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
+                @if (canShowRecord(column)) {
+                  <button type="button" class="info" (click)="showRecord(column)"
+                    [title]="'ui.preview.info' | t" [attr.aria-label]="'ui.preview.info' | t">
+                    <i class="fa-solid fa-circle-info"></i>
+                  </button>
+                }
+              </span>
+              <app-chain-select [levels]="levels(column)" [showLastName]="false" [(ngModel)]="values[column.code]"
+                [ngModelOptions]="{ standalone: true }" [disabled]="isLocked(column)" [ariaLabel]="column.name" />
             } @else if (hasOptions(column)) {
-              <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
+              <span class="fd-label-row">
+                <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
+                @if (canShowRecord(column)) {
+                  <button type="button" class="info" (click)="showRecord(column)"
+                    [title]="'ui.preview.info' | t" [attr.aria-label]="'ui.preview.info' | t">
+                    <i class="fa-solid fa-circle-info"></i>
+                  </button>
+                }
+              </span>
               <app-search-select [options]="options(column)" [(ngModel)]="values[column.code]"
                 [ngModelOptions]="{ standalone: true }" [disabled]="isLocked(column)"
                 icon="fa-solid fa-list" [placeholder]="'ui.preview.choose' | t" [ariaLabel]="column.name" />
@@ -55,7 +75,8 @@
               }
             }
 
-            @if (isLocked(column)) {
+            <!-- in a locked record the hint would stand under every field, and the dialog already says so -->
+            @if (isLocked(column) && !data.readOnly) {
               <span class="fd-help">{{ 'ui.preview.locked' | t }}</span>
             }
           </div>
@@ -65,13 +86,36 @@
   </div>
 
   <footer class="fd-footer">
-    <span class="fd-hint">{{ 'ui.requiredFieldsMarked' | t }}</span>
+    @if (!data.readOnly) {
+      <span class="fd-hint">{{ 'ui.requiredFieldsMarked' | t }}</span>
+    }
     <div class="fd-actions">
-      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.cancel' | t }}</button>
-      <button type="submit" class="fd-button fd-button-primary" [disabled]="!canSave()">
-        <i class="fa-solid" [class.fa-floppy-disk]="!saving()" [class.fa-spinner]="saving()" [class.fa-spin]="saving()"></i>
-        {{ 'ui.save' | t }}
-      </button>
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ closeLabel | t }}</button>
+      @if (!data.readOnly) {
+        <div class="save-group split">
+          <button type="submit" class="fd-button fd-button-primary save" [disabled]="!canSave()">
+            <i class="fa-solid" [class.fa-floppy-disk]="!saving()" [class.fa-spinner]="saving()" [class.fa-spin]="saving()"></i>
+            {{ 'ui.save' | t }}
+          </button>
+          <button type="button" class="fd-button fd-button-primary more" [matMenuTriggerFor]="saveMenu"
+            [disabled]="isNew && !canSave()" [attr.aria-label]="'ui.moreActions' | t" [title]="'ui.moreActions' | t">
+            <i class="fa-solid fa-chevron-up"></i>
+          </button>
+          <mat-menu #saveMenu="matMenu" class="row-menu" yPosition="above" xPosition="before">
+            <button type="button" mat-menu-item (click)="saveAndStay()" [disabled]="!canSave()">
+              <i class="fa-solid fa-floppy-disk menu-icon"></i>
+              <span>{{ 'ui.preview.saveAndStay' | t }}</span>
+            </button>
+            <!-- a new record is saved first; an existing one is already stored, so it is only opened -->
+            @for (subTable of subTables(); track subTable.modelId) {
+              <button type="button" mat-menu-item (click)="isNew ? save(subTable) : open(subTable)">
+                <i class="fa-solid menu-icon" [class]="subTable.icon || 'fa-solid fa-diagram-project'"></i>
+                <span>{{ (isNew ? 'ui.preview.saveAndOpen' : 'ui.preview.open') | t }}: {{ subTable.name }}</span>
+              </button>
+            }
+          </mat-menu>
+        </div>
+      }
     </div>
   </footer>
 </form>

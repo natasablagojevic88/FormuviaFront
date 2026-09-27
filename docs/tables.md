@@ -3,7 +3,7 @@
 Every table screen in Formuvia works the same way. Learn it once and it applies to all of them: **Users**, **Roles**, and the subtables you reach from a row's ⋯ menu.
 
 ::: info Tables from the Model
-Tables you define yourself in the [Model](/model) appear in the menu and open a screen like the ones described here. Finding a record, sorting, paging, the Excel export, and adding, changing and deleting records through the form all work. The ⋯ button on a row holds the history of the record, just like on the built-in screens. What such a table does not have yet is editing straight in the list — double-click and *Quick edit*. See [Where Formuvia is today](/#where-formuvia-is-today).
+Tables you define yourself in the [Model](/model) appear in the menu and open a screen like the ones described here. Finding a record, sorting, paging, the Excel export, and adding, changing and deleting records through the form all work. The ⋯ button on a row holds the history of the record and the subtables of that table, just like on the built-in screens. What such a table does not have yet is editing straight in the list — double-click and *Quick edit*. See [Where Formuvia is today](/#where-formuvia-is-today).
 :::
 
 A table screen has three parts: a **header** with the title and the *Add* button, a **toolbar** with search and export, and the **list** itself with a paginator at the bottom.
@@ -44,7 +44,13 @@ Filtering, sorting and paging all happen on the server, so a table with a lot of
 
 **Add** in the page header opens the entry form. **Edit** on a row opens the same form with that record in it. Fields marked with `*` have to be filled in before the form will save.
 
+The **Save** button carries a small tab on its right. It always holds **Save and stay** — the record is stored and the form stays open, filled in again with what the server stored, so a long form can be saved as you go and a new record simply turns into an existing one. When the table has subtables, the tab holds one entry per subtable as well. On a **new** record it reads *Save and open: …* — the record is stored and the subtable opens with it as the parent, so the header and its lines are entered in one move. On an **existing** record it reads *Open: …*, because the record is already stored and you may only want to look at it and step into its lines; if you changed something on the form first, you are told those changes will not be saved.
+
 The labels on that form come from the server, in the language you chose, so the form and the table always use the same words for the same thing.
+
+A value picked from a list is cleared with the **×** at the right end of the field — that works in the form, in the table and in the filters alike.
+
+A field that points at a codebook carries a small **ⓘ** beside it, both on the form and on the row in the list. It opens the record behind the chosen value — the same form, with every field locked and nothing to save — so you can check what is behind a code without leaving what you were doing.
 
 ### Straight in the table
 
@@ -64,7 +70,9 @@ The ⋯ button next to *Edit* holds everything else:
 
 **History** — who changed this record and when, with the old and the new value of every field that changed, in a panel that slides in from the right. Deletions and insertions are recorded too, so the panel tells the whole story of the record.
 
-**Related tables** — if the table has subtables, each one is listed here. Opening one shows only the rows belonging to the record you came from, and a trail at the top leads back. The chain can go as deep as the model does.
+**Subtables** — if the table has subtables, each one is listed here. Opening one shows only the rows belonging to the record you came from, and the header says which record that is: *Customers: Acme d.o.o.*, with a **Back** button beside it. The chain can go as deep as the model does.
+
+**Back** puts the list exactly as you left it — the same page, the same filters and sorting, and the row you went into still marked — so you never have to find your place again. Opening that table from the menu again, or reloading the page, starts it fresh.
 
 **Delete** — asks for confirmation first, because it cannot be undone.
 

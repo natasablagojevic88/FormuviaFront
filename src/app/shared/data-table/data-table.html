@@ -35,7 +35,7 @@
       }
     }
     <div class="mobile-sort">
-      <app-search-select class="sort-select" appearance="compact" [options]="sortOptions()" [ngModel]="sortField()"
+      <app-search-select class="sort-select" appearance="compact" [clearable]="false" [options]="sortOptions()" [ngModel]="sortField()"
         (ngModelChange)="setSortField($event)" [placeholder]="'ui.sortBy' | t" [ariaLabel]="'ui.sortBy' | t" />
       <button type="button" class="advanced-button sort-direction" (click)="toggleSortDirection()" [disabled]="!sortField()"
         [title]="'ui.sortDirection' | t" [attr.aria-label]="'ui.sortDirection' | t">
@@ -90,6 +90,12 @@
                     <span>{{ 'ui.history.title' | t }}</span>
                   </button>
                 }
+                @for (subTable of subTables(); track subTable.modelId) {
+                  <button type="button" mat-menu-item (click)="openSubTable(subTable, row)">
+                    <i class="fa-solid menu-icon" [class]="subTable.icon || 'fa-solid fa-diagram-project'"></i>
+                    <span>{{ subTable.name }}</span>
+                  </button>
+                }
                 @for (child of children(); track child.className) {
                   <button type="button" mat-menu-item (click)="openChild(child, row)">
                     <i class="fa-solid menu-icon" [class]="child.icon || 'fa-solid fa-table-list'"></i>
@@ -138,7 +144,11 @@
             [class.cell-saved]="isCell(savedCell(), row, column)" [attr.title]="canEdit(column) ? ('ui.cellEditHint' | t) : null"
             (click)="onCellClick(row, column)" (dblclick)="startEdit(row, column)">
             @if (isRowEditing(row)) {
-              @if (isEnum(column) || column.columnType === 'BOOLEAN') {
+              @if (hasChain(column)) {
+                <app-chain-select class="cell-chain" [levels]="levels(column)" [compact]="true" [showLastName]="false"
+                  [(ngModel)]="rowValues[column.fieldName]" [ngModelOptions]="{ standalone: true }"
+                  [ariaLabel]="column.description" />
+              } @else if (isEnum(column) || column.columnType === 'BOOLEAN') {
                 <app-search-select class="cell-select" appearance="compact"
                   [options]="editorOptions().get(column.fieldName) ?? []" [(ngModel)]="rowValues[column.fieldName]"
                   [ngModelOptions]="{ standalone: true }" [ariaLabel]="column.description" />
@@ -152,7 +162,12 @@
                   (keydown.enter)="saveRow()" (keydown.escape)="cancelRowEdit()" [attr.aria-label]="column.description" />
               }
             } @else if (isCell(editing(), row, column)) {
-              @if (isEnum(column) || column.columnType === 'BOOLEAN') {
+              @if (hasChain(column)) {
+                <app-chain-select class="cell-chain" [levels]="levels(column)" [compact]="true" [showLastName]="false"
+                  [ngModel]="editValue" (ngModelChange)="editValue = $event; commitChain($event)"
+                  [ngModelOptions]="{ standalone: true }" (keydown.escape)="cancelEdit()"
+                  [ariaLabel]="column.description" />
+              } @else if (isEnum(column) || column.columnType === 'BOOLEAN') {
                 <app-search-select class="cell-select" appearance="compact"
                   [options]="editorOptions().get(column.fieldName) ?? []" [ngModel]="editValue"
                   (ngModelChange)="editValue = $event; commitEdit()" [ngModelOptions]="{ standalone: true }"
@@ -172,6 +187,14 @@
               </span>
             } @else if (isEnum(column) && column.columnType !== 'UUID' && row[column.fieldName]) {
               <span class="badge badge-enum">{{ format(row, column) }}</span>
+            } @else if (canShowRecord(row, column)) {
+              <span class="with-info">
+                <span class="value">{{ format(row, column) }}</span>
+                <button type="button" class="info" (click)="showRecord($event, row, column)"
+                  [title]="'ui.preview.info' | t" [attr.aria-label]="'ui.preview.info' | t">
+                  <i class="fa-solid fa-circle-info"></i>
+                </button>
+              </span>
             } @else {
               {{ format(row, column) }}
             }
@@ -208,7 +231,6 @@
       <tr class="mat-mdc-no-data-row" *matNoDataRow>
         <td class="empty-cell" [attr.colspan]="displayedColumns().length">
           @if (!loading()) {
-            <i class="fa-regular fa-folder-open"></i>
             <span>{{ 'ui.noData' | t }}</span>
           }
         </td>

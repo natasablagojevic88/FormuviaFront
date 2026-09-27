@@ -15,6 +15,6 @@
       [class.fa-circle-half-stroke]="theme.mode() === 'system'"></i>
   </button>
 
-  <app-search-select class="language" appearance="dark" icon="fa-solid fa-globe" [options]="languageOptions"
+  <app-search-select class="language" appearance="dark" icon="fa-solid fa-globe" [clearable]="false" [options]="languageOptions"
     [ngModel]="language.current()" (ngModelChange)="language.change($event)" [ariaLabel]="'ui.language' | t" />
 </header>

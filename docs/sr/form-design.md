@@ -50,6 +50,20 @@ Kad izaberete ovaj tip, birate i koja tabela je šifarnik. Formuvia pravi strani
 
 Ono što se u izboru *prikazuje* dolazi iz same šifarničke tabele — vidi [Deo opisa u šifarniku](#deo-opisa-u-sifarniku) niže.
 
+#### Šifarnik koji je i sam podtabela
+
+Ako je šifarnik podtabela neke druge tabele — gradovi ispod okruga, okruzi ispod država — polje nije jedan izbor nego **lanac**, odozgo na dole:
+
+```
+Država   [ Srbija        ▾ ]
+Okrug    [ Beogradski    ▾ ]
+Grad     [ Zemun         ▾ ]
+```
+
+Svaki nivo nudi samo ono što pripada nivou iznad, nivo je zatvoren dok se onaj iznad ne izabere, a promena nivoa prazni sve ispod njega — tako zapis ne može da završi pod roditeljem koji nije izabran. U koloni se čuva samo poslednji nivo; oni iznad služe da se do njega dođe. Kad otvorite postojeći zapis, ceo lanac se popuni sam, od upisane vrednosti naviše.
+
+Lanac ide koliko god duboko model ide, i radi isto u formi za unos i u *Brzoj izmeni* u tabeli, gde red jednostavno poraste u visinu.
+
 ## Gde polje stoji
 
 **Red**, **Kolona** i **Širina u kolonama** postavljaju polje u mrežu. Širina omogućava da polje zauzme više kolona — dugačak opis preko cele forme, dva kratka polja jedno pored drugog.

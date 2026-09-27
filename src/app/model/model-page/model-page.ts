@@ -1,7 +1,7 @@
-import { Component, ElementRef, OnDestroy, signal, viewChild } from "@angular/core";
+import { Component, ElementRef, signal, viewChild } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatTree } from "@angular/material/tree";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { Notify } from "../../services/notify";
 import { SendRequest } from "../../services/send-request";
 import { Translate } from "../../services/translate";
@@ -29,11 +29,14 @@ interface TreeState {
   templateUrl: "./model-page.html",
   styleUrl: "./model-page.css",
 })
-export class ModelPage implements OnDestroy {
+export class ModelPage {
   readonly roots = signal<ModelNode[]>([]);
   readonly loading = signal(false);
   readonly selectedKey = signal<string | null>(null);
   private roles: Role[] = [];
+
+  /** true only when the page was opened by the Back button of the form design. */
+  private restore = false;
 
   private readonly tree = viewChild(MatTree);
   private readonly historyPanel = viewChild(HistoryPanel);
@@ -46,11 +49,13 @@ export class ModelPage implements OnDestroy {
   constructor(
     private dialog: MatDialog,
     private router: Router,
+    route: ActivatedRoute,
     private sendRequest: SendRequest,
     private notify: Notify,
     private translate: Translate,
     private host: ElementRef<HTMLElement>
   ) {
+    this.restore = route.snapshot.queryParamMap.get("restore") === "1";
     this.loadRoles();
     this.load();
   }
@@ -58,11 +63,6 @@ export class ModelPage implements OnDestroy {
   /** Roles for the table form (view, add, edit, delete). */
   private loadRoles(): void {
     this.sendRequest.get(ApiRoute.appuserAllRoles).then((roles: Role[]) => (this.roles = roles ?? []));
-  }
-
-  /** Leaving the page (e.g. to the form design): what was open is remembered. */
-  ngOnDestroy(): void {
-    this.saveState();
   }
 
   load(): void {
@@ -94,7 +94,10 @@ export class ModelPage implements OnDestroy {
     }
   }
 
-  /** Coming back to the page: the tree is restored as it was, and the selected node is brought into view. */
+  /**
+   * Coming back from the form design: the tree is restored as it was and the selected node is brought
+   * into view. Opening Model from the menu, or reloading the page, starts from the root again.
+   */
   private restoreState(root: ModelNode): void {
     const tree = this.tree();
     if (!tree) {
@@ -119,9 +122,15 @@ export class ModelPage implements OnDestroy {
     }
   }
 
+  /** The state is read only on a return from the form design, and is used up while reading. */
   private readState(): TreeState | null {
+    if (!this.restore) {
+      return null;
+    }
+    this.restore = false;
     try {
       const stored = sessionStorage.getItem(STATE_KEY);
+      sessionStorage.removeItem(STATE_KEY);
       return stored ? (JSON.parse(stored) as TreeState) : null;
     } catch {
       return null;

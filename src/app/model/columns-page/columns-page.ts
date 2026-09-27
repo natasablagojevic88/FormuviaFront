@@ -133,8 +133,9 @@ export class ColumnsPage {
       .finally(() => this.savingLayout.set(false));
   }
 
+  /** restore tells the tree to open as it was left when the form design was entered. */
   back(): void {
-    this.router.navigate(["/model"]);
+    this.router.navigate(["/model"], { queryParams: { restore: "1" } });
   }
 
   typeLabel(column: ModelColumn): string {

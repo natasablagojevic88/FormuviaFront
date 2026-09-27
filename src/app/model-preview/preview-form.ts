@@ -1,4 +1,4 @@
-import { ColumnType, ComboOption } from "../shared/database-table";
+import { ColumnType, ComboOption, ParentLevel } from "../shared/database-table";
 import { isDecimalType, isNumberText, parseDecimalText, toDecimalText } from "../shared/number-format";
 
 /** The id column and the column that links to the parent row; the server adds them before the fields. */
@@ -19,6 +19,10 @@ export interface PreviewColumn {
   editable?: boolean;
   value?: any;
   listOfValues?: ComboOption[];
+  /** Codebook this field points at. */
+  modelId?: string;
+  /** Levels above that codebook, bottom-up; the field itself is the last, lowest level. */
+  parentListOfValues?: ParentLevel[];
   textArea?: boolean;
   rowIndex?: number;
   columnIndex?: number;

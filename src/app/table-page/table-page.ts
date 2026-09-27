@@ -24,6 +24,8 @@ export class TablePage {
   readonly title = signal("");
   readonly parentFilter = signal<{ field: string; value: string } | null>(null);
   readonly trail = signal<TrailCrumb[]>([]);
+  /** true when this page was reached by the Back button; only then is the list restored. */
+  readonly restore = signal(false);
   readonly breadcrumb = computed(() =>
     [...this.trail().map((crumb) => `${crumb.title}: ${crumb.label}`), this.title()].join(" / "));
 
@@ -44,6 +46,7 @@ export class TablePage {
       const id = params.get("id");
       this.parentFilter.set(field && id ? { field, value: id } : null);
       this.trail.set(this.readTrail(params.get("trail")));
+      this.restore.set(params.get("restore") === "1");
     });
   }
 
@@ -64,9 +67,12 @@ export class TablePage {
   /** Back to a level from the trail: every step remembers the address it came from. */
   back(index: number): void {
     const crumb = this.trail()[index];
-    if (crumb) {
-      this.router.navigateByUrl(crumb.route);
+    if (!crumb) {
+      return;
     }
+    const tree = this.router.parseUrl(crumb.route);
+    tree.queryParams = { ...tree.queryParams, restore: "1" };
+    this.router.navigateByUrl(tree);
   }
 
   remove(row: { id: string }): void {

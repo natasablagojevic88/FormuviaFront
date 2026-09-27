@@ -5,6 +5,12 @@
     <i class="lead-icon {{ icon() }}"></i>
   }
   <span class="label" [class.placeholder]="!selectedLabel()">{{ selectedLabel() || placeholder() }}</span>
+  @if (clearable() && value() && !disabled()) {
+    <span class="clear" role="button" tabindex="-1" [attr.aria-label]="'ui.clear' | t" [title]="'ui.clear' | t"
+      (click)="clear($event)" (keydown.enter)="clear($event)">
+      <i class="fa-solid fa-xmark"></i>
+    </span>
+  }
   <i class="fa-solid fa-chevron-down chevron"></i>
 </button>
 

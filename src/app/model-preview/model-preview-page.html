@@ -1,9 +1,15 @@
-<app-page-header [title]="title()" [subtitle]="subtitle()">
+<app-page-header [title]="title()" [subtitle]="subtitle()" [breadcrumb]="breadcrumb()">
+  @if (trail().length) {
+    <button type="button" class="back-button" (click)="back(trail().length - 1)">
+      <i class="fa-solid fa-arrow-left"></i>
+      {{ 'ui.back' | t }}
+    </button>
+  }
   <button type="button" class="add-button" (click)="add()">
     <i class="fa-solid fa-plus"></i>
     {{ 'ui.add' | t }}
   </button>
 </app-page-header>
 
-<app-data-table [url]="tableUrl()" [historyUrl]="historyUrl" (loaded)="onLoaded($event)"
-  (edit)="edit($event)" (remove)="remove($event)"></app-data-table>
+<app-data-table [url]="tableUrl()" [trail]="trail()" [restoreState]="restore()" [historyUrl]="historyUrl" (loaded)="onLoaded($event)"
+  (edit)="edit($event)" (remove)="remove($event)" (info)="showRecord($event)"></app-data-table>

@@ -3,7 +3,7 @@
 Svaki ekran sa tabelom u Formuvii radi isto. Naučite jednom i važi za sve: **Korisnike**, **Uloge** i podtabele do kojih se stiže iz ⋯ menija reda.
 
 ::: info Tabele iz Modela
-Tabele koje sami definišete u [Modelu](/sr/model) pojavljuju se u meniju i otvaraju ekran kakav je ovde opisan. Pronalaženje zapisa, sortiranje, straničenje, export u Excel, kao i unos, izmena i brisanje zapisa kroz formu — sve radi. Dugme ⋯ na redu nudi i istoriju zapisa, isto kao na ugrađenim ekranima. Ono što takva tabela još nema jeste izmena u samoj listi — dvoklik i *Brza izmena*. Vidi [Dokle je Formuvia stigla](/sr/#dokle-je-formuvia-stigla).
+Tabele koje sami definišete u [Modelu](/sr/model) pojavljuju se u meniju i otvaraju ekran kakav je ovde opisan. Pronalaženje zapisa, sortiranje, straničenje, export u Excel, kao i unos, izmena i brisanje zapisa kroz formu — sve radi. Dugme ⋯ na redu nudi i istoriju zapisa i podtabele te tabele, isto kao na ugrađenim ekranima. Ono što takva tabela još nema jeste izmena u samoj listi — dvoklik i *Brza izmena*. Vidi [Dokle je Formuvia stigla](/sr/#dokle-je-formuvia-stigla).
 :::
 
 Ekran sa tabelom ima tri dela: **zaglavlje** sa naslovom i dugmetom *Dodaj*, **traku** sa pretragom i exportom, i samu **listu** sa straničenjem na dnu.
@@ -44,7 +44,13 @@ Filtriranje, sortiranje i straničenje rade na serveru, pa tabela sa mnogo redov
 
 **Dodaj** u zaglavlju strane otvara formu za unos. **Izmeni** na redu otvara istu formu sa tim zapisom u njoj. Polja označena sa `*` moraju biti popunjena da bi forma mogla da se snimi.
 
+Dugme **Sačuvaj** ima mali jezičak sa desne strane. U njemu je uvek **Sačuvaj i ostani** — zapis se snimi, a forma ostane otvorena i ponovo se popuni onim što je server upisao, pa se dugačka forma može snimati usput, a nov zapis jednostavno postane postojeći. Kad tabela ima podtabele, u jezičku stoji i po jedna stavka za svaku od njih. Kod **novog** zapisa piše *Sačuvaj i otvori: …* — zapis se snimi, a podtabela se otvori sa njim kao nadređenim, pa se zaglavlje i stavke unesu u jednom potezu. Kod **postojećeg** zapisa piše *Otvori: …*, jer je zapis već snimljen, a vi možda samo hoćete da ga pogledate i pređete na stavke; ako ste pre toga nešto izmenili na formi, dobićete upozorenje da te izmene neće biti sačuvane.
+
 Nazivi polja na toj formi dolaze sa servera, na jeziku koji ste izabrali, pa forma i tabela uvek koriste iste reči za istu stvar.
+
+Vrednost izabrana iz liste poništava se **×** na desnom kraju polja — isto radi i na formi, i u tabeli, i u filterima.
+
+Polje koje pokazuje na šifarnik ima pored sebe malo **ⓘ**, i na formi i na redu u listi. Njime se otvara zapis iza izabrane vrednosti — ista forma, sa svim poljima zaključanim i bez snimanja — pa možete da proverite šta stoji iza šifre bez napuštanja onoga što radite.
 
 ### Pravo u tabeli
 
@@ -64,7 +70,9 @@ Dugme ⋯ pored *Izmeni* nosi sve ostalo:
 
 **Istorija** — ko je i kada menjao ovaj zapis, sa starom i novom vrednošću svakog polja koje se promenilo, u panelu koji se izvlači s desne strane. Brisanja i unosi se takođe beleže, pa panel priča celu priču o zapisu.
 
-**Povezane tabele** — ako tabela ima podtabele, svaka je navedena ovde. Kad je otvorite, vidite samo redove koji pripadaju zapisu iz kog ste došli, a putanja na vrhu vodi nazad. Lanac može ići koliko god duboko model ide.
+**Podtabele** — ako tabela ima podtabele, svaka je navedena ovde. Kad je otvorite, vidite samo redove koji pripadaju zapisu iz kog ste došli, a u zaglavlju piše koji je to zapis: *Komitenti: Acme d.o.o.*, sa dugmetom **Nazad** pored. Lanac može ići koliko god duboko model ide.
+
+**Nazad** vraća listu tačno onakvu kakvu ste ostavili — ista strana, isti filteri i sortiranje, i red u koji ste ušli i dalje označen — pa ne morate ponovo da tražite gde ste stali. Kad tu tabelu ponovo otvorite iz menija, ili osvežite stranu, kreće ispočetka.
 
 **Obriši** — prvo traži potvrdu, jer se ne može poništiti.
 

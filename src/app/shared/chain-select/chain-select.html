@@ -1,0 +1,13 @@
+<div class="chain" [class.compact]="compact()">
+  @for (level of levels(); track level.name + $index; let index = $index) {
+    <div class="level">
+      @if (showLastName() || index < levels().length - 1) {
+        <span class="level-name">{{ level.name }}</span>
+      }
+      <app-search-select [options]="options()[index]" [appearance]="compact() ? 'compact' : 'field'"
+        [ngModel]="valueOf(index)" (ngModelChange)="select(index, $event)" [ngModelOptions]="{ standalone: true }"
+        [disabled]="isLocked(index)" [placeholder]="placeholder(index)"
+        [ariaLabel]="level.name || ariaLabel()" icon="fa-solid fa-list" />
+    </div>
+  }
+</div>

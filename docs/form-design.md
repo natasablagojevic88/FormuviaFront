@@ -50,6 +50,20 @@ Choose this type and you also choose which table is the codebook. Formuvia creat
 
 What the picker *shows* comes from the codebook table itself — see [Part of the label in a codebook](#part-of-the-label-in-a-codebook) below.
 
+#### A codebook that is a subtable
+
+If the codebook is itself a subtable of another table — cities under districts, districts under countries — the field is not one picker but a **chain**, from the top down:
+
+```
+Country   [ Serbia        ▾ ]
+District  [ Belgrade      ▾ ]
+City      [ Zemun         ▾ ]
+```
+
+Each level offers only what belongs to the level above it, a level stays closed until the one above is chosen, and changing a level empties everything below it, so a record can never end up under a parent that was not chosen. Only the last level is stored in the column; the ones above it are there to find it. Opening an existing record fills the whole chain in, from the stored value upwards.
+
+The chain goes as deep as the model does, and it works the same in the entry form and in *Quick edit* in the table, where the row simply grows taller.
+
 ## Where the field sits
 
 **Row**, **Column** and **Width in columns** place the field in the grid. Width lets a field span several columns — a long description across the whole form, two short fields side by side.

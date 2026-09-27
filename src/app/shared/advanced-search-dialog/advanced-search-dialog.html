@@ -13,11 +13,11 @@
     @for (criterion of criteria; track $index; let index = $index) {
       @let column = columnOf(criterion.fieldName);
       <div class="criterion">
-        <app-search-select [options]="columnOptions" [ngModel]="criterion.fieldName"
+        <app-search-select [options]="columnOptions" [clearable]="false" [ngModel]="criterion.fieldName"
           (ngModelChange)="setColumn(criterion, $event)" [ngModelOptions]="{ standalone: true }"
           [ariaLabel]="'ui.column' | t" />
 
-        <app-search-select [options]="operationOptions.get(column.fieldName) ?? []" [(ngModel)]="criterion.searchOperation"
+        <app-search-select [options]="operationOptions.get(column.fieldName) ?? []" [clearable]="false" [(ngModel)]="criterion.searchOperation"
           [ngModelOptions]="{ standalone: true }" [ariaLabel]="'ui.operation' | t" />
 
         <!-- for "between" the From and To fields go one below the other, so they are not too narrow -->

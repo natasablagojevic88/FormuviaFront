@@ -251,3 +251,23 @@
     animation: none;
   }
 }
+
+/* Clearing the value: the x sits before the arrow and does not open the list. */
+.clear {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 2px;
+  border-radius: 999px;
+  color: var(--c-text-faint);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.clear:hover {
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+}

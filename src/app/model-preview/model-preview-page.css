@@ -13,6 +13,7 @@ app-data-table {
   flex: 1;
 }
 
+.back-button,
 .add-button {
   display: inline-flex;
   align-items: center;
@@ -32,12 +33,14 @@ app-data-table {
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
+.back-button:hover,
 .add-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 14px 28px rgba(3, 8, 23, 0.2);
 }
 
 @media (max-width: 900px) {
+  .back-button,
   .add-button {
     justify-content: center;
     width: 100%;

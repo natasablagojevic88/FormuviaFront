@@ -31,7 +31,7 @@
 
       <div class="fd-field">
         <span class="fd-label fd-required">{{ label('columnType') }}</span>
-        <app-search-select [options]="typeOptions()" [(ngModel)]="column.columnType"
+        <app-search-select [options]="typeOptions()" [clearable]="false" [(ngModel)]="column.columnType"
           [ngModelOptions]="{ standalone: true }" [disabled]="!isNew" icon="fa-solid fa-shapes"
           [ariaLabel]="label('columnType')" />
         @if (!isNew) {

@@ -1,0 +1,30 @@
+:host {
+  display: block;
+}
+
+/* Every level stands below the one above it, however deep the chain goes. */
+.chain {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chain.compact {
+  gap: 6px;
+}
+
+.level {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* The name of the parent table, so it is clear which level is being chosen. */
+.level-name {
+  color: var(--c-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

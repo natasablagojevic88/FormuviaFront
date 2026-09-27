@@ -43,7 +43,7 @@ Oko toga stoji ono što poslovnoj aplikaciji ionako treba: nalozi i uloge, zapis
 Formuvia se još razvija, a ovo uputstvo opisuje ono što stvarno radi, ne ono što je planirano. Dve stvari vredi znati pre nego što počnete:
 
 - **Ugrađeni ekrani** — Korisnici, Uloge i Model — su gotovi, kao i podtabele do kojih se stiže iz ⋯ menija reda.
-- Tabela koju definišete u **Modelu** pravi se u bazi, pojavljuje se u meniju i otvara kao lista koja se filtrira, sortira, straniči i izvozi u Excel. Zapisi se unose, menjaju i brišu kroz formu koju ste složili u [Dizajnu forme](/sr/form-design). Dugme ⋯ na redu otvara istoriju tog zapisa, kao i svuda drugde. Ono što takva tabela još nema jeste izmena u samoj listi (dvoklik i *Brza izmena*) i podtabele u meniju.
+- Tabela koju definišete u **Modelu** pravi se u bazi, pojavljuje se u meniju i otvara kao lista koja se filtrira, sortira, straniči i izvozi u Excel. Zapisi se unose, menjaju i brišu kroz formu koju ste složili u [Dizajnu forme](/sr/form-design). Dugme ⋯ na redu otvara istoriju tog zapisa i podtabele te tabele, kao i svuda drugde. Ono što takva tabela još nema jeste izmena u samoj listi — dvoklik i *Brza izmena*.
 
 Svaka strana uputstva kaže koji delovi onoga što definišete već imaju dejstvo.
 

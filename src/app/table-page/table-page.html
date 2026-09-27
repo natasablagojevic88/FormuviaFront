@@ -7,5 +7,5 @@
   }
 </app-page-header>
 
-<app-data-table [url]="tableUrl()" [parentFilter]="parentFilter()" [trail]="trail()"
+<app-data-table [url]="tableUrl()" [parentFilter]="parentFilter()" [trail]="trail()" [restoreState]="restore()"
   (loaded)="onLoaded($event)" (remove)="remove($event)"></app-data-table>

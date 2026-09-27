@@ -8,9 +8,10 @@ import { ApiRoute } from "../ApiRoute";
 import { Translate } from "../../services/translate";
 import { Language } from "../../services/language";
 import { AdvancedSearchDialog, AdvancedSearchDialogData } from "../advanced-search-dialog/advanced-search-dialog";
-import { DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, QueryDatabaseOrder, TableChild } from "../database-table";
+import { DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, QueryDatabaseOrder, SubTable, TableChild } from "../database-table";
 import { HistoryPanel } from "../history-panel/history-panel";
 import { Criterion, inputModeFor, inputTypeFor, isEnum, needsValue, quickFilter, toFilter } from "../filter-operations";
+import { chainLevels, ChainLevel } from "../parent-chain";
 import { formatDate, formatDateTime, formatTime } from "../date-format";
 import { formatDecimal, isDecimalType, isNumberType, parseDecimalText, toDecimalText } from "../number-format";
 import { SelectOption } from "../search-select/search-select";
@@ -18,8 +19,21 @@ import { SelectOption } from "../search-select/search-select";
 const ACTIONS_COLUMN = "actions";
 const FILTER_PREFIX = "filter-";
 const FILTER_DELAY = 350;
-const ID_FIELD = "id";
+export const ID_FIELD = "id";
 const TOUCH_QUERY = window.matchMedia("(hover: none)");
+
+/** Where the user left the list: it is restored when they come back from a subtable. */
+interface TableState {
+  pageIndex: number;
+  pageSize: number;
+  filters: Record<string, string>;
+  criteria: Criterion[];
+  order: QueryDatabaseOrder | null;
+  highlightedId: string | null;
+}
+
+/** The state of a list is kept per table, for as long as the browser tab lives. */
+const STATE_PREFIX = "formuvia.table.";
 
 /** One step in the parent -> child trail; route is the address it came from. */
 export interface TrailCrumb {
@@ -94,11 +108,18 @@ export class DataTable {
   readonly readOnly = input(false);
   /** false: the row cannot be deleted, so the row menu has no "Delete" item. */
   readonly canDelete = input(true);
+  /**
+   * true only when the page was reached by going back from a subtable: the list is then restored as
+   * it was left. Opening the same table from the menu, or reloading the page, always starts fresh.
+   */
+  readonly restoreState = input(false);
   /** Path to the history of a row for tables without a className (tables from the model). */
   readonly historyUrl = input<((id: string) => string) | null>(null);
   readonly edit = output<any>();
   readonly remove = output<any>();
   readonly loaded = output<DatabaseTable<any>>();
+  /** A codebook value in a cell: the page opens that record. */
+  readonly info = output<{ column: DatabaseColumn; id: string }>();
 
   readonly pageSizes = [10, 20, 50, 100];
   readonly actionsColumn = ACTIONS_COLUMN;
@@ -127,6 +148,8 @@ export class DataTable {
   readonly tableName = signal("");
   readonly className = signal<string | null>(null);
   readonly children = signal<TableChild[]>([]);
+  /** Subtables of a model table; the row they are opened from becomes their parent. */
+  readonly subTables = signal<SubTable[]>([]);
   // A phone has no table header, so the sorting is chosen in the toolbar.
   readonly sortOptions = computed<SelectOption[]>(() =>
     this.columns().map((column) => ({ value: column.fieldName, label: column.description })));
@@ -194,11 +217,9 @@ export class DataTable {
     return options;
   });
   /**
-   * Values for the combobox when editing a row or a cell. The empty item is there only when the field
-   * is not required, so that the value can be cleared.
+   * Values for the combobox when editing a row or a cell; the value is cleared with the x in the field.
    */
   readonly editorOptions = computed(() => {
-    const empty: SelectOption = { value: "", label: "—" };
     const options = new Map<string, SelectOption[]>();
     for (const column of this.allColumns()) {
       if (column.columnType === "BOOLEAN") {
@@ -208,7 +229,7 @@ export class DataTable {
         ]);
       } else if (isEnum(column)) {
         const values = column.listOfValues!.map((option) => ({ value: option.value, label: option.option }));
-        options.set(column.fieldName, column.required ? values : [empty, ...values]);
+        options.set(column.fieldName, values);
       }
     }
     return options;
@@ -247,7 +268,81 @@ export class DataTable {
       this.clearTable();
     }
     this.loadedUrl = url;
-    this.reload();
+    this.readState();
+    this.reload(this.highlightedId(), false);
+  }
+
+  /**
+   * One key per list; a subtable of another parent row is a list of its own. Saving uses the table
+   * that is really loaded, because the url input has already changed when moving to another table.
+   */
+  private stateKey(url: string): string {
+    const parent = this.parentFilter();
+    return STATE_PREFIX + url + (parent ? "|" + parent.value : "");
+  }
+
+  /** Saved only when going into a subtable, so that the way back lands on the same place. */
+  private saveState(): void {
+    if (!this.loadedUrl) {
+      return;
+    }
+    const state: TableState = {
+      pageIndex: this.pageIndex(),
+      pageSize: this.pageSize(),
+      filters: this.filters(),
+      criteria: this.criteria(),
+      order: this.order(),
+      highlightedId: this.highlightedId(),
+    };
+    try {
+      sessionStorage.setItem(this.stateKey(this.loadedUrl), JSON.stringify(state));
+    } catch {
+      // without sessionStorage the list simply opens from the beginning
+    }
+  }
+
+  /**
+   * Restores the list only on a return from a subtable, and uses the saved state up: a later opening
+   * from the menu, or a reload, finds nothing and starts fresh.
+   */
+  private readState(): void {
+    if (!this.restoreState()) {
+      return;
+    }
+
+    let state: TableState | null = null;
+    try {
+      const key = this.stateKey(this.url());
+      const stored = sessionStorage.getItem(key);
+      sessionStorage.removeItem(key);
+      state = stored ? (JSON.parse(stored) as TableState) : null;
+    } catch {
+      state = null;
+    }
+    if (!state) {
+      return;
+    }
+
+    this.pageIndex.set(state.pageIndex ?? 0);
+    this.pageSize.set(state.pageSize ?? this.pageSize());
+    this.filters.set(state.filters ?? {});
+    this.criteria.set(state.criteria ?? []);
+    this.order.set(state.order ?? null);
+    this.highlightedId.set(state.highlightedId ?? null);
+
+    // the header arrow is set once the table is drawn, the query already carries the sorting
+    const order = state.order;
+    if (order) {
+      setTimeout(() => {
+        const sort = this.sort();
+        if (!sort) {
+          return;
+        }
+        sort.active = order.fieldName;
+        sort.direction = order.direction === "DESC" ? "desc" : "asc";
+        sort._stateChanges.next();
+      });
+    }
   }
 
   private clearTable(): void {
@@ -274,10 +369,11 @@ export class DataTable {
     this.saveUrl.set(null);
     this.className.set(null);
     this.children.set([]);
+    this.subTables.set([]);
     this.tableName.set("");
   }
 
-  reload(highlightId: string | null = null): void {
+  reload(highlightId: string | null = null, flash = true): void {
     const requestId = ++this.requestId;
     this.highlightedId.set(null);
     const order = this.order();
@@ -304,6 +400,7 @@ export class DataTable {
         this.tableName.set(table.name ?? "");
         this.className.set(table.className || null);
         this.children.set(table.children ?? []);
+        this.subTables.set(table.subTables ?? []);
         this.editing.set(null);
         this.editRowId.set(null);
         this.draftRow.set(null);
@@ -316,7 +413,7 @@ export class DataTable {
         this.loaded.emit(table);
         if (highlightId && table.list.some((row) => row[ID_FIELD] === highlightId)) {
           this.highlightedId.set(highlightId);
-          this.highlightFlash.set(true);
+          this.highlightFlash.set(flash);
           setTimeout(() => this.scrollToHighlighted());
         }
       })
@@ -376,6 +473,7 @@ export class DataTable {
   /** Opens the child table as a new page, with the way back in the header. */
   openChild(child: TableChild, row: any): void {
     this.selectRow(row);
+    this.saveState();
     const trail: TrailCrumb[] = [
       ...this.trail(),
       { title: this.tableName(), label: this.rowTitle(row), route: this.router.url },
@@ -393,8 +491,55 @@ export class DataTable {
 
   /** The ⋯ menu is shown only when there is something in it: history, a subtable or deleting. */
   readonly hasRowMenu = computed(
-    () => !!this.className() || !!this.historyUrl() || this.children().length > 0 || this.canDelete()
+    () =>
+      !!this.className() ||
+      !!this.historyUrl() ||
+      this.children().length > 0 ||
+      this.subTables().length > 0 ||
+      this.canDelete()
   );
+
+  /**
+   * Opens a subtable of a model table: the row it is opened from is sent as the parent, and the trail
+   * keeps the way back to this list and to the row the user was on.
+   */
+  openSubTable(subTable: SubTable, row: any): void {
+    this.selectRow(row);
+    this.saveState();
+    const trail: TrailCrumb[] = [
+      ...this.trail(),
+      { title: this.tableName(), label: this.rowTitle(row), route: this.router.url },
+    ];
+    this.router.navigate(["/preview/model", subTable.modelId], {
+      queryParams: { parent: row[ID_FIELD], trail: JSON.stringify(trail) },
+    });
+  }
+
+  /** A cell holding a codebook record offers to show that record. */
+  canShowRecord(row: any, column: DatabaseColumn): boolean {
+    return !!column.modelId && !!row[column.fieldName];
+  }
+
+  showRecord(event: Event, row: any, column: DatabaseColumn): void {
+    event.stopPropagation();
+    this.info.emit({ column, id: String(row[column.fieldName]) });
+  }
+
+  /** A chained codebook is saved once the last level is chosen; the levels above only narrow the list. */
+  commitChain(value: string): void {
+    if (value) {
+      this.commitEdit();
+    }
+  }
+
+  /** A codebook that hangs off another table is chosen level by level, from the root down. */
+  hasChain(column: DatabaseColumn): boolean {
+    return (column.parentList?.length ?? 0) > 0;
+  }
+
+  levels(column: DatabaseColumn): ChainLevel[] {
+    return chainLevels(column.parentList, { name: column.description, options: column.listOfValues ?? [] });
+  }
 
   /** History is offered only when the server sends a className with the table. */
   canShowHistory(): boolean {
@@ -410,10 +555,15 @@ export class DataTable {
     this.historyPanel()?.open(this.className() ?? "", id, this.rowTitle(row), this.historyUrl()?.(id));
   }
 
-  /** Title of the panel or of a step in the trail: the values of the first two visible columns of the row. */
+  /**
+   * Title of the panel or of a step in the trail: the columns the server marks as part of the label
+   * of a record, in their order. A table without such columns (the built-in ones) falls back to the
+   * first two visible columns.
+   */
   rowTitle(row: any): string {
-    return this.columns()
-      .slice(0, 2)
+    const described = this.allColumns().filter((column) => column.inDescription);
+    const columns = described.length ? described : this.columns().slice(0, 2);
+    return columns
       .map((column) => this.format(row, column))
       .filter((value) => value !== "")
       .join(" ");

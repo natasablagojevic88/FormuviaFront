@@ -297,6 +297,75 @@ td.cell-saved {
   }
 }
 
+/* The value of a codebook cell and the small button that opens that record. */
+.with-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.with-info .value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.with-info .info {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--c-text-faint);
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0;
+  transition: background-color 0.15s, color 0.15s, opacity 0.15s;
+}
+
+/* It stays out of the way until the row is touched, so the list is not full of icons. */
+tr.mat-mdc-row:hover .with-info .info,
+tr.mat-mdc-row.row-highlight .with-info .info,
+.with-info .info:focus-visible {
+  opacity: 1;
+}
+
+.with-info .info:hover {
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+}
+
+@media (max-width: 900px) {
+  /* no hover on a touch screen */
+  .with-info .info {
+    opacity: 1;
+  }
+}
+
+/* A chained codebook takes several selects, so the row being edited grows downwards. */
+.cell-chain {
+  display: block;
+  width: 100%;
+  min-width: 190px;
+  padding: 4px 0;
+}
+
+tr.mat-mdc-row.row-editing,
+tr.mat-mdc-row.row-editing td.mat-mdc-cell {
+  height: auto;
+}
+
+tr.mat-mdc-row.row-editing td.mat-mdc-cell {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  vertical-align: top;
+}
+
 .cell-date,
 .filter-date {
   display: block;
@@ -514,12 +583,6 @@ tr.mat-mdc-row.row-highlight td:first-child {
   color: var(--c-text-faint);
   font-size: 14px;
   text-align: center;
-}
-
-.empty-cell i {
-  display: block;
-  margin-bottom: 10px;
-  font-size: 28px;
 }
 
 .paginator {

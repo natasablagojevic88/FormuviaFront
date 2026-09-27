@@ -43,7 +43,7 @@ Around that sits everything a business application needs anyway: accounts and ro
 Formuvia is still being built, and this guide describes what actually works rather than what is planned. Two things are worth knowing before you start:
 
 - The **built-in screens** — Users, Roles and Model — are complete, and so are the subtables you reach from a row's ⋯ menu.
-- A table you define in the **Model** is created in the database, appears in the menu, and opens as a list you can filter, sort, page through and export. Its records are entered, changed and deleted through the form you laid out in [Form design](/form-design). The ⋯ button on a row opens the history of that record, the same as everywhere else. What such a table does not have yet is editing straight in the list (double-click and *Quick edit*) and subtables in the menu.
+- A table you define in the **Model** is created in the database, appears in the menu, and opens as a list you can filter, sort, page through and export. Its records are entered, changed and deleted through the form you laid out in [Form design](/form-design). The ⋯ button on a row opens the history of that record and the subtables of that table, the same as everywhere else. What such a table does not have yet is editing straight in the list — double-click and *Quick edit*.
 
 Each page of this guide says which parts of what you define are already in effect.
 

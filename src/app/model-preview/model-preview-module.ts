@@ -3,12 +3,13 @@ import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 
 import { ModelPreviewRoutingModule } from "./model-preview-routing-module";
+import { MatMenuModule } from "@angular/material/menu";
 import { SharedModule } from "../shared/shared-module";
 import { ModelPreviewPage } from "./model-preview-page";
 import { PreviewFormDialog } from "./preview-form-dialog/preview-form-dialog";
 
 @NgModule({
   declarations: [ModelPreviewPage, PreviewFormDialog],
-  imports: [CommonModule, FormsModule, ModelPreviewRoutingModule, SharedModule],
+  imports: [CommonModule, FormsModule, MatMenuModule, ModelPreviewRoutingModule, SharedModule],
 })
 export class ModelPreviewModule {}
