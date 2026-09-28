@@ -137,7 +137,8 @@
 
       @for (column of cellColumns(); track column.fieldName) {
         <ng-container [matColumnDef]="column.fieldName">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header [class.cell-center]="isCentered(column.columnType)"
+          <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="noSort(column)"
+            [class.cell-center]="isCentered(column.columnType)"
             [class.cell-number]="isNumber(column.columnType)">{{ column.description
             }}@if (editMode() && column.required) {<span class="required-mark">*</span>}</th>
           <td mat-cell *matCellDef="let row" [attr.data-label]="column.description" [class.cell-center]="isCentered(column.columnType)"

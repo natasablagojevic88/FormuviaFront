@@ -34,6 +34,9 @@ export interface ModelColumn {
   rowIndex: number;
   columnIndex: number;
   colspan: number;
+  /** Order of this column in the sorting a table opens with; empty means it takes no part in it. */
+  initSortOrder?: number | null;
+  initSortDirection?: "ASC" | "DESC" | null;
 }
 
 /** Limits from ModelColumnDTO (@Min/@Max on the server). */
@@ -41,6 +44,7 @@ export const COLUMN_LIMITS = {
   rowIndex: { min: 1 },
   columnIndex: { min: 1, max: 12 },
   colspan: { min: 1, max: 12 },
+  initSortOrder: { min: 1 },
 };
 
 /** Code of the column: the same pattern as on the server. */
@@ -60,5 +64,7 @@ export function newColumn(modelId: string, rowIndex: number, columnIndex: number
     rowIndex,
     columnIndex,
     colspan: 1,
+    initSortOrder: null,
+    initSortDirection: null,
   };
 }

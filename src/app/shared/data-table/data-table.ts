@@ -169,8 +169,16 @@ export class DataTable {
   readonly hasUpdate = signal(true);
   readonly hasDelete = signal(true);
   // A phone has no table header, so the sorting is chosen in the toolbar.
+  /**
+   * A column pointing at a codebook holds the identifier of the record, not the text shown, so
+   * sorting by it would order by something the reader cannot see. It is therefore not offered.
+   */
+  readonly noSort = (column: DatabaseColumn) => !!column.modelId;
+
   readonly sortOptions = computed<SelectOption[]>(() =>
-    this.columns().map((column) => ({ value: column.fieldName, label: column.description })));
+    this.columns()
+      .filter((column) => !this.noSort(column))
+      .map((column) => ({ value: column.fieldName, label: column.description })));
   readonly sortField = computed(() => this.order()?.fieldName ?? "");
   readonly sortAscending = computed(() => this.order()?.direction !== "DESC");
   editValue = "";

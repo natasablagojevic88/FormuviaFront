@@ -34,7 +34,7 @@ All conditions must match at once. **Apply** runs the search and the conditions 
 
 ### Sorting and paging
 
-Click a column header to sort by it, click again to reverse. At the bottom you choose how many rows fit on a page and move between pages.
+Click a column header to sort by it, click again to reverse. A column that points at a codebook is not sorted: it holds the identifier of the record, not the text you see, so sorting by it would order the list by something invisible. At the bottom you choose how many rows fit on a page and move between pages.
 
 Filtering, sorting and paging all happen on the server, so a table with a lot of rows stays as fast as a small one.
 

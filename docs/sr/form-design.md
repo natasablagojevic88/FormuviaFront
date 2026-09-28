@@ -42,6 +42,8 @@ Kad kolona jednom postoji, njen naziv je zaključan — kao i tip podatka, i ši
 | **Datum** | dan |
 | **Datum i vreme** | dan i vreme |
 | **Vreme** | samo doba dana, bez datuma |
+
+**Redosled sortiranja** i **Smer** određuju kako se tabela otvara: kolona sa redosledom 1 sortira se prva, pa 2, i tako redom; ostavite redosled prazan i kolona u tome ne učestvuje. Kolona vezana za šifarnik ne može da se koristi, jer u njoj stoji identifikator, a ne tekst koji se prikazuje.
 | **Veza na šifarnik** | vrednost koja se bira iz druge tabele |
 
 ### Veza na šifarnik

@@ -38,6 +38,13 @@ export class ColumnDialog implements OnInit {
   readonly typeOptions = computed<SelectOption[]>(() =>
     TYPES.map((type) => ({ value: type, label: this.translate.get("ui.column.type." + type) })));
 
+  /** Which way the table sorts by this column when it is opened. */
+  readonly directionOptions = computed<SelectOption[]>(() =>
+    ["ASC", "DESC"].map((direction) => ({
+      value: direction,
+      label: this.translate.get("ui.column.direction." + direction),
+    })));
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ColumnDialogData,
     private dialogRef: MatDialogRef<ColumnDialog, ModelColumn | "deleted" | false>,
@@ -147,6 +154,18 @@ export class ColumnDialog implements OnInit {
     if (this.isBoolean) {
       // yes/no has no list of values of its own
       this.column.listOfValuesSql = null;
+    }
+    if (this.isCodebook) {
+      // a codebook column holds an identifier, so a table cannot open sorted by it
+      this.column.initSortOrder = null;
+      this.column.initSortDirection = null;
+    }
+    if (!this.column.initSortOrder) {
+      // a column that takes no part in the sorting has no direction either (the server clears it too)
+      this.column.initSortOrder = null;
+      this.column.initSortDirection = null;
+    } else if (!this.column.initSortDirection) {
+      this.column.initSortDirection = "ASC";
     }
     this.saving.set(true);
     this.sendRequest.post(ApiRoute.modelColumn, this.column)

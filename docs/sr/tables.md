@@ -34,7 +34,7 @@ Svi uslovi moraju da važe istovremeno. **Primeni** pokreće pretragu, a uslovi 
 
 ### Sortiranje i straničenje
 
-Klik na zaglavlje kolone sortira po njoj, drugi klik obrće redosled. Na dnu birate koliko redova staje na stranu i krećete se kroz strane.
+Klik na zaglavlje kolone sortira po njoj, drugi klik obrće redosled. Kolona koja pokazuje na šifarnik se ne sortira: u njoj stoji identifikator zapisa, a ne tekst koji vidite, pa bi sortiranje poređalo listu po nečemu nevidljivom. Na dnu birate koliko redova staje na stranu i krećete se kroz strane.
 
 Filtriranje, sortiranje i straničenje rade na serveru, pa tabela sa mnogo redova ostaje brza kao i mala.
 

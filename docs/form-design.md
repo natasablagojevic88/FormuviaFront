@@ -42,6 +42,8 @@ Once the column exists, its name is locked — as is the data type, and the code
 | **Date** | a day |
 | **Date and time** | a day and a time |
 | **Time** | a time of day on its own, without a date |
+
+**Sorting order** and **Direction** decide how the table opens: the column with order 1 is sorted first, then 2, and so on; leave the order empty and the column takes no part in it. A column linked to a codebook cannot be used, because it holds an identifier rather than the text shown.
 | **Link to a codebook** | a value picked from another table |
 
 ### Link to a codebook

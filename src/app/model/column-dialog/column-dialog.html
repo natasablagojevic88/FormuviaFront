@@ -107,6 +107,21 @@
         </label>
       </div>
 
+      <!-- sorting the table opens with: the order of this column, and which way it goes -->
+      <div class="fd-field">
+        <label class="fd-label" for="initSortOrder">{{ label('initSortOrder') }}</label>
+        <input id="initSortOrder" name="initSortOrder" type="number" class="fd-input"
+          [(ngModel)]="column.initSortOrder" [min]="limits.initSortOrder.min" [disabled]="isCodebook" />
+        <span class="fd-help">{{ (isCodebook ? 'ui.column.initSortCodebook' : 'ui.column.initSortHelp') | t }}</span>
+      </div>
+
+      <div class="fd-field">
+        <span class="fd-label">{{ label('initSortDirection') }}</span>
+        <app-search-select [options]="directionOptions()" [(ngModel)]="column.initSortDirection"
+          [ngModelOptions]="{ standalone: true }" [disabled]="isCodebook || !column.initSortOrder"
+          icon="fa-solid fa-arrow-down-a-z" [ariaLabel]="label('initSortDirection')" />
+      </div>
+
       <div class="fd-field">
         <label class="switch">
           <input type="checkbox" name="editable" [(ngModel)]="column.editable" />
