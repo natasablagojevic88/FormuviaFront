@@ -90,6 +90,10 @@ export class ModelPreviewPage {
   /** History of a row: model tables have a path of their own instead of a DTO class name. */
   readonly historyUrl = (id: string) => ApiRoute.modelPreviewHistory(this.modelId(), id);
 
+  /** The file stored in one column of a row. */
+  readonly fileUrl = (id: string, fieldName: string) =>
+    ApiRoute.modelPreviewDownload(this.modelId(), id, fieldName);
+
   /** One row, read when coming back from a subtable so the list itself is not loaded again. */
   readonly rowUrl = (id: string) => ApiRoute.modelPreviewRow(this.modelId(), id);
 
@@ -205,7 +209,7 @@ export class ModelPreviewPage {
           this.table().showNew(saved.id);
         } else {
           // edit: only that row is refreshed, the table is not loaded again
-          this.table().showChanged(saved);
+          this.table().showChanged(saved, result.fileChanged);
         }
       });
   }

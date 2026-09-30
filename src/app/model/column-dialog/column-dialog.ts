@@ -19,7 +19,7 @@ export interface ColumnDialogData {
 }
 
 const TYPES: ModelColumnType[] = [
-  "STRING", "BOOLEAN", "INTEGER", "LONG", "BIGDECIMAL", "LOCALDATE", "LOCALDATETIME", "LOCALTIME", "UUID",
+  "STRING", "BOOLEAN", "INTEGER", "LONG", "BIGDECIMAL", "LOCALDATE", "LOCALDATETIME", "LOCALTIME", "UUID", "FILE",
 ];
 
 @Component({
@@ -85,6 +85,23 @@ export class ColumnDialog implements OnInit {
     return this.column.columnType === "STRING";
   }
 
+  /** A file field holds the identifier of the stored file, so it has no list of values of its own. */
+  get isFile(): boolean {
+    return this.column.columnType === "FILE";
+  }
+
+  /** A column whose value is an identifier cannot be sorted by in a way that means anything. */
+  get sortImpossible(): boolean {
+    return this.isCodebook || this.isFile;
+  }
+
+  initSortHint(): string {
+    if (this.isCodebook) {
+      return "ui.column.initSortCodebook";
+    }
+    return this.isFile ? "ui.column.initSortFile" : "ui.column.initSortHelp";
+  }
+
   /** A yes/no field has no list of values - its values are already yes and no (the server clears it too). */
   get isBoolean(): boolean {
     return this.column.columnType === "BOOLEAN";
@@ -96,11 +113,11 @@ export class ColumnDialog implements OnInit {
 
   /** The server accepts only a SELECT query (JSqlParser), so it is checked here as well. */
   defaultSqlInvalid(): boolean {
-    return this.notSelect(this.column.defaultValueSql);
+    return !this.isFile && this.notSelect(this.column.defaultValueSql);
   }
 
   listSqlInvalid(): boolean {
-    return !this.isBoolean && this.notSelect(this.column.listOfValuesSql);
+    return !this.isBoolean && !this.isFile && this.notSelect(this.column.listOfValuesSql);
   }
 
   private notSelect(sql?: string | null): boolean {
@@ -155,8 +172,15 @@ export class ColumnDialog implements OnInit {
       // yes/no has no list of values of its own
       this.column.listOfValuesSql = null;
     }
-    if (this.isCodebook) {
-      // a codebook column holds an identifier, so a table cannot open sorted by it
+    if (this.isFile) {
+      // a file is only chosen and stored: no query, no label of a codebook, no sorting, no long text
+      this.column.defaultValueSql = null;
+      this.column.listOfValuesSql = null;
+      this.column.inDescriptionForCodebook = false;
+      this.column.textArea = false;
+    }
+    if (this.sortImpossible) {
+      // the column holds an identifier, so a table cannot open sorted by it
       this.column.initSortOrder = null;
       this.column.initSortDirection = null;
     }

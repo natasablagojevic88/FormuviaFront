@@ -4,7 +4,7 @@ import { Language } from "../../services/language";
 import { SendRequest } from "../../services/send-request";
 import { ApiRoute } from "../../shared/ApiRoute";
 import { SelectOption } from "../../shared/search-select/search-select";
-import { ComboOption, SubTable } from "../../shared/database-table";
+import { ComboOption, FileValue, fileId, SubTable } from "../../shared/database-table";
 import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
 import { Translate } from "../../services/translate";
 import { Notify } from "../../services/notify";
@@ -45,6 +45,11 @@ export interface PreviewFormDialogData {
 export interface PreviewFormResult {
   record: any;
   goTo?: SubTable;
+  /**
+   * A file was sent with the record. A file that replaces another one keeps the identifier of the
+   * one before it (the server only adds a new version), so the list cannot see the change by itself.
+   */
+  fileChanged?: boolean;
 }
 
 /**
@@ -80,6 +85,8 @@ export class PreviewFormDialog implements OnInit {
 
   /** The last record stored while the dialog stayed open; the list is refreshed by it on closing. */
   private lastSaved: any = null;
+  /** A file was sent by one of those saves, so the list has to read that row again. */
+  private lastFileChanged = false;
 
   /** Records of the codebooks above the fields, once per model. */
   private parentCodebook: Record<string, ComboOption[]> = {};
@@ -205,6 +212,16 @@ export class PreviewFormDialog implements OnInit {
     });
   }
 
+  /**
+   * A file is taken from the record it is stored with, so it is offered only on an existing record
+   * and only while the field still holds the file that was stored.
+   */
+  downloadUrl(column: PreviewColumn): string | null {
+    return this.data.id && fileId(this.values[column.code])
+      ? ApiRoute.modelPreviewDownload(this.data.modelId, this.data.id, column.code)
+      : null;
+  }
+
   /** A required field with no value; a switch always has a value (yes or no). */
   private isEmpty(column: PreviewColumn): boolean {
     if (column.columnType === "BOOLEAN") {
@@ -289,6 +306,10 @@ export class PreviewFormDialog implements OnInit {
           : fromFieldValue(this.values[column.code], column))
     );
 
+    const fileChanged = this.fields().some(
+      (column) => column.columnType === "FILE" && !!(record[column.code] as FileValue)?.fileUploadFile
+    );
+
     this.saving.set(true);
     this.sendRequest
       .post(ApiRoute.modelPreviewUpdate(this.data.modelId), record)
@@ -297,11 +318,12 @@ export class PreviewFormDialog implements OnInit {
         this.notify.success(this.translate.get("ui.saved"));
 
         if (!stay) {
-          this.dialogRef.close({ record: stored, goTo });
+          this.dialogRef.close({ record: stored, goTo, fileChanged });
           return;
         }
 
         this.lastSaved = stored;
+        this.lastFileChanged = this.lastFileChanged || fileChanged;
         this.saving.set(false);
         this.data.id = stored[PREVIEW_ID_FIELD] ?? this.data.id;
         this.loadForm();
@@ -311,7 +333,9 @@ export class PreviewFormDialog implements OnInit {
 
   /** Closing after a save that kept the dialog open still refreshes the list behind it. */
   close(): void {
-    this.dialogRef.close(this.lastSaved ? { record: this.lastSaved } : false);
+    this.dialogRef.close(
+      this.lastSaved ? { record: this.lastSaved, fileChanged: this.lastFileChanged } : false
+    );
   }
 
   /** Once something has been stored there is nothing left to cancel. */

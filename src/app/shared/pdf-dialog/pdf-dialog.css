@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+/* The viewer takes the whole dialog; only the header stays above it. */
+.pdf-body {
+  height: min(78vh, 900px);
+  margin: 0 -8px -8px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--c-surface-3);
+}
+
+.pdf-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* On a phone the dialog is as tall as the screen allows, so the page is still readable. */
+@media (max-width: 600px) {
+  .pdf-body {
+    height: 70vh;
+  }
+}

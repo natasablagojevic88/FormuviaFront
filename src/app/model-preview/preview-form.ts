@@ -1,4 +1,4 @@
-import { ColumnType, ComboOption, ParentLevel } from "../shared/database-table";
+import { ColumnType, ComboOption, FileValue, fileId, ParentLevel } from "../shared/database-table";
 import { isDecimalType, isNumberText, parseDecimalText, toDecimalText } from "../shared/number-format";
 
 /** The id column and the column that links to the parent row; the server adds them before the fields. */
@@ -17,6 +17,8 @@ export interface PreviewColumn {
   length?: number;
   nullable?: boolean;
   editable?: boolean;
+  /** false: the field is not drawn on the form, but its value stays in the record. */
+  showable?: boolean;
   value?: any;
   listOfValues?: ComboOption[];
   /** Codebook this field points at. */
@@ -54,7 +56,7 @@ export interface FormLayout {
  * shown on the form, but its value stays in the record and is sent when it is saved.
  */
 export function hasPlace(column: PreviewColumn): boolean {
-  return (column.rowIndex ?? 0) > 0 && (column.columnIndex ?? 0) > 0;
+  return column.showable !== false && (column.rowIndex ?? 0) > 0 && (column.columnIndex ?? 0) > 0;
 }
 
 /** A field has a list of values when it is a codebook or when its list is given by a query. */
@@ -151,6 +153,10 @@ export function toFieldValue(value: any, column: PreviewColumn, language: string
   if (column.columnType === "LOCALTIME") {
     return String(value).substring(0, 5);
   }
+  // a file keeps the whole record the server sent, so the field can show its name
+  if (column.columnType === "FILE") {
+    return value;
+  }
   return String(value);
 }
 
@@ -158,6 +164,10 @@ export function toFieldValue(value: any, column: PreviewColumn, language: string
 export function fromFieldValue(value: any, column: PreviewColumn): any {
   if (column.columnType === "BOOLEAN") {
     return value === true || value === "true";
+  }
+  // a file goes back whole: the server needs the identifier of the upload as well as the stored file
+  if (column.columnType === "FILE") {
+    return value && (fileId(value) || (value as FileValue).fileUploadFile) ? value : null;
   }
   const text = value === null || value === undefined ? "" : String(value).trim();
   if (text === "") {

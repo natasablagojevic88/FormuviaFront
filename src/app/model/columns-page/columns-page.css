@@ -365,3 +365,9 @@ app-page-header {
     width: 100%;
   }
 }
+
+/* A field that is not drawn on the form: it keeps its place here, but it is plainly marked. */
+.field.not-on-form {
+  border-style: dashed;
+  opacity: 0.65;
+}

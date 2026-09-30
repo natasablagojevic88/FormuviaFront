@@ -42,9 +42,20 @@ Once the column exists, its name is locked — as is the data type, and the code
 | **Date** | a day |
 | **Date and time** | a day and a time |
 | **Time** | a time of day on its own, without a date |
-
-**Sorting order** and **Direction** decide how the table opens: the column with order 1 is sorted first, then 2, and so on; leave the order empty and the column takes no part in it. A column linked to a codebook cannot be used, because it holds an identifier rather than the text shown.
+| **File** | a document kept with the record |
 | **Link to a codebook** | a value picked from another table |
+
+**Sorting order** and **Direction** decide how the table opens: the column with order 1 is sorted first, then 2, and so on; leave the order empty and the column takes no part in it. A column that holds an identifier — a link to a codebook, or a file — cannot be used, because what is stored in it is not the text shown.
+
+### File
+
+The field is a button that opens the file picker of your computer or phone. The file is sent to the server as soon as you choose it, and the record keeps the file that was stored; the name of the file stands beside the button, and **×** removes it from the field. Once the record is saved, a small **download** button appears beside the name and hands you the file back. A PDF also carries an **eye**: it opens in a reader inside the application, so it need not be saved to be read.
+
+Choose another file on a record that already has one and the new one takes its place as the file of that record. The one before it is not thrown away: Formuvia keeps it as an earlier version of that file, even though only the current one is offered for reading and download.
+
+In the list such a column shows a paperclip with the name of the file, and the same two buttons. A file cannot be sorted or filtered by, and it is not changed by a double-click in the table: it is changed on the form, where it can be chosen.
+
+A file column is only chosen and stored, so it has no default value query, no list of values, no *Long text* and no part in the label of a codebook — those options are simply not offered for it.
 
 ### Link to a codebook
 
@@ -72,12 +83,15 @@ The chain goes as deep as the model does, and it works the same in the entry for
 
 Formuvia will not let you put a field where another one already is, or let one hang off the edge of the grid.
 
+A field that is switched off with *Show on the form* keeps its place in the design — it is drawn with a dashed border and marked with a small minus, so you can see it is there without looking for it in every field.
+
 ## Options
 
 | Option | Effect |
 |---|---|
 | **Optional** | the field may be left empty; switch it off and it is required |
 | **Show in the table** | whether the column appears in the list, or only in the form |
+| **Show on the form** | switch it off and the field is not drawn on the entry form at all; the value the record already holds stays as it is, and a new record can only get one from the default value query |
 | **Can be changed** | switch it off and the field is shown but cannot be typed in, on entry or later; its value comes from the default value query |
 | **Long text** | a multi-line box instead of a single line (text fields only) |
 | **Part of the label in a codebook** | see below |

@@ -105,20 +105,28 @@
           <span class="switch-track"><span class="switch-thumb"></span></span>
           <span class="switch-text">{{ label('showInTable') }}</span>
         </label>
+        <label class="switch">
+          <input type="checkbox" name="showable" [(ngModel)]="column.showable" />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span class="switch-text">{{ label('showable') }}</span>
+        </label>
+        @if (!column.showable) {
+          <span class="fd-help">{{ (isFile ? 'ui.column.showableFile' : 'ui.column.showableHelp') | t }}</span>
+        }
       </div>
 
       <!-- sorting the table opens with: the order of this column, and which way it goes -->
       <div class="fd-field">
         <label class="fd-label" for="initSortOrder">{{ label('initSortOrder') }}</label>
         <input id="initSortOrder" name="initSortOrder" type="number" class="fd-input"
-          [(ngModel)]="column.initSortOrder" [min]="limits.initSortOrder.min" [disabled]="isCodebook" />
-        <span class="fd-help">{{ (isCodebook ? 'ui.column.initSortCodebook' : 'ui.column.initSortHelp') | t }}</span>
+          [(ngModel)]="column.initSortOrder" [min]="limits.initSortOrder.min" [disabled]="sortImpossible" />
+        <span class="fd-help">{{ initSortHint() | t }}</span>
       </div>
 
       <div class="fd-field">
         <span class="fd-label">{{ label('initSortDirection') }}</span>
         <app-search-select [options]="directionOptions()" [(ngModel)]="column.initSortDirection"
-          [ngModelOptions]="{ standalone: true }" [disabled]="isCodebook || !column.initSortOrder"
+          [ngModelOptions]="{ standalone: true }" [disabled]="sortImpossible || !column.initSortOrder"
           icon="fa-solid fa-arrow-down-a-z" [ariaLabel]="label('initSortDirection')" />
       </div>
 
@@ -137,7 +145,7 @@
         }
       </div>
 
-      @if (!isCodebook) {
+      @if (!isCodebook && !isFile) {
         <div class="fd-field fd-field-wide">
           <label class="switch">
             <input type="checkbox" name="inDescriptionForCodebook" [(ngModel)]="column.inDescriptionForCodebook" />
@@ -148,19 +156,21 @@
         </div>
       }
 
-      <div class="fd-field fd-field-wide">
-        <label class="fd-label" for="defaultValueSql">{{ label('defaultValueSql') }}</label>
-        <textarea id="defaultValueSql" name="defaultValueSql" class="fd-input code sql" rows="2"
-          [(ngModel)]="column.defaultValueSql" autocomplete="off" spellcheck="false"
-          [class.fd-input-error]="defaultSqlInvalid()" [placeholder]="'ui.column.defaultHint' | t"></textarea>
-        @if (defaultSqlInvalid()) {
-          <span class="fd-field-error">{{ 'ui.column.defaultInvalid' | t }}</span>
-        } @else {
-          <span class="fd-help">{{ 'ui.column.defaultHelp' | t }}</span>
-        }
-      </div>
+      @if (!isFile) {
+        <div class="fd-field fd-field-wide">
+          <label class="fd-label" for="defaultValueSql">{{ label('defaultValueSql') }}</label>
+          <textarea id="defaultValueSql" name="defaultValueSql" class="fd-input code sql" rows="2"
+            [(ngModel)]="column.defaultValueSql" autocomplete="off" spellcheck="false"
+            [class.fd-input-error]="defaultSqlInvalid()" [placeholder]="'ui.column.defaultHint' | t"></textarea>
+          @if (defaultSqlInvalid()) {
+            <span class="fd-field-error">{{ 'ui.column.defaultInvalid' | t }}</span>
+          } @else {
+            <span class="fd-help">{{ 'ui.column.defaultHelp' | t }}</span>
+          }
+        </div>
+      }
 
-      @if (!isBoolean) {
+      @if (!isBoolean && !isFile) {
         <div class="fd-field fd-field-wide">
           <label class="fd-label" for="listOfValuesSql">{{ label('listOfValuesSql') }}</label>
           <textarea id="listOfValuesSql" name="listOfValuesSql" class="fd-input code sql" rows="2"

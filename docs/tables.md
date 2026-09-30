@@ -34,7 +34,7 @@ All conditions must match at once. **Apply** runs the search and the conditions 
 
 ### Sorting and paging
 
-Click a column header to sort by it, click again to reverse. A column that points at a codebook is not sorted: it holds the identifier of the record, not the text you see, so sorting by it would order the list by something invisible. At the bottom you choose how many rows fit on a page and move between pages.
+Click a column header to sort by it, click again to reverse. A column that points at a codebook, and a column holding a file, are not sorted: they hold an identifier, not the text you see, so sorting by them would order the list by something invisible. At the bottom you choose how many rows fit on a page and move between pages.
 
 Filtering, sorting and paging all happen on the server, so a table with a lot of rows stays as fast as a small one.
 
@@ -54,13 +54,15 @@ The labels on that form come from the server, in the language you chose, so the 
 
 A value picked from a list is cleared with the **×** at the right end of the field — that works in the form, in the table and in the filters alike.
 
+A field of the *File* type is a button that opens the file picker. The file goes to the server as soon as you choose it, its name then stands beside the button, and **×** takes it out of the field. A file stored with the record carries a **download** button beside its name, on the form and on the row in the list alike, so the file can be taken without opening the record. A PDF carries an **eye** as well, which opens it in a reader inside the application.
+
 A field that points at a codebook carries a small **ⓘ** beside it, both on the form and on the row in the list. It opens the record behind the chosen value — the same form, with every field locked and nothing to save — so you can check what is behind a code without leaving what you were doing.
 
 ### Straight in the table
 
 Double-click a cell, change the value, `Enter` saves it and `Esc` cancels. On a phone, tap the row first and then the cell.
 
-Only cells that may be changed react to a double-click; a column the server marks as read-only ignores it.
+Only cells that may be changed react to a double-click; a column the server marks as read-only ignores it, and so does a column holding a file — a file is chosen on the form.
 
 ### Quick edit
 

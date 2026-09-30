@@ -14,11 +14,13 @@ import { DataTable } from "./data-table/data-table";
 import { HistoryPanel } from "./history-panel/history-panel";
 import { IconPickerDialog } from "./icon-picker-dialog/icon-picker-dialog";
 import { IconSelect } from "./icon-select/icon-select";
+import { FileField } from "./file-field/file-field";
+import { PdfDialog } from "./pdf-dialog/pdf-dialog";
 import { ConfirmDialog } from "./confirm-dialog/confirm-dialog";
 import { AdvancedSearchDialog } from "./advanced-search-dialog/advanced-search-dialog";
 
 @NgModule({
-  declarations: [PageHeader, DataTable, ConfirmDialog, AdvancedSearchDialog, HistoryPanel, IconPickerDialog, IconSelect],
+  declarations: [PageHeader, DataTable, ConfirmDialog, AdvancedSearchDialog, HistoryPanel, IconPickerDialog, IconSelect, FileField, PdfDialog],
   imports: [
     CommonModule,
     FormsModule,
@@ -38,6 +40,8 @@ import { AdvancedSearchDialog } from "./advanced-search-dialog/advanced-search-d
     DataTable,
     ConfirmDialog,
     IconSelect,
+    FileField,
+    PdfDialog,
     HistoryPanel
   ]
 })

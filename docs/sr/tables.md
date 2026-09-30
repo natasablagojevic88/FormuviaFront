@@ -34,7 +34,7 @@ Svi uslovi moraju da važe istovremeno. **Primeni** pokreće pretragu, a uslovi 
 
 ### Sortiranje i straničenje
 
-Klik na zaglavlje kolone sortira po njoj, drugi klik obrće redosled. Kolona koja pokazuje na šifarnik se ne sortira: u njoj stoji identifikator zapisa, a ne tekst koji vidite, pa bi sortiranje poređalo listu po nečemu nevidljivom. Na dnu birate koliko redova staje na stranu i krećete se kroz strane.
+Klik na zaglavlje kolone sortira po njoj, drugi klik obrće redosled. Kolona koja pokazuje na šifarnik i kolona sa fajlom se ne sortiraju: u njima stoji identifikator, a ne tekst koji vidite, pa bi sortiranje poređalo listu po nečemu nevidljivom. Na dnu birate koliko redova staje na stranu i krećete se kroz strane.
 
 Filtriranje, sortiranje i straničenje rade na serveru, pa tabela sa mnogo redova ostaje brza kao i mala.
 
@@ -54,13 +54,15 @@ Nazivi polja na toj formi dolaze sa servera, na jeziku koji ste izabrali, pa for
 
 Vrednost izabrana iz liste poništava se **×** na desnom kraju polja — isto radi i na formi, i u tabeli, i u filterima.
 
+Polje tipa *Fajl* je dugme koje otvara izbor fajla. Fajl ide na server odmah kad ga izaberete, njegov naziv tada stoji pored dugmeta, a **×** ga vadi iz polja. Fajl koji je snimljen sa zapisom ima pored naziva dugme **preuzmi**, i na formi i na redu u listi, pa se fajl uzima bez otvaranja zapisa. PDF ima i **oko**, koje ga otvara u čitaču unutar aplikacije.
+
 Polje koje pokazuje na šifarnik ima pored sebe malo **ⓘ**, i na formi i na redu u listi. Njime se otvara zapis iza izabrane vrednosti — ista forma, sa svim poljima zaključanim i bez snimanja — pa možete da proverite šta stoji iza šifre bez napuštanja onoga što radite.
 
 ### Pravo u tabeli
 
 Dvoklik na ćeliju, izmenite vrednost, `Enter` snima a `Esc` odustaje. Na telefonu prvo dodirnete red pa onda ćeliju.
 
-Na dvoklik reaguju samo ćelije koje smeju da se menjaju; kolonu koju server označi kao nepromenljivu dvoklik ne otvara.
+Na dvoklik reaguju samo ćelije koje smeju da se menjaju; kolonu koju server označi kao nepromenljivu dvoklik ne otvara, kao ni kolonu sa fajlom — fajl se bira na formi.
 
 ### Brza izmena
 

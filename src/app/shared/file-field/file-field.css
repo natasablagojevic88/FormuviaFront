@@ -1,0 +1,113 @@
+:host {
+  display: block;
+}
+
+.ff {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 48px;
+}
+
+/* The real field stays hidden; the file is chosen through the button. */
+.ff-picker {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ff-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.ff-button:hover:not(:disabled) {
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+}
+
+.ff-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Taking the stored file, next to the button that chooses a new one. */
+.ff-get {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--c-text-faint);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.ff-get:hover:not(:disabled) {
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+}
+
+.ff-name {
+  flex: 1;
+  min-width: 0;
+  color: var(--c-text-muted);
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ff-clear {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--c-text-faint);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.ff-clear:hover {
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+}
+
+.ff-disabled .ff-name {
+  opacity: 0.7;
+}
+
+/* On a phone the name goes under the button so nothing is cut off. */
+@media (max-width: 600px) {
+  .ff {
+    flex-wrap: wrap;
+  }
+
+  .ff-name {
+    flex-basis: 100%;
+  }
+}

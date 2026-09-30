@@ -13,5 +13,5 @@
   }
 </app-page-header>
 
-<app-data-table [url]="tableUrl()" [trail]="trail()" [restoreState]="restore()" [historyUrl]="historyUrl" [rowUrl]="rowUrl" (loaded)="onLoaded($event)"
+<app-data-table [url]="tableUrl()" [trail]="trail()" [restoreState]="restore()" [historyUrl]="historyUrl" [rowUrl]="rowUrl" [fileUrl]="fileUrl" (loaded)="onLoaded($event)"
   (edit)="edit($event)" (remove)="remove($event)" (info)="showRecord($event)"></app-data-table>

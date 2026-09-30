@@ -8,7 +8,8 @@ import { ApiRoute } from "../ApiRoute";
 import { Translate } from "../../services/translate";
 import { Language } from "../../services/language";
 import { AdvancedSearchDialog, AdvancedSearchDialogData } from "../advanced-search-dialog/advanced-search-dialog";
-import { ComboOption, DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, QueryDatabaseOrder, SubTable, TableChild } from "../database-table";
+import { ComboOption, DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, fileId, fileName, isPdf, QueryDatabaseOrder, SubTable, TableChild } from "../database-table";
+import { PdfDialog, PdfDialogData } from "../pdf-dialog/pdf-dialog";
 import { HistoryPanel } from "../history-panel/history-panel";
 import { Criterion, inputModeFor, inputTypeFor, isEnum, needsValue, quickFilter, toFilter } from "../filter-operations";
 import { chainLevels, ChainLevel } from "../parent-chain";
@@ -53,9 +54,12 @@ interface CellRef {
   fieldName: string;
 }
 
-/** A UUID is changed only when it has a list of values (a foreign key); the id of the row itself is never changed. */
+/**
+ * A UUID is changed only when it has a list of values (a foreign key); the id of the row itself is
+ * never changed. A file is changed on the form, where it can be chosen and sent, not in a cell.
+ */
 function isEditableType(column: DatabaseColumn): boolean {
-  return column.columnType !== "UUID" || isEnum(column);
+  return column.columnType !== "FILE" && (column.columnType !== "UUID" || isEnum(column));
 }
 
 /** Value of a row -> text for the edit field (inputs and selects work with strings). */
@@ -124,6 +128,8 @@ export class DataTable {
    * user returns to, instead of loading the whole page again.
    */
   readonly rowUrl = input<((id: string) => string) | null>(null);
+  /** Path to the file stored in a column of a row; without it a file column only shows its name. */
+  readonly fileUrl = input<((id: string, fieldName: string) => string) | null>(null);
   /** Path to the history of a row for tables without a className (tables from the model). */
   readonly historyUrl = input<((id: string) => string) | null>(null);
   readonly edit = output<any>();
@@ -173,7 +179,8 @@ export class DataTable {
    * A column pointing at a codebook holds the identifier of the record, not the text shown, so
    * sorting by it would order by something the reader cannot see. It is therefore not offered.
    */
-  readonly noSort = (column: DatabaseColumn) => !!column.modelId;
+  // A codebook column holds an identifier, and so does a file: sorting by it would mean nothing.
+  readonly noSort = (column: DatabaseColumn) => !!column.modelId || column.columnType === "FILE";
 
   readonly sortOptions = computed<SelectOption[]>(() =>
     this.columns()
@@ -189,6 +196,8 @@ export class DataTable {
   readonly editRowId = signal<string | null>(null);
   readonly draftRow = signal<any | null>(null);
   readonly savingRow = signal(false);
+  /** A file is being taken; the buttons wait so the same file is not asked for twice. */
+  readonly downloading = signal(false);
   rowValues: Record<string, string> = {};
   readonly rowEditMode = computed(() => this.editRowId() !== null || this.draftRow() !== null);
   readonly canEditMode = computed(() => this.hasUpdate() && !!this.saveUrl() && this.editColumns().length > 0);
@@ -264,7 +273,10 @@ export class DataTable {
     return options;
   });
 
-  readonly searchableColumns = computed(() => this.allColumns().filter((column) => column.searchable !== false));
+  // A file column carries a list of values (the names of the files), but it is not searched by:
+  // the server has no branch for a filter on it.
+  readonly searchableColumns = computed(() =>
+    this.allColumns().filter((column) => column.searchable !== false && column.columnType !== "FILE"));
 
   private requestId = 0;
   private filterTimer?: ReturnType<typeof setTimeout>;
@@ -595,6 +607,38 @@ export class DataTable {
     this.info.emit({ column, id: String(row[column.fieldName]) });
   }
 
+  /** A PDF of a row is read in the viewer, without opening the record either. */
+  canViewFile(row: any, column: DatabaseColumn): boolean {
+    return !!this.fileUrl() && !!row[column.fieldName] && isPdf(row[column.fieldName], this.format(row, column));
+  }
+
+  viewFile(event: Event, row: any, column: DatabaseColumn): void {
+    event.stopPropagation();
+    const url = this.fileUrl()?.(row[ID_FIELD], column.fieldName);
+    if (!url || this.downloading()) {
+      return;
+    }
+    this.downloading.set(true);
+    this.sendRequest
+      .blob(url)
+      .then((content: Blob) => {
+        const data: PdfDialogData = { title: this.format(row, column) || column.description, content };
+        this.dialog.open(PdfDialog, { width: "min(1100px, 95vw)", data });
+      })
+      .finally(() => this.downloading.set(false));
+  }
+
+  /** The file of a row is taken straight from the table, without opening the record. */
+  downloadFile(event: Event, row: any, column: DatabaseColumn): void {
+    event.stopPropagation();
+    const url = this.fileUrl()?.(row[ID_FIELD], column.fieldName);
+    if (!url || this.downloading()) {
+      return;
+    }
+    this.downloading.set(true);
+    this.sendRequest.download(url).finally(() => this.downloading.set(false));
+  }
+
   /** A chained codebook is saved once the last level is chosen; the levels above only narrow the list. */
   commitChain(value: string): void {
     if (value) {
@@ -723,14 +767,14 @@ export class DataTable {
     });
 
     this.savingRow.set(true);
-    this.sendRequest.post("/api" + this.saveUrl(), changed)
+    this.sendRequest.post("/api" + this.saveUrl(), this.rowForSave(changed))
       .then((saved: any) => {
         this.cancelRowEdit();
         if (draft) {
           this.showNew(saved[ID_FIELD]);
           return;
         }
-        this.replaceRow({ ...changed, ...saved });
+        this.replaceRow(this.mergeSaved(changed, saved));
         this.highlightedId.set(saved[ID_FIELD] ?? id);
         this.highlightFlash.set(true);
       })
@@ -821,9 +865,9 @@ export class DataTable {
     const changed = { ...row, [column.fieldName]: value };
     this.replaceRow(changed);
     this.savingCell.set(cell);
-    this.sendRequest.post("/api" + this.saveUrl(), changed)
+    this.sendRequest.post("/api" + this.saveUrl(), this.rowForSave(changed))
       .then((saved: any) => {
-        this.replaceRow({ ...changed, ...saved });
+        this.replaceRow(this.mergeSaved(changed, saved));
         this.savedCell.set(cell);
       })
       .catch(() => this.replaceRow(row))
@@ -832,6 +876,37 @@ export class DataTable {
           this.savingCell.set(null);
         }
       });
+  }
+
+  /**
+   * A row on its way to the server. A file column holds only the identifier of the stored file in the
+   * list, and the save endpoint of a model table expects the whole file (identifier and name), so it
+   * is put together here from what the column knows.
+   */
+  private rowForSave(row: any): any {
+    const copy = { ...row };
+    this.allColumns()
+      .filter((column) => column.columnType === "FILE")
+      .forEach((column) => {
+        const value = copy[column.fieldName];
+        const id = fileId(value);
+        copy[column.fieldName] = id ? { id, fileName: fileName(value) || this.optionText(column, id) } : null;
+      });
+    return copy;
+  }
+
+  /** The answer of the server carries a file as a bare identifier; the name already read stays. */
+  private mergeSaved(row: any, saved: any): any {
+    const merged = { ...row, ...saved };
+    this.allColumns()
+      .filter((column) => column.columnType === "FILE")
+      .forEach((column) => {
+        const before = row[column.fieldName];
+        if (fileName(before) && fileId(before) === fileId(merged[column.fieldName])) {
+          merged[column.fieldName] = before;
+        }
+      });
+    return merged;
   }
 
   private replaceRow(row: any): void {
@@ -848,7 +923,7 @@ export class DataTable {
    * The table may have changed in the meantime (another user added a row), so loading it again would
    * easily put the changed row on another page. When the row is not on the page, the page is loaded.
    */
-  showChanged(saved: any): void {
+  showChanged(saved: any, fileChanged = false): void {
     const id = saved?.[ID_FIELD];
     if (!id) {
       return;
@@ -858,9 +933,27 @@ export class DataTable {
       this.reload(id);
       return;
     }
-    this.replaceRow({ ...current, ...saved });
+
+    // A new file comes back only as an identifier, and the name it had before is no longer the right
+    // one - a file that replaces another keeps its identifier - so that one row is read again.
+    const newFile = fileChanged || this.fileChanged(current, saved);
+    this.replaceRow(newFile ? { ...current, ...saved } : this.mergeSaved(current, saved));
     this.highlightedId.set(id);
     this.highlightFlash.set(true);
+
+    if (newFile) {
+      this.refreshRow(id);
+    }
+  }
+
+  /** A file column of the row holds another file than before the save. */
+  private fileChanged(before: any, saved: any): boolean {
+    return this.allColumns().some(
+      (column) =>
+        column.columnType === "FILE" &&
+        column.fieldName in saved &&
+        fileId(saved[column.fieldName]) !== fileId(before[column.fieldName])
+    );
   }
 
   onFilter(fieldName: string, value: string): void {
@@ -941,12 +1034,19 @@ export class DataTable {
     if (value === null || value === undefined || value === "") {
       return "";
     }
+    // A file: the name either comes with the value, or with the column, as for a list of values.
+    // A file stored a moment ago is in neither, and its identifier says nothing, so nothing is shown.
+    if (column.columnType === "FILE") {
+      const id = fileId(value);
+      const text = this.optionText(column, id);
+      return fileName(value) || (text === id ? "" : text);
+    }
     return this.displayValue(column, String(value));
   }
 
   private displayValue(column: DatabaseColumn, value: string): string {
     if (isEnum(column)) {
-      return column.listOfValues!.find((option) => option.value === value)?.option ?? value;
+      return this.optionText(column, value);
     }
     switch (column.columnType) {
       case "BOOLEAN":
@@ -963,6 +1063,11 @@ export class DataTable {
       default:
         return value;
     }
+  }
+
+  /** Text of a value from the list of values of the column; the value itself when it is not in the list. */
+  private optionText(column: DatabaseColumn, value: string): string {
+    return column.listOfValues?.find((option) => String(option.value) === value)?.option ?? value;
   }
 
   private scrollToHighlighted(): void {

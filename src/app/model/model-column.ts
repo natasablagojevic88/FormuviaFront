@@ -8,6 +8,7 @@ export type ModelColumnType =
   | "LOCALDATE"
   | "LOCALDATETIME"
   | "LOCALTIME"
+  | "FILE"
   | "UUID";
 
 /** One field of the form, that is, a column of the table the model creates in the database. */
@@ -23,6 +24,8 @@ export interface ModelColumn {
   codebookId?: string | null;
   nullable: boolean;
   showInTable: boolean;
+  /** false: the field is not drawn on the entry form, although its value is kept. */
+  showable: boolean;
   editable: boolean;
   defaultValueSql?: string | null;
   /** A SELECT with two columns (value, text) that fills the list of choices for this field. */
@@ -58,6 +61,7 @@ export function newColumn(modelId: string, rowIndex: number, columnIndex: number
     columnType: "STRING",
     nullable: true,
     showInTable: true,
+    showable: true,
     editable: true,
     textArea: false,
     inDescriptionForCodebook: false,

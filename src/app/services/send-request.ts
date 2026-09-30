@@ -84,13 +84,32 @@ export class SendRequest {
     return this.send(this.http.post(environment.apiUrl + api, body, this.options()), requestOptions);
   }
 
-  /** POST that returns a file; the file name is taken from the Content-Disposition header. */
-  download(api: string, body: any, requestOptions?: RequestOptions): Promise<void> {
-    const request = this.http.post(environment.apiUrl + api, body, {
-      ...this.options(),
-      responseType: "blob",
-      observe: "response",
-    });
+  /** Upload of a file: the body is the file itself, as the server takes it (application/octet-stream). */
+  upload(api: string, file: File): Promise<any> {
+    const options = {
+      withCredentials: true,
+      headers: new HttpHeaders({
+        [SendRequest.LANGUAGE_HEADER]: this.language.current(),
+        "Content-Type": "application/octet-stream",
+      }),
+    };
+    return this.send(this.http.post(environment.apiUrl + api, file, options));
+  }
+
+  /** GET that returns the content of a file, to be shown instead of saved. */
+  blob(api: string, requestOptions?: RequestOptions): Promise<Blob> {
+    const request = this.http.get(environment.apiUrl + api, { ...this.options(), responseType: "blob" });
+    return this.send(request, requestOptions);
+  }
+
+  /**
+   * A request that returns a file; the name is taken from the Content-Disposition header.
+   * Without a body it is a GET (the file of a record), with one a POST (the export of a table).
+   */
+  download(api: string, body?: any, requestOptions?: RequestOptions): Promise<void> {
+    const request = body === undefined
+      ? this.http.get(environment.apiUrl + api, { ...this.options(), responseType: "blob", observe: "response" })
+      : this.http.post(environment.apiUrl + api, body, { ...this.options(), responseType: "blob", observe: "response" });
     return this.send(request, requestOptions).then((response: HttpResponse<Blob>) => {
       SendRequest.saveFile(response.body!, SendRequest.fileName(response.headers.get("Content-Disposition")));
     });

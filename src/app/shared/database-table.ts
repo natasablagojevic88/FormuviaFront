@@ -7,6 +7,7 @@ export type ColumnType =
   | "LOCALDATE"
   | "LOCALDATETIME"
   | "LOCALTIME"
+  | "FILE"
   | "UUID";
 
 export type SearchOperation =
@@ -156,4 +157,42 @@ export interface DatabaseParameter {
   pageSize: number;
   filters: DatabaseFilter[];
   orders: QueryDatabaseOrder[];
+}
+
+/**
+ * Value of a field of the FILE type (FileUploadDTO). The server sends the stored file as id and
+ * fileName; a file just chosen is sent back as fileUploadFile, the identifier the upload returned,
+ * and the server makes the stored file out of it.
+ */
+export interface FileValue {
+  id?: string | null;
+  fileName?: string | null;
+  fileUploadFile?: string | null;
+  mimeType?: string | null;
+}
+
+/** Identifier of the stored file. */
+export function fileId(value: any): string {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  return typeof value === "object" ? String((value as FileValue).id ?? "") : String(value);
+}
+
+/** Name of the file, when the server sent the whole record of it. */
+export function fileName(value: any): string {
+  return typeof value === "object" && value ? String((value as FileValue).fileName ?? "") : "";
+}
+
+/**
+ * A file that can be shown in the viewer. The content type is used when the server sends it,
+ * otherwise the name of the file tells it.
+ */
+export function isPdf(value: any, name?: string): boolean {
+  const mimeType = typeof value === "object" && value ? (value as FileValue).mimeType : null;
+  if (mimeType) {
+    return mimeType === "application/pdf";
+  }
+  const text = name || fileName(value);
+  return text.toLowerCase().endsWith(".pdf");
 }

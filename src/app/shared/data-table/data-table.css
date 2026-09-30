@@ -616,7 +616,12 @@ tr.mat-mdc-row.row-highlight td:first-child {
     justify-content: center;
   }
 
-  /* On a phone the export stays an icon only, the advanced search takes the rest of the row */
+  /* A file in a cell: only the mark that there is one, the identifier says nothing to the user. */
+.file-mark {
+  color: var(--c-text-faint);
+}
+
+/* On a phone the export stays an icon only, the advanced search takes the rest of the row */
   .export-button {
     flex: none;
     width: 44px;

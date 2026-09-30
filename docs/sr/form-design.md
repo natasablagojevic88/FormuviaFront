@@ -42,9 +42,20 @@ Kad kolona jednom postoji, njen naziv je zaključan — kao i tip podatka, i ši
 | **Datum** | dan |
 | **Datum i vreme** | dan i vreme |
 | **Vreme** | samo doba dana, bez datuma |
-
-**Redosled sortiranja** i **Smer** određuju kako se tabela otvara: kolona sa redosledom 1 sortira se prva, pa 2, i tako redom; ostavite redosled prazan i kolona u tome ne učestvuje. Kolona vezana za šifarnik ne može da se koristi, jer u njoj stoji identifikator, a ne tekst koji se prikazuje.
+| **Fajl** | dokument koji se čuva uz zapis |
 | **Veza na šifarnik** | vrednost koja se bira iz druge tabele |
+
+**Redosled sortiranja** i **Smer** određuju kako se tabela otvara: kolona sa redosledom 1 sortira se prva, pa 2, i tako redom; ostavite redosled prazan i kolona u tome ne učestvuje. Kolona u kojoj stoji identifikator — veza na šifarnik ili fajl — ne može da se koristi, jer to što je u njoj upisano nije tekst koji se prikazuje.
+
+### Fajl
+
+Polje je dugme koje otvara izbor fajla na vašem računaru ili telefonu. Fajl se šalje na server odmah kad ga izaberete, a zapis pamti sačuvani fajl; naziv fajla stoji pored dugmeta, a **×** ga uklanja iz polja. Kad je zapis snimljen, pored naziva se pojavi i malo dugme **preuzmi**, koje vam fajl vraća. PDF ima i **oko**: otvara se u čitaču unutar aplikacije, pa ne mora da se snima da bi se pročitao.
+
+Ako na zapisu koji već ima fajl izaberete drugi, novi postaje fajl tog zapisa. Prethodni se ne baca: Formuvia ga pamti kao stariju verziju tog fajla, mada se za čitanje i preuzimanje nudi samo trenutni.
+
+U listi takva kolona prikazuje spajalicu sa nazivom fajla i ista dva dugmeta. Po fajlu se ne sortira i ne filtrira, i ne menja se dvoklikom u tabeli: menja se na formi, gde može i da se izabere.
+
+Fajl se samo bira i čuva, pa kolona sa fajlom nema upit za podrazumevanu vrednost, nema listu vrednosti, nema *Dugačak tekst* i ne ulazi u opis šifarnika — te opcije se za nju ni ne nude.
 
 ### Veza na šifarnik
 
@@ -72,12 +83,15 @@ Lanac ide koliko god duboko model ide, i radi isto u formi za unos i u *Brzoj iz
 
 Formuvia neće dozvoliti da postavite polje tamo gde je već drugo, niti da jedno visi van ivice mreže.
 
+Polje koje je isključeno opcijom *Prikaži na formi* ostaje na svom mestu u dizajnu — iscrtava se isprekidanom linijom i označeno je malim minusom, pa se vidi da je tu bez traženja po svim poljima.
+
 ## Opcije
 
 | Opcija | Dejstvo |
 |---|---|
 | **Opciono** | polje sme ostati prazno; kad je isključite, polje je obavezno |
 | **Prikaži u tabeli** | da li se kolona vidi u listi, ili samo na formi |
+| **Prikaži na formi** | kad je isključite, polje se na formi za unos uopšte ne iscrtava; vrednost koju zapis već ima ostaje kakva je, a nov zapis je može dobiti samo iz upita za podrazumevanu vrednost |
 | **Može se menjati** | kad je isključite, polje se vidi ali se u njega ne unosi, ni pri unosu ni kasnije; vrednost mu daje upit za podrazumevanu vrednost |
 | **Dugačak tekst** | višered umesto jednog reda (samo za tekstualna polja) |
 | **Deo opisa u šifarniku** | vidi niže |

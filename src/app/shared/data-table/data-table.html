@@ -188,6 +188,27 @@
               <span class="badge" [class.badge-yes]="row[column.fieldName]" [class.badge-no]="!row[column.fieldName]">
                 {{ (row[column.fieldName] ? 'ui.yes' : 'ui.no') | t }}
               </span>
+            } @else if (column.columnType === 'FILE') {
+              @if (row[column.fieldName]) {
+                <span class="with-info">
+                  <i class="fa-solid fa-paperclip file-mark"></i>
+                  <span class="value">{{ format(row, column) || ('ui.preview.fileStored' | t) }}</span>
+                  @if (canViewFile(row, column)) {
+                    <button type="button" class="info" (click)="viewFile($event, row, column)"
+                      [disabled]="downloading()" [title]="'ui.preview.view' | t"
+                      [attr.aria-label]="'ui.preview.view' | t">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                  }
+                  @if (fileUrl()) {
+                    <button type="button" class="info" (click)="downloadFile($event, row, column)"
+                      [disabled]="downloading()" [title]="'ui.preview.download' | t"
+                      [attr.aria-label]="'ui.preview.download' | t">
+                      <i class="fa-solid fa-download"></i>
+                    </button>
+                  }
+                </span>
+              }
             } @else if (isEnum(column) && column.columnType !== 'UUID' && row[column.fieldName]) {
               <span class="badge badge-enum">{{ format(row, column) }}</span>
             } @else if (canShowRecord(row, column)) {
@@ -206,7 +227,9 @@
 
         <ng-container [matColumnDef]="filterPrefix + column.fieldName">
           <th mat-header-cell *matHeaderCellDef class="filter-cell" [class.cell-center]="isCentered(column.columnType)">
-            @if (isEnum(column) || column.columnType === 'BOOLEAN') {
+            @if (column.columnType === 'FILE') {
+              <!-- the names of the files are in the list of values of the column, but the server cannot filter by them -->
+            } @else if (isEnum(column) || column.columnType === 'BOOLEAN') {
               <app-search-select class="filter-select" appearance="compact" [options]="filterOptions().get(column.fieldName) ?? []"
                 [ngModel]="filterValue(column.fieldName)" (ngModelChange)="onFilter(column.fieldName, $event)"
                 [centered]="column.columnType === 'BOOLEAN'" [ariaLabel]="column.description" />

@@ -9,6 +9,7 @@
     static readonly role='/api/role';
     static readonly roleTable='/api/role/table';
     static readonly exportTable='/api/export-table';
+    static readonly fileUpload='/api/file-upload';
 
     static appuserId(id: string): string {
         return `/api/appuser/${id}`;
@@ -68,6 +69,11 @@
     /** Deleting a record of a model table; the rows of its subtables go with it (cascade). */
     static modelPreviewDelete(modelId: string, id: string): string {
         return `/api/preview/delete/${modelId}/${id}`;
+    }
+
+    /** The file stored in one column of a record of a model table. */
+    static modelPreviewDownload(modelId: string, id: string, columnName: string): string {
+        return `/api/preview/download/${modelId}/${id}/${columnName}`;
     }
 
     /** Saving a record of a model table (insert when the id is empty, otherwise update). */

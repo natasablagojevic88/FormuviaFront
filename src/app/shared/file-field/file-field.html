@@ -1,0 +1,38 @@
+<div class="ff" [class.ff-disabled]="disabled()">
+  <input #picker type="file" class="ff-picker" [disabled]="disabled()" (change)="choose(picker)"
+    [attr.aria-label]="ariaLabel()" />
+
+  <button type="button" class="ff-button" [disabled]="disabled() || sending()" (click)="picker.click()">
+    <i class="fa-solid" [class.fa-paperclip]="!sending()" [class.fa-spinner]="sending()" [class.fa-spin]="sending()"></i>
+    <span>{{ 'ui.preview.chooseFile' | t }}</span>
+  </button>
+
+  @if (canView) {
+    <button type="button" class="ff-get" (click)="view()" [disabled]="loading()"
+      [title]="'ui.preview.view' | t" [attr.aria-label]="'ui.preview.view' | t">
+      <i class="fa-solid fa-eye"></i>
+    </button>
+  }
+
+  @if (canDownload) {
+    <button type="button" class="ff-get" (click)="download()" [disabled]="loading()"
+      [title]="'ui.preview.download' | t" [attr.aria-label]="'ui.preview.download' | t">
+      <i class="fa-solid" [class.fa-download]="!loading()" [class.fa-spinner]="loading()" [class.fa-spin]="loading()"></i>
+    </button>
+  }
+
+  <span class="ff-name" [title]="fileName() || value()">
+    @if (hasFile) {
+      {{ fileName() || ('ui.preview.fileStored' | t) }}
+    } @else {
+      {{ 'ui.preview.noFileChosen' | t }}
+    }
+  </span>
+
+  @if (hasFile && !disabled()) {
+    <button type="button" class="ff-clear" (click)="clear()"
+      [title]="'ui.preview.removeFile' | t" [attr.aria-label]="'ui.preview.removeFile' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  }
+</div>

@@ -56,6 +56,10 @@
               <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
               <app-date-field [withTime]="column.columnType === 'LOCALDATETIME'" [(ngModel)]="values[column.code]"
                 [ngModelOptions]="{ standalone: true }" [disabled]="isLocked(column)" [ariaLabel]="column.name" />
+            } @else if (column.columnType === 'FILE') {
+              <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
+              <app-file-field [(ngModel)]="values[column.code]" [ngModelOptions]="{ standalone: true }"
+                [disabled]="isLocked(column)" [downloadUrl]="downloadUrl(column)" [ariaLabel]="column.name" />
             } @else if (column.textArea) {
               <label class="fd-label" [class.fd-required]="isRequired(column)" [for]="'pf-' + column.code">{{ column.name }}</label>
               <textarea [id]="'pf-' + column.code" class="fd-input area" rows="3"

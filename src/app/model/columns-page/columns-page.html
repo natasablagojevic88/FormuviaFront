@@ -69,7 +69,8 @@
         @for (cell of cells(); track cell.row + '-' + cell.column) {
           @if (cell.column_; as column) {
             <button type="button" class="field" [style.grid-column]="'span ' + cell.span"
-              [class.selected]="column.id === selectedId()" (click)="edit(column)" [title]="'ui.edit' | t">
+              [class.selected]="column.id === selectedId()" [class.not-on-form]="!column.showable"
+              (click)="edit(column)" [title]="'ui.edit' | t">
               <span class="field-head">
                 <span class="field-name">{{ column.name }}</span>
                 @if (!column.nullable) {
@@ -84,6 +85,9 @@
                 }
                 @if (!column.editable) {
                   <i class="fa-solid fa-lock" [title]="'ui.column.notEditable' | t"></i>
+                }
+                @if (!column.showable) {
+                  <i class="fa-solid fa-square-minus" [title]="'ui.column.notOnForm' | t"></i>
                 }
               </span>
             </button>
