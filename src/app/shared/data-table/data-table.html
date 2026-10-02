@@ -147,7 +147,10 @@
             [class.cell-saved]="isCell(savedCell(), row, column)" [attr.title]="canEdit(column) ? ('ui.cellEditHint' | t) : null"
             (click)="onCellClick(row, column)" (dblclick)="startEdit(row, column)">
             @if (isRowEditing(row)) {
-              @if (hasChain(column)) {
+              @if (column.columnType === 'FILE') {
+                <app-file-field class="cell-file" [compact]="true" [(ngModel)]="rowValues[column.fieldName]"
+                  [ngModelOptions]="{ standalone: true }" [ariaLabel]="column.description" />
+              } @else if (hasChain(column)) {
                 <app-chain-select class="cell-chain" [levels]="levels(column)" [compact]="true" [showLastName]="false"
                   [(ngModel)]="rowValues[column.fieldName]" [ngModelOptions]="{ standalone: true }"
                   [ariaLabel]="column.description" />
@@ -165,7 +168,12 @@
                   (keydown.enter)="saveRow()" (keydown.escape)="cancelRowEdit()" [attr.aria-label]="column.description" />
               }
             } @else if (isCell(editing(), row, column)) {
-              @if (hasChain(column)) {
+              @if (column.columnType === 'FILE') {
+                <!-- the file is sent as soon as it is chosen, so the cell is saved at that moment -->
+                <app-file-field class="cell-file" [compact]="true" [ngModel]="editValue"
+                  (ngModelChange)="editValue = $event; commitEdit()" [ngModelOptions]="{ standalone: true }"
+                  (keydown.escape)="cancelEdit()" [ariaLabel]="column.description" />
+              } @else if (hasChain(column)) {
                 <app-chain-select class="cell-chain" [levels]="levels(column)" [compact]="true" [showLastName]="false"
                   [ngModel]="editValue" (ngModelChange)="editValue = $event; commitChain($event)"
                   [ngModelOptions]="{ standalone: true }" (keydown.escape)="cancelEdit()"
@@ -194,14 +202,16 @@
                   <i class="fa-solid fa-paperclip file-mark"></i>
                   <span class="value">{{ format(row, column) || ('ui.preview.fileStored' | t) }}</span>
                   @if (canViewFile(row, column)) {
-                    <button type="button" class="info" (click)="viewFile($event, row, column)"
+                    <button type="button" class="info" (dblclick)="$event.stopPropagation()"
+                      (click)="viewFile($event, row, column)"
                       [disabled]="downloading()" [title]="'ui.preview.view' | t"
                       [attr.aria-label]="'ui.preview.view' | t">
                       <i class="fa-solid fa-eye"></i>
                     </button>
                   }
                   @if (fileUrl()) {
-                    <button type="button" class="info" (click)="downloadFile($event, row, column)"
+                    <button type="button" class="info" (dblclick)="$event.stopPropagation()"
+                      (click)="downloadFile($event, row, column)"
                       [disabled]="downloading()" [title]="'ui.preview.download' | t"
                       [attr.aria-label]="'ui.preview.download' | t">
                       <i class="fa-solid fa-download"></i>

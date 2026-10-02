@@ -8,7 +8,7 @@ import { ApiRoute } from "../ApiRoute";
 import { Translate } from "../../services/translate";
 import { Language } from "../../services/language";
 import { AdvancedSearchDialog, AdvancedSearchDialogData } from "../advanced-search-dialog/advanced-search-dialog";
-import { ComboOption, DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, fileId, fileName, isPdf, QueryDatabaseOrder, SubTable, TableChild } from "../database-table";
+import { ComboOption, DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, FileValue, fileId, fileName, isPdf, QueryDatabaseOrder, SubTable, TableChild } from "../database-table";
 import { PdfDialog, PdfDialogData } from "../pdf-dialog/pdf-dialog";
 import { HistoryPanel } from "../history-panel/history-panel";
 import { Criterion, inputModeFor, inputTypeFor, isEnum, needsValue, quickFilter, toFilter } from "../filter-operations";
@@ -54,18 +54,19 @@ interface CellRef {
   fieldName: string;
 }
 
-/**
- * A UUID is changed only when it has a list of values (a foreign key); the id of the row itself is
- * never changed. A file is changed on the form, where it can be chosen and sent, not in a cell.
- */
+/** A UUID is changed only when it has a list of values (a foreign key); the id of the row itself is never changed. */
 function isEditableType(column: DatabaseColumn): boolean {
-  return column.columnType !== "FILE" && (column.columnType !== "UUID" || isEnum(column));
+  return column.columnType !== "UUID" || isEnum(column);
 }
 
-/** Value of a row -> text for the edit field (inputs and selects work with strings). */
-function toEditValue(value: any, column: DatabaseColumn, language: string): string {
+/** Value of a row -> value of the edit field (inputs and selects work with text, a file with its record). */
+function toEditValue(value: any, column: DatabaseColumn, language: string): any {
   if (value === null || value === undefined) {
     return "";
+  }
+  // a file keeps whatever the server sent, so the field can show its name and send it back whole
+  if (column.columnType === "FILE") {
+    return value;
   }
   if (column.columnType === "LOCALDATETIME") {
     return String(value).substring(0, 16);
@@ -81,10 +82,13 @@ function toEditValue(value: any, column: DatabaseColumn, language: string): stri
   return String(value);
 }
 
-/** Text from the edit field -> value sent to the server. */
-function fromEditValue(text: string, column: DatabaseColumn): any {
+/** Value of the edit field -> value sent to the server. */
+function fromEditValue(text: any, column: DatabaseColumn): any {
   if (column.columnType === "BOOLEAN") {
     return text === "true";
+  }
+  if (column.columnType === "FILE") {
+    return text || null;
   }
   if (text === "") {
     return null;
@@ -188,7 +192,7 @@ export class DataTable {
       .map((column) => ({ value: column.fieldName, label: column.description })));
   readonly sortField = computed(() => this.order()?.fieldName ?? "");
   readonly sortAscending = computed(() => this.order()?.direction !== "DESC");
-  editValue = "";
+  editValue: any = "";
   // A separate edit mode: switched on in the toolbar, it shows every editable column and allows
   // editing a row and entering a new row in the table itself. Outside it the table works as before (dialogs).
   readonly editMode = signal(false);
@@ -198,7 +202,7 @@ export class DataTable {
   readonly savingRow = signal(false);
   /** A file is being taken; the buttons wait so the same file is not asked for twice. */
   readonly downloading = signal(false);
-  rowValues: Record<string, string> = {};
+  rowValues: Record<string, any> = {};
   readonly rowEditMode = computed(() => this.editRowId() !== null || this.draftRow() !== null);
   readonly canEditMode = computed(() => this.hasUpdate() && !!this.saveUrl() && this.editColumns().length > 0);
   /** The row is only shown, not changed: the pencil becomes an eye and the form opens locked. */
@@ -730,7 +734,7 @@ export class DataTable {
     }
     this.rowValues = {};
     this.editColumns().forEach(
-      (column) => (this.rowValues[column.fieldName] = toEditValue(row[column.fieldName], column, this.language.current()))
+      (column) => (this.rowValues[column.fieldName] = this.editValueOf(row, column))
     );
     this.highlightedId.set(id);
     this.highlightFlash.set(false);
@@ -767,7 +771,8 @@ export class DataTable {
     });
 
     this.savingRow.set(true);
-    this.sendRequest.post("/api" + this.saveUrl(), this.rowForSave(changed))
+    const sent = this.rowForSave(changed);
+    this.sendRequest.post("/api" + this.saveUrl(), sent)
       .then((saved: any) => {
         this.cancelRowEdit();
         if (draft) {
@@ -777,6 +782,9 @@ export class DataTable {
         this.replaceRow(this.mergeSaved(changed, saved));
         this.highlightedId.set(saved[ID_FIELD] ?? id);
         this.highlightFlash.set(true);
+        if (this.hasNewFile(sent)) {
+          this.refreshRow(saved[ID_FIELD] ?? id);
+        }
       })
       .finally(() => this.savingRow.set(false));
   }
@@ -790,6 +798,18 @@ export class DataTable {
     // A double click works in edit mode too; it is off only while some row is open for editing.
     return this.hasUpdate() && !!this.saveUrl() && !this.rowEditMode() && column.editable !== false
       && isEditableType(column);
+  }
+
+  /**
+   * Value of a cell for its editor. A file is held as a whole record, with the name the column
+   * knows, because the row itself carries only the identifier of the stored file.
+   */
+  private editValueOf(row: any, column: DatabaseColumn): any {
+    if (column.columnType !== "FILE") {
+      return toEditValue(row[column.fieldName], column, this.language.current());
+    }
+    const id = fileId(row[column.fieldName]);
+    return id ? { id, fileName: this.format(row, column) || null } : "";
   }
 
   isCell(cell: CellRef | null, row: any, column: DatabaseColumn): boolean {
@@ -808,7 +828,7 @@ export class DataTable {
     if (!this.canEdit(column) || this.isCell(this.editing(), row, column) || this.isCell(this.savingCell(), row, column)) {
       return;
     }
-    this.editValue = toEditValue(row[column.fieldName], column, this.language.current());
+    this.editValue = this.editValueOf(row, column);
     this.editing.set({ id: row[ID_FIELD], fieldName: column.fieldName });
     // a double click on a cell with a list opens the list at once, so it need not be clicked twice
     this.focusEditor(true);
@@ -820,8 +840,15 @@ export class DataTable {
    */
   private focusEditor(openList: boolean): void {
     setTimeout(() => {
-      const editor = this.host.nativeElement.querySelector<HTMLElement>(".cell-editor, .cell-select, .cell-date");
+      const editor = this.host.nativeElement.querySelector<HTMLElement>(
+        ".cell-editor, .cell-select, .cell-date, .cell-file"
+      );
       if (!editor) {
+        return;
+      }
+      // the file field: the button that opens the picker takes the focus, so Escape reaches the cell
+      if (editor.classList.contains("cell-file")) {
+        editor.querySelector<HTMLElement>("button")?.focus();
         return;
       }
       if (editor.classList.contains("cell-date")) {
@@ -865,10 +892,14 @@ export class DataTable {
     const changed = { ...row, [column.fieldName]: value };
     this.replaceRow(changed);
     this.savingCell.set(cell);
-    this.sendRequest.post("/api" + this.saveUrl(), this.rowForSave(changed))
+    const sent = this.rowForSave(changed);
+    this.sendRequest.post("/api" + this.saveUrl(), sent)
       .then((saved: any) => {
         this.replaceRow(this.mergeSaved(changed, saved));
         this.savedCell.set(cell);
+        if (this.hasNewFile(sent)) {
+          this.refreshRow(cell.id);
+        }
       })
       .catch(() => this.replaceRow(row))
       .finally(() => {
@@ -889,10 +920,22 @@ export class DataTable {
       .filter((column) => column.columnType === "FILE")
       .forEach((column) => {
         const value = copy[column.fieldName];
+        const uploaded = (value as FileValue)?.fileUploadFile;
         const id = fileId(value);
-        copy[column.fieldName] = id ? { id, fileName: fileName(value) || this.optionText(column, id) } : null;
+        if (uploaded) {
+          copy[column.fieldName] = value;
+        } else {
+          copy[column.fieldName] = id ? { id, fileName: fileName(value) || this.optionText(column, id) } : null;
+        }
       });
     return copy;
+  }
+
+  /** A file was chosen in this save; its name is known only once the row is read again. */
+  private hasNewFile(sent: any): boolean {
+    return this.allColumns().some(
+      (column) => column.columnType === "FILE" && !!(sent[column.fieldName] as FileValue)?.fileUploadFile
+    );
   }
 
   /** The answer of the server carries a file as a bare identifier; the name already read stays. */

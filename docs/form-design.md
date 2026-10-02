@@ -49,11 +49,11 @@ Once the column exists, its name is locked — as is the data type, and the code
 
 ### File
 
-The field is a button that opens the file picker of your computer or phone. The file is sent to the server as soon as you choose it, and the record keeps the file that was stored; the name of the file stands beside the button, and **×** removes it from the field. Once the record is saved, a small **download** button appears beside the name and hands you the file back. A PDF also carries an **eye**: it opens in a reader inside the application, so it need not be saved to be read.
+The field is a button that opens the file picker of your computer or phone. The file is sent to the server as soon as you choose it, and the record keeps the file that was stored; the name of the file stands beside the button, and **×** removes it from the field. Removing a file the record already holds is confirmed first, because in the table it takes effect at once; a file only just chosen is dropped without a question. Once the record is saved, a small **download** button appears beside the name and hands you the file back. A PDF also carries an **eye**: it opens in a reader inside the application, so it need not be saved to be read.
 
 Choose another file on a record that already has one and the new one takes its place as the file of that record. The one before it is not thrown away: Formuvia keeps it as an earlier version of that file, even though only the current one is offered for reading and download.
 
-In the list such a column shows a paperclip with the name of the file, and the same two buttons. A file cannot be sorted or filtered by, and it is not changed by a double-click in the table: it is changed on the form, where it can be chosen.
+In the list such a column shows a paperclip with the name of the file, and the same two buttons. A file cannot be sorted or filtered by, but it can be changed from the table itself: a double-click on the cell, and *Quick edit*, offer the same file button as the form.
 
 A file column is only chosen and stored, so it has no default value query, no list of values, no *Long text* and no part in the label of a codebook — those options are simply not offered for it.
 

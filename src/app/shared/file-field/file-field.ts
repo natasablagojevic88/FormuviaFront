@@ -1,7 +1,9 @@
-import { Component, forwardRef, input, signal } from "@angular/core";
+import { Component, forwardRef, input, OnDestroy, signal } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { Translate } from "../../services/translate";
 import { SendRequest } from "../../services/send-request";
+import { ConfirmDialog, ConfirmDialogData } from "../confirm-dialog/confirm-dialog";
 import { ApiRoute } from "../ApiRoute";
 import { FileValue, fileId, fileName, isPdf } from "../database-table";
 import { PdfDialog, PdfDialogData } from "../pdf-dialog/pdf-dialog";
@@ -17,10 +19,12 @@ import { PdfDialog, PdfDialogData } from "../pdf-dialog/pdf-dialog";
   styleUrl: "./file-field.css",
   providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FileField), multi: true }],
 })
-export class FileField implements ControlValueAccessor {
+export class FileField implements ControlValueAccessor, OnDestroy {
   readonly ariaLabel = input("");
   /** Path to the stored file; without it the field only chooses a file, it does not offer it back. */
   readonly downloadUrl = input<string | null>(null);
+  /** In a cell of the table: lower, and the button is only an icon. */
+  readonly compact = input(false);
 
   /** Identifier of the stored file; empty while only a newly chosen one is in the field. */
   readonly value = signal("");
@@ -37,10 +41,15 @@ export class FileField implements ControlValueAccessor {
 
   /** The content type of the file, when the server sent it; without it the name decides. */
   private mimeType: string | null = null;
+  /** The file the record came with; by it it is known whether removing takes something away. */
+  private storedId = "";
+  /** The open question about removing; it goes when the field goes, so nothing answers into a dead editor. */
+  private confirmRef: MatDialogRef<ConfirmDialog, boolean> | null = null;
 
-  constructor(private sendRequest: SendRequest, private dialog: MatDialog) {}
+  constructor(private sendRequest: SendRequest, private dialog: MatDialog, private translate: Translate) {}
 
   writeValue(value: any): void {
+    this.storedId = fileId(value);
     this.value.set(fileId(value));
     this.uploaded.set("");
     this.fileName.set(fileName(value));
@@ -122,6 +131,34 @@ export class FileField implements ControlValueAccessor {
     if (this.disabled()) {
       return;
     }
+    // A file only just chosen is dropped without a word; one the record already holds is asked about,
+    // because in the table it is removed from the record the moment the question is answered.
+    if (!this.storedId) {
+      this.remove();
+      return;
+    }
+
+    const data: ConfirmDialogData = {
+      title: this.translate.get("ui.preview.removeFile"),
+      message: this.translate.get("ui.preview.removeFileConfirm"),
+      confirmText: this.translate.get("ui.delete"),
+      danger: true,
+    };
+    this.confirmRef = this.dialog.open(ConfirmDialog, { width: "460px", data });
+    this.confirmRef.afterClosed().subscribe((confirmed) => {
+      this.confirmRef = null;
+      if (confirmed) {
+        this.remove();
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.confirmRef?.close();
+  }
+
+  private remove(): void {
+    this.storedId = "";
     this.value.set("");
     this.uploaded.set("");
     this.fileName.set("");

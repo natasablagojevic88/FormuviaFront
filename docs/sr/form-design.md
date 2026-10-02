@@ -49,11 +49,11 @@ Kad kolona jednom postoji, njen naziv je zaključan — kao i tip podatka, i ši
 
 ### Fajl
 
-Polje je dugme koje otvara izbor fajla na vašem računaru ili telefonu. Fajl se šalje na server odmah kad ga izaberete, a zapis pamti sačuvani fajl; naziv fajla stoji pored dugmeta, a **×** ga uklanja iz polja. Kad je zapis snimljen, pored naziva se pojavi i malo dugme **preuzmi**, koje vam fajl vraća. PDF ima i **oko**: otvara se u čitaču unutar aplikacije, pa ne mora da se snima da bi se pročitao.
+Polje je dugme koje otvara izbor fajla na vašem računaru ili telefonu. Fajl se šalje na server odmah kad ga izaberete, a zapis pamti sačuvani fajl; naziv fajla stoji pored dugmeta, a **×** ga uklanja iz polja. Uklanjanje fajla koji zapis već ima se prvo potvrđuje, jer u tabeli dejstvuje odmah; fajl koji je tek izabran se uklanja bez pitanja. Kad je zapis snimljen, pored naziva se pojavi i malo dugme **preuzmi**, koje vam fajl vraća. PDF ima i **oko**: otvara se u čitaču unutar aplikacije, pa ne mora da se snima da bi se pročitao.
 
 Ako na zapisu koji već ima fajl izaberete drugi, novi postaje fajl tog zapisa. Prethodni se ne baca: Formuvia ga pamti kao stariju verziju tog fajla, mada se za čitanje i preuzimanje nudi samo trenutni.
 
-U listi takva kolona prikazuje spajalicu sa nazivom fajla i ista dva dugmeta. Po fajlu se ne sortira i ne filtrira, i ne menja se dvoklikom u tabeli: menja se na formi, gde može i da se izabere.
+U listi takva kolona prikazuje spajalicu sa nazivom fajla i ista dva dugmeta. Po fajlu se ne sortira i ne filtrira, ali se menja i iz same tabele: dvoklik na ćeliju, kao i *Brza izmena*, nude isto dugme za izbor fajla kao forma.
 
 Fajl se samo bira i čuva, pa kolona sa fajlom nema upit za podrazumevanu vrednost, nema listu vrednosti, nema *Dugačak tekst* i ne ulazi u opis šifarnika — te opcije se za nju ni ne nude.
 

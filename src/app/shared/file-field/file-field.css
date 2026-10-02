@@ -111,3 +111,25 @@
     flex-basis: 100%;
   }
 }
+
+/* In a cell of the table the field is lower and the button carries only the paperclip. */
+.ff-compact {
+  gap: 6px;
+  min-height: 0;
+}
+
+.ff-compact .ff-button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  justify-content: center;
+}
+
+.ff-compact .ff-name {
+  font-size: 13px;
+}
+
+.ff-compact .ff-clear {
+  width: 28px;
+  height: 28px;
+}
