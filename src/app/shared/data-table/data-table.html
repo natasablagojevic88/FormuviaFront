@@ -47,6 +47,14 @@
       <i class="fa-solid" [class.fa-file-excel]="!exporting()" [class.fa-spinner]="exporting()" [class.fa-spin]="exporting()"></i>
       <span class="export-label">{{ 'ui.exportExcel' | t }}</span>
     </button>
+    @if (templateUrl() && hasAdd()) {
+      <button type="button" class="advanced-button template-button" (click)="downloadTemplate()"
+        [disabled]="takingTemplate()" [title]="'ui.template' | t" [attr.aria-label]="'ui.template' | t">
+        <i class="fa-solid" [class.fa-file-arrow-down]="!takingTemplate()" [class.fa-spinner]="takingTemplate()"
+          [class.fa-spin]="takingTemplate()"></i>
+        <span class="export-label">{{ 'ui.template' | t }}</span>
+      </button>
+    }
   </div>
 
   <div class="progress">

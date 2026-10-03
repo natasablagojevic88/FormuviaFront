@@ -71,6 +71,11 @@
         return `/api/preview/delete/${modelId}/${id}`;
     }
 
+    /** Excel template for entering data into a model table. */
+    static modelPreviewTemplate(modelId: string): string {
+        return `/api/preview/template/download/${modelId}`;
+    }
+
     /** The file stored in one column of a record of a model table. */
     static modelPreviewDownload(modelId: string, id: string, columnName: string): string {
         return `/api/preview/download/${modelId}/${id}/${columnName}`;

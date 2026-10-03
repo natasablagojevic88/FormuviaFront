@@ -132,6 +132,8 @@ export class DataTable {
    * user returns to, instead of loading the whole page again.
    */
   readonly rowUrl = input<((id: string) => string) | null>(null);
+  /** Path to the Excel template for entering data; without it the toolbar has no such button. */
+  readonly templateUrl = input<string | null>(null);
   /** Path to the file stored in a column of a row; without it a file column only shows its name. */
   readonly fileUrl = input<((id: string, fieldName: string) => string) | null>(null);
   /** Path to the history of a row for tables without a className (tables from the model). */
@@ -202,6 +204,7 @@ export class DataTable {
   readonly savingRow = signal(false);
   /** A file is being taken; the buttons wait so the same file is not asked for twice. */
   readonly downloading = signal(false);
+  readonly takingTemplate = signal(false);
   rowValues: Record<string, any> = {};
   readonly rowEditMode = computed(() => this.editRowId() !== null || this.draftRow() !== null);
   readonly canEditMode = computed(() => this.hasUpdate() && !!this.saveUrl() && this.editColumns().length > 0);
@@ -609,6 +612,16 @@ export class DataTable {
   showRecord(event: Event, row: any, column: DatabaseColumn): void {
     event.stopPropagation();
     this.info.emit({ column, id: String(row[column.fieldName]) });
+  }
+
+  /** The empty Excel template of this table: the columns, their names and the lists to choose from. */
+  downloadTemplate(): void {
+    const url = this.templateUrl();
+    if (!url || this.takingTemplate()) {
+      return;
+    }
+    this.takingTemplate.set(true);
+    this.sendRequest.download(url).finally(() => this.takingTemplate.set(false));
   }
 
   /** A PDF of a row is read in the viewer, without opening the record either. */

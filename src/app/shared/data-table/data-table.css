@@ -190,6 +190,21 @@ tr.mat-mdc-row.row-editing:hover {
   color: var(--c-success);
 }
 
+/* The template sits next to the export; its own colour tells them apart at a glance. */
+.template-button i {
+  color: var(--c-primary);
+}
+
+.template-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* A file in a cell: only the mark that there is one, the identifier says nothing to the user. */
+.file-mark {
+  color: var(--c-text-faint);
+}
+
 .export-button:disabled {
   opacity: 0.6;
   cursor: wait;
@@ -623,13 +638,9 @@ tr.mat-mdc-row.row-highlight td:first-child {
     justify-content: center;
   }
 
-  /* A file in a cell: only the mark that there is one, the identifier says nothing to the user. */
-.file-mark {
-  color: var(--c-text-faint);
-}
-
-/* On a phone the export stays an icon only, the advanced search takes the rest of the row */
-  .export-button {
+  /* On a phone the export and the template stay icons only, the advanced search takes the rest of the row */
+  .export-button,
+  .template-button {
     flex: none;
     width: 44px;
     padding: 0;

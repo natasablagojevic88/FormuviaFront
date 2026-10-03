@@ -88,6 +88,14 @@ Dugme ⋯ pored *Izmeni* nosi sve ostalo:
 
 Dobijate tačno ono što filteri i redosled sortiranja opisuju, a **ne** samo stranu koja je na ekranu: suzite na prošli mesec, sortirajte po iznosu, i fajl sadrži sve te redove, tim redosledom, sa prevedenim nazivima kolona.
 
+## Šablon za unos
+
+**Šablon**, pored izvoza, preuzima prazan `.xlsx` fajl za unos podataka u ovu tabelu. Pojavljuje se samo kod tabele u koju smete da dodajete zapise.
+
+U fajlu je jedan red sa nazivima kolona — crvenim tamo gde je polje obavezno — i ništa drugo za popunjavanje. Svaka kolona već zna šta u nju ide: u broj se može upisati samo broj, u datum samo datum, a kolona vezana za šifarnik ili za listu vrednosti nudi izbor umesto kucanja. Vrednosti tih lista putuju sa fajlom, na listovima koji su skriveni, pa šablon radi i bez veze sa aplikacijom.
+
+Nazivi i skriveni prvi red fajla su zaštićeni: po njima aplikacija prepoznaje koja je kolona koja kad se fajl vrati, pa se tabela prepoznaje i ako kolone preimenujete ili premestite. Sve ispod toga je vaše za popunjavanje.
+
 ## Brojevi
 
 Ceo broj se prikazuje onako kako je upisan, bez razdvajanja hiljada — šifra, godina ili broj računa treba da se čitaju kako su uneti.

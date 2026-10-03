@@ -90,6 +90,9 @@ export class ModelPreviewPage {
   /** History of a row: model tables have a path of their own instead of a DTO class name. */
   readonly historyUrl = (id: string) => ApiRoute.modelPreviewHistory(this.modelId(), id);
 
+  /** The Excel template for entering data into this table. */
+  readonly templateUrl = computed(() => (this.modelId() ? ApiRoute.modelPreviewTemplate(this.modelId()) : null));
+
   /** The file stored in one column of a row. */
   readonly fileUrl = (id: string, fieldName: string) =>
     ApiRoute.modelPreviewDownload(this.modelId(), id, fieldName);

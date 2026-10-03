@@ -88,6 +88,14 @@ The ⋯ button next to *Edit* holds everything else:
 
 What you get is exactly what the filters and the sort order describe, **not** just the page on the screen: filter down to last month's records, sort them by amount, and the file contains all of them, in that order, with the translated column headers.
 
+## The entry template
+
+**Template**, beside the export, downloads an empty `.xlsx` file for entering data into this table. It appears only for a table you may add records to.
+
+The file has one row of column names — red where the field is required — and nothing else to fill in. Each column already knows what belongs in it: a number column takes only numbers, a date column only dates, and a column tied to a codebook or to a list of values offers a drop-down instead of typing. The values of those lists travel with the file, on sheets that are hidden, so the template works without a connection to the application.
+
+The names and the hidden first row of the file are protected: they tell the application which column is which when the file comes back, so the table can be recognised even if the columns are renamed or moved. Everything below them is yours to fill in.
+
 ## Numbers
 
 A whole number is shown exactly as it is stored, without thousands separators — a code, a year or an invoice number should read the way it was entered.
