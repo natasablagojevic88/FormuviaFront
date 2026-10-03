@@ -92,9 +92,9 @@ What you get is exactly what the filters and the sort order describe, **not** ju
 
 **Template**, beside the export, downloads an empty `.xlsx` file for entering data into this table. It appears only for a table you may add records to.
 
-The file has one row of column names — red where the field is required — and nothing else to fill in. Each column already knows what belongs in it: a number column takes only numbers, a date column only dates, and a column tied to a codebook or to a list of values offers a drop-down instead of typing. The values of those lists travel with the file, on sheets that are hidden, so the template works without a connection to the application.
+The first row holds the column names — red where the field is required — and everything below it is yours to fill in. Each column already knows what belongs in it: a number column takes only numbers, a date column only dates, and a column tied to a codebook or to a list of values offers a drop-down instead of typing. The values of those lists travel with the file, on sheets that are hidden, so the template works without a connection to the application.
 
-The names and the hidden first row of the file are protected: they tell the application which column is which when the file comes back, so the table can be recognised even if the columns are renamed or moved. Everything below them is yours to fill in.
+The row of names is protected and cannot be overwritten, and the file remembers which field each column belongs to. Fill in the columns as they stand: do not add, remove or move them, or the data will arrive in the wrong fields. Widening a column, or sorting what you have typed, changes nothing.
 
 ## Numbers
 

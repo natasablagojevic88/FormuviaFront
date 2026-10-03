@@ -92,9 +92,9 @@ Dobijate tačno ono što filteri i redosled sortiranja opisuju, a **ne** samo st
 
 **Šablon**, pored izvoza, preuzima prazan `.xlsx` fajl za unos podataka u ovu tabelu. Pojavljuje se samo kod tabele u koju smete da dodajete zapise.
 
-U fajlu je jedan red sa nazivima kolona — crvenim tamo gde je polje obavezno — i ništa drugo za popunjavanje. Svaka kolona već zna šta u nju ide: u broj se može upisati samo broj, u datum samo datum, a kolona vezana za šifarnik ili za listu vrednosti nudi izbor umesto kucanja. Vrednosti tih lista putuju sa fajlom, na listovima koji su skriveni, pa šablon radi i bez veze sa aplikacijom.
+U prvom redu su nazivi kolona — crveni tamo gde je polje obavezno — a sve ispod toga je vaše za popunjavanje. Svaka kolona već zna šta u nju ide: u broj se može upisati samo broj, u datum samo datum, a kolona vezana za šifarnik ili za listu vrednosti nudi izbor umesto kucanja. Vrednosti tih lista putuju sa fajlom, na listovima koji su skriveni, pa šablon radi i bez veze sa aplikacijom.
 
-Nazivi i skriveni prvi red fajla su zaštićeni: po njima aplikacija prepoznaje koja je kolona koja kad se fajl vrati, pa se tabela prepoznaje i ako kolone preimenujete ili premestite. Sve ispod toga je vaše za popunjavanje.
+Red sa nazivima je zaštićen i ne može se prepisati, a fajl pamti kojem polju koja kolona pripada. Popunjavajte kolone kako stoje: nemojte ih dodavati, brisati ni premeštati, jer bi podaci stigli u pogrešna polja. Širenje kolone ili sortiranje onoga što ste uneli ne smeta.
 
 ## Brojevi
 
