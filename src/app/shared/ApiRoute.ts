@@ -76,6 +76,16 @@
         return `/api/preview/template/download/${modelId}`;
     }
 
+    /** Import of a filled-in template; the file is sent beforehand through the file upload. */
+    static modelPreviewImport(modelId: string, fileId: string): string {
+        return `/api/preview/template/upload/${modelId}/${fileId}`;
+    }
+
+    /** Import into a subtable: every row of the file belongs to the given row of the parent table. */
+    static modelPreviewImportWithParent(modelId: string, fileId: string, parentId: string): string {
+        return `/api/preview/template/upload/${modelId}/${fileId}/${parentId}`;
+    }
+
     /** The file stored in one column of a record of a model table. */
     static modelPreviewDownload(modelId: string, id: string, columnName: string): string {
         return `/api/preview/download/${modelId}/${id}/${columnName}`;

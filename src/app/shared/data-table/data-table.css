@@ -190,6 +190,24 @@ tr.mat-mdc-row.row-editing:hover {
   color: var(--c-success);
 }
 
+/* The real field stays hidden; the file is chosen through the button. */
+.import-picker {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.import-button i {
+  color: var(--c-primary);
+}
+
+.import-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 /* The template sits next to the export; its own colour tells them apart at a glance. */
 .template-button i {
   color: var(--c-primary);
@@ -640,7 +658,8 @@ tr.mat-mdc-row.row-highlight td:first-child {
 
   /* On a phone the export and the template stay icons only, the advanced search takes the rest of the row */
   .export-button,
-  .template-button {
+  .template-button,
+  .import-button {
     flex: none;
     width: 44px;
     padding: 0;

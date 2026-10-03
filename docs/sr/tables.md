@@ -96,6 +96,12 @@ U prvom redu su nazivi kolona — crveni tamo gde je polje obavezno — a sve is
 
 Red sa nazivima je zaštićen i ne može se prepisati, a fajl pamti kojem polju koja kolona pripada. Popunjavajte kolone kako stoje: nemojte ih dodavati, brisati ni premeštati, jer bi podaci stigli u pogrešna polja. Širenje kolone ili sortiranje onoga što ste uneli ne smeta.
 
+### Vraćanje popunjenog šablona
+
+**Uvoz**, pored šablona, traži popunjen fajl i upisuje njegove redove u tabelu. Pojavljuje se pod istim pravom kao i šablon, a u podtabeli se redovi dodaju pod zapis iz kog ste je otvorili.
+
+Fajl ulazi u celini: ako server ne može da prihvati neki red, ne upiše se ništa, a poruka kaže koji je to red i šta u njemu ne valja. Ispravite taj red i pošaljite fajl ponovo — nema polovično uvezenih podataka koje treba čistiti. Kad prođe, lista se otvara na prvoj strani, bez filtera, od najnovijeg — pa su uvezeni zapisi baš ono što vidite.
+
 ## Brojevi
 
 Ceo broj se prikazuje onako kako je upisan, bez razdvajanja hiljada — šifra, godina ili broj računa treba da se čitaju kako su uneti.

@@ -163,6 +163,7 @@ body {
   background: var(--c-surface);
   color: var(--c-text);
   border-radius: 28px;
+  /* Only the body of the dialog scrolls; the surface itself never does. */
   overflow: hidden;
   box-shadow: var(--shadow-2);
 }
@@ -288,7 +289,9 @@ input[type="number"]:disabled::-webkit-inner-spin-button {
 .fd {
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
+  /* The same number as maxHeight of the panel in MAT_DIALOG_DEFAULT_OPTIONS; a percentage does not
+     work here, because no ancestor has a height of its own for it to resolve against. */
+  max-height: calc(100dvh - 32px);
   background: var(--c-surface);
   color: var(--c-text);
 }
@@ -347,6 +350,10 @@ input[type="number"]:disabled::-webkit-inner-spin-button {
   gap: 18px;
   padding: 24px;
   overflow-y: auto;
+  /* In a column flex box a child does not shrink below its content unless it is told to; without
+     this the body pushes the footer out of the dialog instead of scrolling. */
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .fd-grid {

@@ -31,6 +31,25 @@
   border-color: var(--c-danger);
 }
 
+/* The switches stand in a grid of their own: equal columns, each with room for its hint. */
+.switches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2px 24px;
+  align-items: start;
+}
+
+.switch-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.switch-item .fd-help {
+  margin-top: -6px;
+  margin-bottom: 6px;
+}
+
 .switch {
   display: inline-flex;
   align-items: center;

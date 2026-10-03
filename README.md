@@ -17,7 +17,7 @@ It requires the backend API from the separate repository: **Formuvia** (Java).
 - Data entry in the tables you define: the form is drawn from the model — fields in the grid you designed, translated labels, lists of values and default values — and records are added, changed and deleted from the table screen
 - Files on a record: a field of type File sends the chosen file to the server, and the file stored with a record is taken back from the form or straight from the row in the table; a PDF opens in a reader inside the application
 - Export of any table to Excel, respecting the current filters and sort order
-- Entry template for a table from the Model: an empty Excel file with the columns, their formats, required fields marked and drop-downs for codebooks
+- Entry template for a table from the Model: an empty Excel file with the columns, their formats, required fields marked and drop-downs for codebooks, and the import of that file back into the table - all rows or none, with the row number in the error message
 - Editing a value directly in the table (double-click a cell), plus an edit mode for changing a whole row or adding a new one in the grid
 - History of every row: who changed what and when, with old and new values
 - Change own password

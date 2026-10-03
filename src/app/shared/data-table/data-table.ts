@@ -7,6 +7,7 @@ import { SendRequest } from "../../services/send-request";
 import { ApiRoute } from "../ApiRoute";
 import { Translate } from "../../services/translate";
 import { Language } from "../../services/language";
+import { Notify } from "../../services/notify";
 import { AdvancedSearchDialog, AdvancedSearchDialogData } from "../advanced-search-dialog/advanced-search-dialog";
 import { ComboOption, DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, FileValue, fileId, fileName, isPdf, QueryDatabaseOrder, SubTable, TableChild } from "../database-table";
 import { PdfDialog, PdfDialogData } from "../pdf-dialog/pdf-dialog";
@@ -132,8 +133,16 @@ export class DataTable {
    * user returns to, instead of loading the whole page again.
    */
   readonly rowUrl = input<((id: string) => string) | null>(null);
+  /**
+   * Values every new row of this table starts with, whatever the user types. A subtable passes the
+   * row of the parent table here, because the server requires it and the table itself knows nothing
+   * about it - the parent column is left out of the response.
+   */
+  readonly newRowValues = input<Record<string, any> | null>(null);
   /** Path to the Excel template for entering data; without it the toolbar has no such button. */
   readonly templateUrl = input<string | null>(null);
+  /** Path the filled-in template is sent to, built from the identifier the file upload returned. */
+  readonly importUrl = input<((fileId: string) => string) | null>(null);
   /** Path to the file stored in a column of a row; without it a file column only shows its name. */
   readonly fileUrl = input<((id: string, fieldName: string) => string) | null>(null);
   /** Path to the history of a row for tables without a className (tables from the model). */
@@ -205,6 +214,7 @@ export class DataTable {
   /** A file is being taken; the buttons wait so the same file is not asked for twice. */
   readonly downloading = signal(false);
   readonly takingTemplate = signal(false);
+  readonly importing = signal(false);
   rowValues: Record<string, any> = {};
   readonly rowEditMode = computed(() => this.editRowId() !== null || this.draftRow() !== null);
   readonly canEditMode = computed(() => this.hasUpdate() && !!this.saveUrl() && this.editColumns().length > 0);
@@ -295,6 +305,7 @@ export class DataTable {
   constructor(
     private sendRequest: SendRequest,
     private translate: Translate,
+    private notify: Notify,
     private language: Language,
     private dialog: MatDialog,
     private router: Router,
@@ -533,7 +544,7 @@ export class DataTable {
 
   // After adding: no filters, first page, newest first (the id is a UUIDv7, so id DESC
   // gives the order things were created in), and the new row marked so the user sees what was added.
-  showNew(id: string): void {
+  showNew(id?: string): void {
     clearTimeout(this.filterTimer);
     this.filters.set({});
     this.criteria.set([]);
@@ -545,7 +556,7 @@ export class DataTable {
       sort._stateChanges.next();
     }
     this.pageIndex.set(0);
-    this.reload(id);
+    this.reload(id ?? null);
   }
 
   // After editing: the same page and the same filters, with the changed row marked.
@@ -612,6 +623,31 @@ export class DataTable {
   showRecord(event: Event, row: any, column: DatabaseColumn): void {
     event.stopPropagation();
     this.info.emit({ column, id: String(row[column.fieldName]) });
+  }
+
+  /**
+   * A filled-in template: the file goes to the server first, then its identifier is sent to the import.
+   * The server writes the whole file or nothing, so after it the list is shown as after an entry -
+   * without filters, newest first.
+   */
+  importFile(input: HTMLInputElement): void {
+    const file = input.files?.[0];
+    // the same file can be chosen again, so the field is emptied
+    input.value = "";
+    const importUrl = this.importUrl();
+    if (!file || !importUrl || this.importing()) {
+      return;
+    }
+
+    this.importing.set(true);
+    this.sendRequest
+      .upload(ApiRoute.fileUpload, file)
+      .then((stored: FileValue) => this.sendRequest.post(importUrl(String(stored?.fileUploadFile ?? "")), {}))
+      .then(() => {
+        this.notify.success(this.translate.get("ui.imported"));
+        this.showNew();
+      })
+      .finally(() => this.importing.set(false));
   }
 
   /** The empty Excel template of this table: the columns, their names and the lists to choose from. */
@@ -734,6 +770,7 @@ export class DataTable {
     }
     const draft: Record<string, any> = {};
     this.editColumns().forEach((column) => (draft[column.fieldName] = column.columnType === "BOOLEAN" ? true : null));
+    Object.assign(draft, this.newRowValues() ?? {});
     this.draftRow.set(draft);
     this.startRowEdit(draft, null);
     this.focusEditor(false);

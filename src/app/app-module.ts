@@ -44,6 +44,9 @@ import { AppErrorHandler } from './services/app-error-handler';
       provide: MAT_DIALOG_DEFAULT_OPTIONS,
       useValue: {
         maxWidth: 'calc(100vw - 32px)',
+        // The height of the panel and of the form must be the same number, otherwise the surface
+        // scrolls on its own and the header slides out of sight.
+        maxHeight: 'calc(100dvh - 32px)',
         panelClass: 'formuvia-dialog',
         backdropClass: 'formuvia-backdrop',
         enterAnimationDuration: '90ms',

@@ -47,6 +47,15 @@
       <i class="fa-solid" [class.fa-file-excel]="!exporting()" [class.fa-spinner]="exporting()" [class.fa-spin]="exporting()"></i>
       <span class="export-label">{{ 'ui.exportExcel' | t }}</span>
     </button>
+    @if (importUrl() && hasAdd()) {
+      <input #importPicker type="file" class="import-picker" accept=".xlsx" (change)="importFile(importPicker)" />
+      <button type="button" class="advanced-button import-button" (click)="importPicker.click()"
+        [disabled]="importing()" [title]="'ui.import' | t" [attr.aria-label]="'ui.import' | t">
+        <i class="fa-solid" [class.fa-file-import]="!importing()" [class.fa-spinner]="importing()"
+          [class.fa-spin]="importing()"></i>
+        <span class="export-label">{{ 'ui.import' | t }}</span>
+      </button>
+    }
     @if (templateUrl() && hasAdd()) {
       <button type="button" class="advanced-button template-button" (click)="downloadTemplate()"
         [disabled]="takingTemplate()" [title]="'ui.template' | t" [attr.aria-label]="'ui.template' | t">

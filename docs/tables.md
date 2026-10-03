@@ -96,6 +96,12 @@ The first row holds the column names — red where the field is required — and
 
 The row of names is protected and cannot be overwritten, and the file remembers which field each column belongs to. Fill in the columns as they stand: do not add, remove or move them, or the data will arrive in the wrong fields. Widening a column, or sorting what you have typed, changes nothing.
 
+### Returning the filled-in template
+
+**Import**, beside the template, asks for the filled-in file and writes its rows into the table. It appears under the same right as the template, and in a subtable the rows are added under the record you opened it from.
+
+The file goes in as a whole: if the server cannot accept a row, nothing at all is written and the message says which row it was and what is wrong with it. Fix that row and send the file again — there is no half-finished import to clean up. When it goes through, the list opens on the first page, without filters, newest first, so the imported records are the ones you see.
+
 ## Numbers
 
 A whole number is shown exactly as it is stored, without thousands separators — a code, a year or an invoice number should read the way it was entered.

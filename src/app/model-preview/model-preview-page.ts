@@ -37,7 +37,7 @@ export class ModelPreviewPage {
 
   private readonly modelId = signal("");
   /** Subtable: id of the row in the parent table; empty for an ordinary table. */
-  private readonly parent = signal<string | null>(null);
+  readonly parent = signal<string | null>(null);
 
   /** true when the page was opened by the Back button of a subtable; only then is the list restored. */
   readonly restore = signal(false);
@@ -89,6 +89,15 @@ export class ModelPreviewPage {
 
   /** History of a row: model tables have a path of their own instead of a DTO class name. */
   readonly historyUrl = (id: string) => ApiRoute.modelPreviewHistory(this.modelId(), id);
+
+  /** In a subtable every new row belongs to the row of the parent table the page was opened from. */
+  readonly newRowValues = computed(() => (this.parent() ? { parent: this.parent() } : null));
+
+  /** Where a filled-in template is sent; in a subtable the rows belong to the row it was opened from. */
+  readonly importUrl = (fileId: string) =>
+    this.parent()
+      ? ApiRoute.modelPreviewImportWithParent(this.modelId(), fileId, this.parent()!)
+      : ApiRoute.modelPreviewImport(this.modelId(), fileId);
 
   /** The Excel template for entering data into this table. */
   readonly templateUrl = computed(() => (this.modelId() ? ApiRoute.modelPreviewTemplate(this.modelId()) : null));
