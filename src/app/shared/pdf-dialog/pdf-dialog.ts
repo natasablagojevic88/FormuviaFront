@@ -32,7 +32,9 @@ export class PdfDialog implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.objectUrl = URL.createObjectURL(this.data.content);
-    const viewer = `assets/pdf/web/viewer.html?file=${encodeURIComponent(this.objectUrl)}#zoom=page-width`;
+    // pagemode=none: the viewer otherwise opens with the page thumbnails, or as it was left last time
+    const viewer =
+      `assets/pdf/web/viewer.html?file=${encodeURIComponent(this.objectUrl)}#zoom=page-width&pagemode=none`;
     this.source.set(this.sanitizer.bypassSecurityTrustResourceUrl(viewer));
   }
 

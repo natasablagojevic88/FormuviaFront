@@ -7,6 +7,7 @@ import { ConfirmDialog, ConfirmDialogData } from "../confirm-dialog/confirm-dial
 import { ApiRoute } from "../ApiRoute";
 import { FileValue, fileId, fileName, isPdf } from "../database-table";
 import { PdfDialog, PdfDialogData } from "../pdf-dialog/pdf-dialog";
+import { FileVersionsDialog, FileVersionsDialogData } from "../file-versions-dialog/file-versions-dialog";
 
 /**
  * Field of the FILE type: the chosen file is sent to the server at once
@@ -25,6 +26,12 @@ export class FileField implements ControlValueAccessor, OnDestroy {
   readonly downloadUrl = input<string | null>(null);
   /** In a cell of the table: lower, and the button is only an icon. */
   readonly compact = input(false);
+  /** Path to the versions of the stored file; without it the field does not offer them. */
+  readonly versionsUrl = input<string | null>(null);
+  /** Path to one version of that file, by its identifier. */
+  readonly versionUrl = input<((versionId: string) => string) | null>(null);
+  /** false: the versions are only shown, without removing. */
+  readonly canDeleteVersion = input(true);
 
   /** Identifier of the stored file; empty while only a newly chosen one is in the field. */
   readonly value = signal("");
@@ -79,6 +86,24 @@ export class FileField implements ControlValueAccessor, OnDestroy {
     }
     this.loading.set(true);
     this.sendRequest.download(this.downloadUrl()!).finally(() => this.loading.set(false));
+  }
+
+  /** Every file that stood in this field, newest first. */
+  get canSeeVersions(): boolean {
+    return !!this.value() && !!this.versionsUrl();
+  }
+
+  versions(): void {
+    if (!this.canSeeVersions) {
+      return;
+    }
+    const data: FileVersionsDialogData = {
+      title: this.ariaLabel(),
+      url: this.versionsUrl()!,
+      versionUrl: this.versionUrl() ?? (() => ""),
+      canDelete: this.canDeleteVersion() && !this.disabled(),
+    };
+    this.dialog.open(FileVersionsDialog, { width: "640px", data });
   }
 
   /** A PDF can be read here, without saving it first. */

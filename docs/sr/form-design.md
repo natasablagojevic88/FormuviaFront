@@ -51,7 +51,7 @@ Kad kolona jednom postoji, njen naziv je zaključan — kao i tip podatka, i ši
 
 Polje je dugme koje otvara izbor fajla na vašem računaru ili telefonu. Fajl se šalje na server odmah kad ga izaberete, a zapis pamti sačuvani fajl; naziv fajla stoji pored dugmeta, a **×** ga uklanja iz polja. Uklanjanje fajla koji zapis već ima se prvo potvrđuje, jer u tabeli dejstvuje odmah; fajl koji je tek izabran se uklanja bez pitanja. Kad je zapis snimljen, pored naziva se pojavi i malo dugme **preuzmi**, koje vam fajl vraća. PDF ima i **oko**: otvara se u čitaču unutar aplikacije, pa ne mora da se snima da bi se pročitao.
 
-Ako na zapisu koji već ima fajl izaberete drugi, novi postaje fajl tog zapisa. Prethodni se ne baca: Formuvia ga pamti kao stariju verziju tog fajla, mada se za čitanje i preuzimanje nudi samo trenutni.
+Ako na zapisu koji već ima fajl izaberete drugi, novi postaje fajl tog zapisa. Prethodni se ne baca: Formuvia ga pamti kao stariju verziju. **Sat** pored polja, i pored fajla u listi, otvara te verzije — svaku sa nazivom, tipom i vremenom kad je sačuvana, od najnovije. Svaka se može preuzeti svojim dugmetom **preuzmi**, a PDF i otvoriti **okom**, pa se stariji fajl pročita bez diranja onog koji zapis sada drži. Verzija se briše **korpom**, uz pitanje; poslednja ne može da se obriše, a ako obrišete onu na koju zapis pokazuje, zapis se vraća na verziju sačuvanu pre nje.
 
 U listi takva kolona prikazuje spajalicu sa nazivom fajla i ista dva dugmeta. Po fajlu se ne sortira i ne filtrira, ali se menja i iz same tabele: dvoklik na ćeliju, kao i *Brza izmena*, nude isto dugme za izbor fajla kao forma.
 

@@ -16,6 +16,7 @@ import {
   hasPlace,
   inputModeOf,
   inputTypeOf,
+  hasTooManyDecimals,
   isRequired,
   isWrongNumber,
   layoutOf,
@@ -102,6 +103,12 @@ export class PreviewFormDialog implements OnInit {
   readonly inputType = inputTypeOf;
   readonly inputMode = inputModeOf;
   readonly wrongNumber = (column: PreviewColumn) => isWrongNumber(this.values[column.code], column);
+  readonly tooManyDecimals = (column: PreviewColumn) => hasTooManyDecimals(this.values[column.code], column);
+
+  /** "At most N decimals are allowed", with the number the column holds. */
+  decimalsMessage(column: PreviewColumn): string {
+    return this.translate.get("ui.preview.tooManyDecimals").replace("{0}", String(column.length ?? ""));
+  }
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: PreviewFormDialogData,
@@ -222,6 +229,19 @@ export class PreviewFormDialog implements OnInit {
       : null;
   }
 
+  /** Versions of the file in this field; like the download, only for a record already stored. */
+  versionsUrl(column: PreviewColumn): string | null {
+    return this.data.id && fileId(this.values[column.code])
+      ? ApiRoute.modelPreviewFileVersions(this.data.modelId, this.data.id, column.code)
+      : null;
+  }
+
+  /** One version of the file in this field. */
+  versionUrl(column: PreviewColumn): (versionId: string) => string {
+    return (versionId: string) =>
+      ApiRoute.modelPreviewFileVersion(this.data.modelId, this.data.id ?? "", column.code, versionId);
+  }
+
   /** A required field with no value; a switch always has a value (yes or no). */
   private isEmpty(column: PreviewColumn): boolean {
     if (column.columnType === "BOOLEAN") {
@@ -237,7 +257,9 @@ export class PreviewFormDialog implements OnInit {
 
   canSave(): boolean {
     return !this.loading() && !this.saving() && this.fields().length > 0
-      && !this.fields().some((column) => this.missing(column) || this.wrongNumber(column));
+      && !this.fields().some(
+        (column) => this.missing(column) || this.wrongNumber(column) || this.tooManyDecimals(column)
+      );
   }
 
   /** Subtables are offered next to Save, so a new record can be filled in and opened at once. */

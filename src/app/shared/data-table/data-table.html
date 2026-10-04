@@ -218,6 +218,13 @@
                 <span class="with-info">
                   <i class="fa-solid fa-paperclip file-mark"></i>
                   <span class="value">{{ format(row, column) || ('ui.preview.fileStored' | t) }}</span>
+                  @if (fileVersionsUrl()) {
+                    <button type="button" class="info" (dblclick)="$event.stopPropagation()"
+                      (click)="fileVersions($event, row, column)" [title]="'ui.preview.versions' | t"
+                      [attr.aria-label]="'ui.preview.versions' | t">
+                      <i class="fa-solid fa-clock-rotate-left"></i>
+                    </button>
+                  }
                   @if (canViewFile(row, column)) {
                     <button type="button" class="info" (dblclick)="$event.stopPropagation()"
                       (click)="viewFile($event, row, column)"

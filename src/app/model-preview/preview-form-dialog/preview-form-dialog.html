@@ -59,7 +59,10 @@
             } @else if (column.columnType === 'FILE') {
               <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
               <app-file-field [(ngModel)]="values[column.code]" [ngModelOptions]="{ standalone: true }"
-                [disabled]="isLocked(column)" [downloadUrl]="downloadUrl(column)" [ariaLabel]="column.name" />
+                [disabled]="isLocked(column)" [downloadUrl]="downloadUrl(column)"
+                [versionsUrl]="versionsUrl(column)" [versionUrl]="versionUrl(column)"
+                [canDeleteVersion]="!data.readOnly"
+                [ariaLabel]="column.name" />
             } @else if (column.textArea) {
               <label class="fd-label" [class.fd-required]="isRequired(column)" [for]="'pf-' + column.code">{{ column.name }}</label>
               <textarea [id]="'pf-' + column.code" class="fd-input area" rows="3"
@@ -71,11 +74,13 @@
               <input [id]="'pf-' + column.code" class="fd-input" [type]="inputType(column)"
                 [(ngModel)]="values[column.code]" [ngModelOptions]="{ standalone: true }"
                 [disabled]="isLocked(column)" [attr.inputmode]="inputMode(column)"
-                [class.fd-input-error]="wrongNumber(column)"
+                [class.fd-input-error]="wrongNumber(column) || tooManyDecimals(column)"
                 [attr.maxlength]="column.columnType === 'STRING' ? (column.length || null) : null"
                 autocomplete="off" />
               @if (wrongNumber(column)) {
                 <span class="fd-field-error">{{ 'ui.preview.invalidNumber' | t }}</span>
+              } @else if (tooManyDecimals(column)) {
+                <span class="fd-field-error">{{ decimalsMessage(column) }}</span>
               }
             }
 

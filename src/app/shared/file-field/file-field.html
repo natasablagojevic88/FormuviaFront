@@ -10,6 +10,13 @@
     }
   </button>
 
+  @if (canSeeVersions) {
+    <button type="button" class="ff-get" (click)="versions()"
+      [title]="'ui.preview.versions' | t" [attr.aria-label]="'ui.preview.versions' | t">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+    </button>
+  }
+
   @if (canView) {
     <button type="button" class="ff-get" (click)="view()" [disabled]="loading()"
       [title]="'ui.preview.view' | t" [attr.aria-label]="'ui.preview.view' | t">

@@ -86,6 +86,16 @@
         return `/api/preview/template/upload/${modelId}/${fileId}/${parentId}`;
     }
 
+    /** Versions of the file stored in one column of a record, newest first. */
+    static modelPreviewFileVersions(modelId: string, id: string, columnName: string): string {
+        return `/api/preview/download/${modelId}/${id}/${columnName}/version`;
+    }
+
+    /** One version of the file stored in a column of a record. */
+    static modelPreviewFileVersion(modelId: string, id: string, columnName: string, versionId: string): string {
+        return `/api/preview/download/${modelId}/${id}/${columnName}/version/${versionId}`;
+    }
+
     /** The file stored in one column of a record of a model table. */
     static modelPreviewDownload(modelId: string, id: string, columnName: string): string {
         return `/api/preview/download/${modelId}/${id}/${columnName}`;

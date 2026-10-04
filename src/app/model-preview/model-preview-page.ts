@@ -102,6 +102,14 @@ export class ModelPreviewPage {
   /** The Excel template for entering data into this table. */
   readonly templateUrl = computed(() => (this.modelId() ? ApiRoute.modelPreviewTemplate(this.modelId()) : null));
 
+  /** Versions of the file stored in one column of a row. */
+  readonly fileVersionsUrl = (id: string, fieldName: string) =>
+    ApiRoute.modelPreviewFileVersions(this.modelId(), id, fieldName);
+
+  /** One version of the file stored in one column of a row. */
+  readonly fileVersionUrl = (id: string, fieldName: string, versionId: string) =>
+    ApiRoute.modelPreviewFileVersion(this.modelId(), id, fieldName, versionId);
+
   /** The file stored in one column of a row. */
   readonly fileUrl = (id: string, fieldName: string) =>
     ApiRoute.modelPreviewDownload(this.modelId(), id, fieldName);

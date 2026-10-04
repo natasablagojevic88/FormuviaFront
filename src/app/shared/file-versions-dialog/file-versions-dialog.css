@@ -1,0 +1,116 @@
+:host {
+  display: block;
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  min-height: 140px;
+  color: var(--c-primary);
+  font-size: 26px;
+}
+
+.empty {
+  color: var(--c-text-muted);
+  font-size: 14px;
+  text-align: center;
+  padding: 24px 0;
+}
+
+.versions {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.versions th {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--c-border-soft);
+  color: var(--c-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.versions td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--c-border-soft);
+  color: var(--c-text);
+}
+
+/* The newest version is the one the record holds now. */
+.versions tbody tr:first-child td {
+  font-weight: 600;
+}
+
+.versions .number {
+  text-align: right;
+}
+
+.versions .actions {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.action {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--c-text-faint);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.action:hover:not(:disabled) {
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+}
+
+.action.remove:hover:not(:disabled) {
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+}
+
+.action:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* On a phone every row becomes a small card, as in the big table. */
+@media (max-width: 600px) {
+  .versions thead {
+    display: none;
+  }
+
+  .versions tr {
+    display: block;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--c-border-soft);
+  }
+
+  .versions td {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border: 0;
+    padding: 4px 0;
+    text-align: right;
+  }
+
+  .versions td::before {
+    content: attr(data-label);
+    color: var(--c-text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+}

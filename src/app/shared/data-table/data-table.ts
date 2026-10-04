@@ -11,6 +11,7 @@ import { Notify } from "../../services/notify";
 import { AdvancedSearchDialog, AdvancedSearchDialogData } from "../advanced-search-dialog/advanced-search-dialog";
 import { ComboOption, DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, FileValue, fileId, fileName, isPdf, QueryDatabaseOrder, SubTable, TableChild } from "../database-table";
 import { PdfDialog, PdfDialogData } from "../pdf-dialog/pdf-dialog";
+import { FileVersionsDialog, FileVersionsDialogData } from "../file-versions-dialog/file-versions-dialog";
 import { HistoryPanel } from "../history-panel/history-panel";
 import { Criterion, inputModeFor, inputTypeFor, isEnum, needsValue, quickFilter, toFilter } from "../filter-operations";
 import { chainLevels, ChainLevel } from "../parent-chain";
@@ -77,8 +78,8 @@ function toEditValue(value: any, column: DatabaseColumn, language: string): any 
     return String(value).substring(0, 5);
   }
   if (isDecimalType(column.columnType)) {
-    // a decimal is typed with the separator of that language, thousands not separated
-    return toDecimalText(value, language);
+    // a decimal is typed with the separator of that language, with as many decimals as the column holds
+    return toDecimalText(value, language, column.length);
   }
   return String(value);
 }
@@ -145,6 +146,10 @@ export class DataTable {
   readonly importUrl = input<((fileId: string) => string) | null>(null);
   /** Path to the file stored in a column of a row; without it a file column only shows its name. */
   readonly fileUrl = input<((id: string, fieldName: string) => string) | null>(null);
+  /** Path to the versions of that file; without it the cell does not offer them. */
+  readonly fileVersionsUrl = input<((id: string, fieldName: string) => string) | null>(null);
+  /** Path to one version of that file, by its identifier. */
+  readonly fileVersionUrl = input<((id: string, fieldName: string, versionId: string) => string) | null>(null);
   /** Path to the history of a row for tables without a className (tables from the model). */
   readonly historyUrl = input<((id: string) => string) | null>(null);
   readonly edit = output<any>();
@@ -679,6 +684,23 @@ export class DataTable {
         this.dialog.open(PdfDialog, { width: "min(1100px, 95vw)", data });
       })
       .finally(() => this.downloading.set(false));
+  }
+
+  /** Every file that stood in this cell, newest first. */
+  fileVersions(event: Event, row: any, column: DatabaseColumn): void {
+    event.stopPropagation();
+    const url = this.fileVersionsUrl()?.(row[ID_FIELD], column.fieldName);
+    if (!url) {
+      return;
+    }
+    const versionUrl = this.fileVersionUrl();
+    const data: FileVersionsDialogData = {
+      title: column.description,
+      url,
+      versionUrl: (versionId: string) => versionUrl?.(row[ID_FIELD], column.fieldName, versionId) ?? "",
+      canDelete: this.hasDelete(),
+    };
+    this.dialog.open(FileVersionsDialog, { width: "640px", data });
   }
 
   /** The file of a row is taken straight from the table, without opening the record. */

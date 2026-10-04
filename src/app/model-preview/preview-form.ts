@@ -1,5 +1,5 @@
 import { ColumnType, ComboOption, FileValue, fileId, ParentLevel } from "../shared/database-table";
-import { isDecimalType, isNumberText, parseDecimalText, toDecimalText } from "../shared/number-format";
+import { isDecimalType, isNumberText, parseDecimalText, toDecimalText, tooManyDecimals } from "../shared/number-format";
 
 /** The id column and the column that links to the parent row; the server adds them before the fields. */
 export const PREVIEW_ID_FIELD = "id";
@@ -132,6 +132,14 @@ export function isWrongNumber(value: any, column: PreviewColumn): boolean {
   return !isNumberText(value === null || value === undefined ? "" : String(value), column.columnType);
 }
 
+/** More decimals than the column holds: the database would round it silently, so it is said here. */
+export function hasTooManyDecimals(value: any, column: PreviewColumn): boolean {
+  if (column.columnType !== "BIGDECIMAL") {
+    return false;
+  }
+  return tooManyDecimals(value === null || value === undefined ? "" : String(value), column.length);
+}
+
 /** Value from the server -> value in the field (fields work with text, the switch with a boolean). */
 export function toFieldValue(value: any, column: PreviewColumn, language: string): any {
   if (column.columnType === "BOOLEAN") {
@@ -141,8 +149,8 @@ export function toFieldValue(value: any, column: PreviewColumn, language: string
     return "";
   }
   if (isDecimalType(column.columnType)) {
-    // a decimal is shown with the separator of the language: Serbian 12,5 - English 12.5
-    return toDecimalText(value, language);
+    // a decimal is shown with the separator of the language and with as many decimals as the column holds
+    return toDecimalText(value, language, column.length);
   }
   if (column.columnType === "LOCALDATETIME") {
     return String(value).substring(0, 16);

@@ -49,11 +49,28 @@ export function formatDecimal(value: any, language: string, decimals?: number | 
 }
 
 /** Value from the server -> text in the entry field: the separator of the language, thousands not separated. */
-export function toDecimalText(value: any, language: string): string {
+export function toDecimalText(value: any, language: string, decimals?: number | null): string {
   if (value === null || value === undefined || value === "") {
     return "";
   }
+  // The column says how many decimals it holds, so a value opened for editing is shown with that many.
+  if (decimals !== null && decimals !== undefined) {
+    const numberValue = Number(String(value).trim());
+    if (!Number.isNaN(numberValue)) {
+      return numberValue.toFixed(Math.min(decimals, MAX_DECIMALS)).replace(".", decimalSeparator(language));
+    }
+  }
   return String(value).trim().replace(".", decimalSeparator(language));
+}
+
+/** More decimals than the column holds; the database would round it without a word. */
+export function tooManyDecimals(text: string, decimals?: number | null): boolean {
+  if (decimals === null || decimals === undefined || !isNumberText(text, "BIGDECIMAL")) {
+    return false;
+  }
+  const value = parseDecimalText(text);
+  const dot = value.indexOf(".");
+  return dot >= 0 && value.length - dot - 1 > decimals;
 }
 
 /**

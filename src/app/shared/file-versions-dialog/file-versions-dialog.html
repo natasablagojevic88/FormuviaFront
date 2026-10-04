@@ -1,0 +1,65 @@
+<div class="fd">
+  <header class="fd-header">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ 'ui.preview.versions' | t }}</h2>
+      <p class="fd-subtitle">{{ data.title }}</p>
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    @if (loading()) {
+      <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    } @else if (!rows().length) {
+      <p class="empty">{{ 'ui.noData' | t }}</p>
+    } @else {
+      <table class="versions">
+        <thead>
+          <tr>
+            @for (column of columns(); track column.fieldName) {
+              <th [class.number]="isNumber(column)">{{ column.description }}</th>
+            }
+            <th class="actions">{{ 'ui.actions' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track $index) {
+            <tr>
+              @for (column of columns(); track column.fieldName) {
+                <td [attr.data-label]="column.description" [class.number]="isNumber(column)">{{ format(row, column) }}</td>
+              }
+              <td class="actions" [attr.data-label]="'ui.actions' | t">
+                @if (canView(row)) {
+                  <button type="button" class="action" (click)="view(row)" [disabled]="isBusy(row)"
+                    [title]="'ui.preview.view' | t" [attr.aria-label]="'ui.preview.view' | t">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                }
+                <button type="button" class="action" (click)="download(row)" [disabled]="isBusy(row)"
+                  [title]="'ui.preview.download' | t" [attr.aria-label]="'ui.preview.download' | t">
+                  <i class="fa-solid" [class.fa-download]="!isBusy(row)" [class.fa-spinner]="isBusy(row)"
+                    [class.fa-spin]="isBusy(row)"></i>
+                </button>
+                @if (canDelete) {
+                  <button type="button" class="action remove" (click)="remove(row)" [disabled]="isBusy(row)"
+                    [title]="'ui.preview.deleteVersion' | t" [attr.aria-label]="'ui.preview.deleteVersion' | t">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint">{{ 'ui.preview.versionsHint' | t }}</span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.close' | t }}</button>
+    </div>
+  </footer>
+</div>
