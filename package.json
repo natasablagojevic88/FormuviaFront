@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:war": "ng build --configuration war",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "icons": "node scripts/generate-fa-icons.mjs",

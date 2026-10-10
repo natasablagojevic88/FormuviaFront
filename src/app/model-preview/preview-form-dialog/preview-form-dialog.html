@@ -17,13 +17,13 @@
     } @else {
       <!-- the grid is the same as in the form design: a field stands in its own row and column -->
       <div class="pf-grid" [style.grid-template-columns]="'repeat(' + layout().columnNumber + ', minmax(0, 1fr))'">
-        @for (column of fields(); track column.code) {
+        @for (column of shownFields(); track column.code) {
           <div class="fd-field" [style.grid-column]="gridColumn(column)" [style.grid-row]="gridRow(column)">
             @if (column.columnType === 'BOOLEAN') {
               <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
               <label class="switch" [class.switch-disabled]="isLocked(column)">
-                <input type="checkbox" [(ngModel)]="values[column.code]" [ngModelOptions]="{ standalone: true }"
-                  [disabled]="isLocked(column)" />
+                <input type="checkbox" [(ngModel)]="values[column.code]" (ngModelChange)="fieldChanged()"
+                  [ngModelOptions]="{ standalone: true }" [disabled]="isLocked(column)" />
                 <span class="switch-track"><span class="switch-thumb"></span></span>
                 <span class="switch-text">{{ (values[column.code] ? 'ui.yes' : 'ui.no') | t }}</span>
               </label>
@@ -38,6 +38,7 @@
                 }
               </span>
               <app-chain-select [levels]="levels(column)" [showLastName]="false" [(ngModel)]="values[column.code]"
+                (ngModelChange)="fieldChanged()"
                 [ngModelOptions]="{ standalone: true }" [disabled]="isLocked(column)" [ariaLabel]="column.name" />
             } @else if (hasOptions(column)) {
               <span class="fd-label-row">
@@ -50,15 +51,18 @@
                 }
               </span>
               <app-search-select [options]="options(column)" [(ngModel)]="values[column.code]"
+                (ngModelChange)="fieldChanged()"
                 [ngModelOptions]="{ standalone: true }" [disabled]="isLocked(column)"
                 icon="fa-solid fa-list" [placeholder]="'ui.preview.choose' | t" [ariaLabel]="column.name" />
             } @else if (column.columnType === 'LOCALDATE' || column.columnType === 'LOCALDATETIME') {
               <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
               <app-date-field [withTime]="column.columnType === 'LOCALDATETIME'" [(ngModel)]="values[column.code]"
+                (ngModelChange)="fieldChanged()"
                 [ngModelOptions]="{ standalone: true }" [disabled]="isLocked(column)" [ariaLabel]="column.name" />
             } @else if (column.columnType === 'FILE') {
               <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
-              <app-file-field [(ngModel)]="values[column.code]" [ngModelOptions]="{ standalone: true }"
+              <app-file-field [(ngModel)]="values[column.code]" (ngModelChange)="fieldChanged()"
+                [ngModelOptions]="{ standalone: true }"
                 [disabled]="isLocked(column)" [downloadUrl]="downloadUrl(column)"
                 [versionsUrl]="versionsUrl(column)" [versionUrl]="versionUrl(column)"
                 [canDeleteVersion]="!data.readOnly"
@@ -66,13 +70,15 @@
             } @else if (column.textArea) {
               <label class="fd-label" [class.fd-required]="isRequired(column)" [for]="'pf-' + column.code">{{ column.name }}</label>
               <textarea [id]="'pf-' + column.code" class="fd-input area" rows="3"
-                [(ngModel)]="values[column.code]" [ngModelOptions]="{ standalone: true }"
+                [(ngModel)]="values[column.code]" (ngModelChange)="fieldChanged()"
+                [ngModelOptions]="{ standalone: true }"
                 [disabled]="isLocked(column)" [attr.maxlength]="column.length || null"
                 autocomplete="off"></textarea>
             } @else {
               <label class="fd-label" [class.fd-required]="isRequired(column)" [for]="'pf-' + column.code">{{ column.name }}</label>
               <input [id]="'pf-' + column.code" class="fd-input" [type]="inputType(column)"
-                [(ngModel)]="values[column.code]" [ngModelOptions]="{ standalone: true }"
+                [(ngModel)]="values[column.code]" (ngModelChange)="fieldChanged()"
+                [ngModelOptions]="{ standalone: true }"
                 [disabled]="isLocked(column)" [attr.inputmode]="inputMode(column)"
                 [class.fd-input-error]="wrongNumber(column) || tooManyDecimals(column)"
                 [attr.maxlength]="column.columnType === 'STRING' ? (column.length || null) : null"
@@ -85,7 +91,9 @@
             }
 
             <!-- in a locked record the hint would stand under every field, and the dialog already says so -->
-            @if (isLocked(column) && !data.readOnly) {
+            @if (lockedByCondition(column)) {
+              <span class="fd-help">{{ 'ui.preview.lockedByCondition' | t }}</span>
+            } @else if (isLocked(column) && !data.readOnly) {
               <span class="fd-help">{{ 'ui.preview.locked' | t }}</span>
             }
           </div>

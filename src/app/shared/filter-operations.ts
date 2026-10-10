@@ -112,7 +112,7 @@ export function toFilter(column: DatabaseColumn, operation: SearchOperation, raw
  * The server parses values from strings: numbers as Integer/Long/BigDecimal, a date as yyyy-MM-dd,
  * a date and time as yyyy-MM-ddTHH:mm:ss. A datetime-local field gives yyyy-MM-ddTHH:mm, so the seconds are added.
  */
-function normalize(column: DatabaseColumn, rawValue: string): string {
+export function normalize(column: DatabaseColumn, rawValue: string): string {
   const value = (rawValue ?? "").trim();
   if (!isEnum(column) && isDecimalType(column.columnType)) {
     // entered with a comma or a dot, the server always gets a dot
@@ -127,7 +127,7 @@ function normalize(column: DatabaseColumn, rawValue: string): string {
   return value;
 }
 
-function isValidValue(column: DatabaseColumn, value: string): boolean {
+export function isValidValue(column: DatabaseColumn, value: string): boolean {
   if (value === "") {
     return false;
   }

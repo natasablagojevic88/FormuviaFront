@@ -1,4 +1,6 @@
-import { ColumnType, ComboOption, FileValue, fileId, ParentLevel } from "../shared/database-table";
+import {
+  ColumnCondition, ColumnType, ComboOption, ConditionType, FileValue, fileId, ParentLevel,
+} from "../shared/database-table";
 import { isDecimalType, isNumberText, parseDecimalText, toDecimalText, tooManyDecimals } from "../shared/number-format";
 
 /** The id column and the column that links to the parent row; the server adds them before the fields. */
@@ -29,6 +31,8 @@ export interface PreviewColumn {
   rowIndex?: number;
   columnIndex?: number;
   colspan?: number;
+  /** Conditions over other fields of this form: while they hold, the field is drawn or can be changed. */
+  conditions?: ColumnCondition[];
 }
 
 /**
@@ -50,13 +54,22 @@ export interface FormLayout {
   width: number;
 }
 
+/** Whether the field carries a condition of that kind; where it does, the condition decides. */
+export function hasConditions(column: PreviewColumn, type: ConditionType): boolean {
+  return (column.conditions ?? []).some((condition) => condition.type === type);
+}
+
 /**
- * A field is shown only when it has a place in the grid (a row and a column). A field without one -
- * the id, the link to the parent row, and any other field the server sends without a place - is not
- * shown on the form, but its value stays in the record and is sent when it is saved.
+ * A field is part of the form when it has a place in the grid (a row and a column). A field without
+ * one - the id, the link to the parent row, and any other field the server sends without a place -
+ * is not shown, but its value stays in the record and is sent when it is saved.
+ *
+ * A field the design does not show (showable = false) is left out as well, unless a condition says
+ * when it is shown: a condition is the more exact word about the field, so it then decides.
  */
 export function hasPlace(column: PreviewColumn): boolean {
-  return column.showable !== false && (column.rowIndex ?? 0) > 0 && (column.columnIndex ?? 0) > 0;
+  return (column.rowIndex ?? 0) > 0 && (column.columnIndex ?? 0) > 0
+    && (column.showable !== false || hasConditions(column, "SHOWABLE"));
 }
 
 /** A field has a list of values when it is a codebook or when its list is given by a query. */

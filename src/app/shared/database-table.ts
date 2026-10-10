@@ -45,6 +45,23 @@ export interface ParentLevel {
   parent: string;
 }
 
+/** What a condition decides about the field it belongs to. */
+export type ConditionType = "EDITABLE" | "SHOWABLE";
+
+/**
+ * One condition of a field, set in the form design: while it holds, the field is drawn on the form
+ * (SHOWABLE) or can be changed (EDITABLE). It is written like a filter of a table - an operation over
+ * the value of another field of the same record - and the values are always kept as text.
+ */
+export interface ColumnCondition {
+  type: ConditionType;
+  /** Code of the field whose value decides: fieldName in a table, code on a form. */
+  conditionColumnCode?: string;
+  searchOperation: SearchOperation;
+  field1?: string | null;
+  field2?: string | null;
+}
+
 export interface DatabaseColumn {
   fieldName: string;
   description: string;
@@ -69,9 +86,13 @@ export interface DatabaseColumn {
   parentList?: ParentLevel[];
   /** Number of decimals of the column; when the server sends it, a decimal number is shown with exactly that many. */
   length?: number;
+  /** Conditions over other fields of the same row; in a table both kinds only lock the cell. */
+  conditions?: ColumnCondition[];
 }
 
 export interface DatabaseTable<T> {
+  /** Sum of every decimal column, over all rows the filters match - not only the page shown. */
+  totalColumns?: Record<string, number | string>;
   name: string;
   /** Description of the table from the server; the page shows it as a subtitle. */
   description?: string;

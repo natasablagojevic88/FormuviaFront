@@ -132,6 +132,46 @@ Polje tipa **Da / Ne** nema listu vrednosti — njegove dve vrednosti su da i ne
 Formuvia sve ovo proverava pri snimanju i kaže šta nije u redu.
 :::
 
+## Uslovi
+
+Polje ne mora da se ponaša isto sve vreme. Otvorite već sačuvano polje i na dnu njegovog dijaloga dodajte **uslov**: polje se tada prikazuje, ili se može menjati, samo dok tako kaže vrednost **drugog polja iste forme**.
+
+Uslov je jedan red i čita se kao rečenica:
+
+| Deo | Značenje |
+|---|---|
+| **Dejstvo** | *Prikazano dok* sklanja polje kad uslov ne važi; *Izmenljivo dok* ga ostavlja na formi, ali zaključano |
+| **Zavisi od polja** | drugo polje ove forme čija se vrednost gleda |
+| **Uslov** | poređenje — jednako, sadrži, veće od, prazno… tačno ona koja napredna pretraga nudi za taj tip podatka |
+| **Vrednost** | sa čim se vrednost poredi; *između* traži dve |
+
+Na primer, na fakturi: *Datum plaćanja* — **Prikazano dok** — *Status* — **je jednako** — `PLAĆENO`.
+
+Nude se samo poređenja koja imaju smisla za tip podatka drugog polja: **fajl** se pita samo da li uopšte postoji (*prazno* / *nije prazno*), **veza na šifarnik** i polje sa **listom vrednosti** porede se sa *je jednako*, tekst zna i *sadrži*, *počinje sa* i *završava se sa*, a brojevi, datumi i vreme obična *veće od*, *manje od* i *između*.
+
+Kada polje od kog uslov zavisi vodi na **šifarnik** ili ima **listu vrednosti**, vrednost se ne upisuje nego se bira sa istog spiska koji nudi i forma za unos, pa izaberete *Acme d.o.o.*, a ne oznaku koja se pod tim čuva. Uslov se u listi tada i čita tim tekstom.
+
+
+Polje može imati više uslova. Svi moraju da važe, a dva dejstva se broje odvojeno: polje može biti prikazano, a ipak zaključano.
+
+Uslovi se snimaju zasebno, čim ih potvrdite, a ne zajedno sa ostatkom polja — zato se i dodaju samo na polje koje već postoji. Klik na uslov u listi ga otvara za izmenu, korpica ga briše. Polje bez uslova ponaša se tačno onako kako kažu njegove opcije.
+
+### Šta uslov radi dok se unosi zapis
+
+Uslov je tačnija reč o polju, pa gde njega ima on odlučuje, a prekidač iznad ne: polje kome je **Prikaži na formi** isključeno, a ima uslov *Prikazano dok*, crta se kad god taj uslov važi, i polje kome je **Može se menjati** isključeno, a ima uslov *Izmenljivo dok*, menja se kad god taj važi. Prekidači odlučuju samo za polje koje nema uslov tog dejstva.
+
+Na formi za unos uslovi se računaju pri svakoj promeni, nad vrednostima koje u tom trenutku stoje na formi:
+
+- Polje čiji uslovi *Prikazano dok* ne važe **nestaje sa forme**. Njegovo mesto u mreži ostaje prazno, a polje se vraća čim uslov ponovo bude ispunjen.
+- Polje čiji uslovi *Izmenljivo dok* ne važe ostaje na formi, ali je **zaključano**, uz napomenu ispod njega zašto.
+- Polje koje nije na formi **se ne traži** ni kad je obavezno, pa zapis nikad ne blokira polje koje niko ne vidi.
+- Red koji ostane bez ijednog iscrtanog polja **ne zauzima mesto**: redovi ispod njega se pomeraju gore, pa forma ne otvara prazninu u sredini.
+- Sakriveno polje **vraća se na vrednost sa kojom je forma otvorena** — podrazumevanu kod novog zapisa, sačuvanu kod postojećeg. Ono što je u njega upisano pre nego što je nestalo ne snima se.
+
+Prazno polje ne zadovoljava nijedno poređenje: dok u *Statusu* ništa nije izabrano, uslov *Status je jednako PLAĆENO* ne važi, pa je polje koje od njega zavisi sakriveno ili zaključano. To je isto pravilo po kom radi i pretraga.
+
+U listi, gde se zapisi menjaju pravo u tabeli, jedna ćelija ne može da nestane a da kolona ostane. Tamo **oba dejstva zaključavaju ćeliju**: kolonu čiji uslov za taj red ne važi dvoklik ne otvara i zaključana je u *Brzoj izmeni*, a njena vrednost odlazi na server nepromenjena.
+
 ## Brisanje polja
 
 Dugme **Obriši** na formi polja uklanja polje sa forme **i briše njegovu kolonu iz baze, sa svakom vrednošću koja je u njoj bila**.

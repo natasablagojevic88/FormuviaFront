@@ -5,6 +5,7 @@ import { Notify } from "../../services/notify";
 import { SendRequest } from "../../services/send-request";
 import { Translate } from "../../services/translate";
 import { ApiRoute } from "../../shared/ApiRoute";
+import { ComboOption } from "../../shared/database-table";
 import { ModelNode } from "../model";
 import { ModelColumn, newColumn } from "../model-column";
 import { DIALOG_LIMITS } from "../model";
@@ -29,6 +30,9 @@ export class ColumnsPage {
   readonly columns = signal<ModelColumn[]>([]);
   readonly loading = signal(false);
   readonly selectedId = signal<string | null>(null);
+
+  /** Records the fields of this form offer a choice from, by field identifier; used by the conditions. */
+  readonly listOfValues = signal<Record<string, ComboOption[]>>({});
 
   // The look of the dialog changes right here; saving goes to the model (POST /api/model).
   readonly limits = DIALOG_LIMITS;
@@ -101,7 +105,20 @@ export class ColumnsPage {
       })
       .then(() => this.sendRequest.get(ApiRoute.modelColumnList(modelId)))
       .then((columns: ModelColumn[]) => this.columns.set(columns ?? []))
+      .then(() => this.sendRequest.get(ApiRoute.modelListOfValues(modelId)))
+      .then((values: Record<string, ComboOption[] | null>) => this.listOfValues.set(this.withoutEmpty(values)))
       .finally(() => this.loading.set(false));
+  }
+
+  /** A codebook with no records yet comes as null, so only the fields that really offer a choice are kept. */
+  private withoutEmpty(values: Record<string, ComboOption[] | null>): Record<string, ComboOption[]> {
+    const kept: Record<string, ComboOption[]> = {};
+    Object.entries(values ?? {}).forEach(([id, records]) => {
+      if (records?.length) {
+        kept[id] = records;
+      }
+    });
+    return kept;
   }
 
   resetLayout(): void {
@@ -152,7 +169,12 @@ export class ColumnsPage {
 
   edit(column: ModelColumn): void {
     this.selectedId.set(column.id ?? null);
-    this.openForm({ ...column });
+    if (!column.id) {
+      this.openForm({ ...column });
+      return;
+    }
+    // the list of fields carries no conditions, so the field is read on its own
+    this.sendRequest.get(ApiRoute.modelColumnId(column.id)).then((full: ModelColumn) => this.openForm({ ...full }));
   }
 
   private openForm(column: ModelColumn): void {
@@ -167,8 +189,9 @@ export class ColumnsPage {
       rowNumber: model.rowNumber ?? 1,
       /** Codebooks for a link: every table of the model. */
       modelId: model.id!,
+      listOfValues: this.listOfValues(),
     };
-    this.dialog.open(ColumnDialog, { width: "720px", data, autoFocus: "#name" })
+    this.dialog.open(ColumnDialog, { width: "980px", data, autoFocus: "#name" })
       .afterClosed()
       .subscribe((saved?: ModelColumn | "deleted" | false) => {
         if (!saved) {

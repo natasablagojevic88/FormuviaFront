@@ -5,6 +5,7 @@ import { SendRequest } from "../../services/send-request";
 import { ApiRoute } from "../../shared/ApiRoute";
 import { SelectOption } from "../../shared/search-select/search-select";
 import { ComboOption, FileValue, fileId, SubTable } from "../../shared/database-table";
+import { conditionsHold, ConditionSourceLookup } from "../../shared/column-conditions";
 import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
 import { Translate } from "../../services/translate";
 import { Notify } from "../../services/notify";
@@ -12,6 +13,7 @@ import { chainLevels, ChainLevel } from "../../shared/parent-chain";
 import {
   DEFAULT_FORM_WIDTH,
   fromFieldValue,
+  hasConditions,
   hasOptions,
   hasPlace,
   inputModeOf,
@@ -98,6 +100,9 @@ export class PreviewFormDialog implements OnInit {
    */
   private hiddenValues: Record<string, any> = {};
 
+  /** Where a condition finds the field it depends on; it names it by code, over the whole form. */
+  private source: ConditionSourceLookup = () => null;
+
   readonly isRequired = isRequired;
   readonly hasOptions = hasOptions;
   readonly inputType = inputTypeOf;
@@ -161,6 +166,14 @@ export class PreviewFormDialog implements OnInit {
       .filter((column) => !hasPlace(column))
       .forEach((column) => (this.hiddenValues[column.code] = column.value ?? null));
 
+    // a condition may depend on a field that is not drawn at all, so the whole form is searched
+    this.source = (code: string) => {
+      const column = columns.find((other) => other.code === code);
+      return column
+        ? { columnType: column.columnType, value: code in this.values ? this.values[code] : this.hiddenValues[code] }
+        : null;
+    };
+
     // The width of the dialog depends on the number of columns, which is known only once the form arrives.
     this.dialogRef.updateSize(this.layout().width + "px");
   }
@@ -190,7 +203,24 @@ export class PreviewFormDialog implements OnInit {
   }
 
   gridRow(column: PreviewColumn): string {
-    return column.rowIndex && column.rowIndex > 0 ? String(column.rowIndex) : "auto";
+    if (!column.rowIndex || column.rowIndex <= 0) {
+      return "auto";
+    }
+    // a row left without a single field - every one of them taken away by a condition, or none of
+    // them on the form at all - leaves no empty band: the rows below it move up
+    const place = this.drawnRows().indexOf(column.rowIndex);
+    return String(place < 0 ? column.rowIndex : place + 1);
+  }
+
+  /** Rows of the grid that still have a field on them, in the order they are drawn. */
+  private drawnRows(): number[] {
+    const rows = new Set<number>();
+    this.shownFields().forEach((column) => {
+      if (column.rowIndex && column.rowIndex > 0) {
+        rows.add(column.rowIndex);
+      }
+    });
+    return [...rows].sort((first, second) => first - second);
   }
 
   /**
@@ -198,7 +228,51 @@ export class PreviewFormDialog implements OnInit {
    * entry - its value comes from the default value query, or stays empty.
    */
   isLocked(column: PreviewColumn): boolean {
-    return this.data.readOnly === true || column.editable === false;
+    if (this.data.readOnly === true) {
+      return true;
+    }
+    // where there is a condition it decides, so a field is unlocked by it as well as locked
+    return hasConditions(column, "EDITABLE")
+      ? !conditionsHold(column.conditions, "EDITABLE", this.source)
+      : column.editable === false;
+  }
+
+  /** A field is drawn while its conditions hold; without any it is drawn as it always was. */
+  shown(column: PreviewColumn): boolean {
+    return hasConditions(column, "SHOWABLE")
+      ? conditionsHold(column.conditions, "SHOWABLE", this.source)
+      : column.showable !== false;
+  }
+
+  /** The fields the form really draws at this moment. */
+  shownFields(): PreviewColumn[] {
+    return this.fields().filter((column) => this.shown(column));
+  }
+
+  /** Locked by a condition, not by the field itself: then it is said why. */
+  lockedByCondition(column: PreviewColumn): boolean {
+    return !this.data.readOnly && hasConditions(column, "EDITABLE") && this.isLocked(column);
+  }
+
+  /**
+   * A changed value may take another field off the form. Such a field goes back to the value the
+   * form opened with - the default value for a new record, the stored one for an existing record -
+   * so that nothing typed into it and then hidden is saved. Restoring a value can take away a
+   * further field, so it is repeated while anything keeps changing.
+   */
+  fieldChanged(): void {
+    for (let pass = 0; pass < this.fields().length; pass++) {
+      let restored = false;
+      this.fields().forEach((column) => {
+        if (!this.shown(column) && this.values[column.code] !== this.loadedValues[column.code]) {
+          this.values[column.code] = this.loadedValues[column.code];
+          restored = true;
+        }
+      });
+      if (!restored) {
+        return;
+      }
+    }
   }
 
   /** A field pointing at a codebook offers the record it holds, shown in the same dialog, locked. */
@@ -256,8 +330,9 @@ export class PreviewFormDialog implements OnInit {
   }
 
   canSave(): boolean {
+    // a field a condition has taken off the form is not filled in, so it is not asked for either
     return !this.loading() && !this.saving() && this.fields().length > 0
-      && !this.fields().some(
+      && !this.shownFields().some(
         (column) => this.missing(column) || this.wrongNumber(column) || this.tooManyDecimals(column)
       );
   }
@@ -320,10 +395,11 @@ export class PreviewFormDialog implements OnInit {
     if (this.data.parent) {
       record[PREVIEW_PARENT_FIELD] = this.data.parent;
     }
-    // A locked field goes back as it came, so that an update is not left without its value.
+    // A locked field, and one a condition has taken off the form, go back as they came, so that an
+    // update is not left without its value and nothing typed into a hidden field is stored.
     this.fields().forEach(
       (column) =>
-        (record[column.code] = this.isLocked(column)
+        (record[column.code] = this.isLocked(column) || !this.shown(column)
           ? column.value ?? null
           : fromFieldValue(this.values[column.code], column))
     );

@@ -373,6 +373,67 @@ tr.mat-mdc-row.row-highlight .with-info .info,
   color: var(--c-primary);
 }
 
+/*
+ * The sums: one low strip with the paging at the foot of the card, in the colour of the header.
+ * Each sum stands under its own column, so the cells are as wide as the header cells and the strip
+ * follows the table when it is scrolled sideways. The row height is not touched for this.
+ */
+.totals {
+  flex-shrink: 0;
+  overflow: hidden;
+  border-top: 1px solid var(--c-border-soft);
+  background: var(--c-surface-2);
+}
+
+.totals-cells {
+  display: flex;
+  width: max-content;
+  min-width: 100%;
+}
+
+.totals-list {
+  display: none;
+}
+
+.total-cell {
+  flex: none;
+  padding: 9px 16px;
+  color: var(--c-text);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.total-cell.cell-number {
+  text-align: right;
+}
+
+.totals-title {
+  color: var(--c-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.total-name {
+  color: var(--c-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.total-value {
+  color: var(--c-text);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
 @media (max-width: 900px) {
   /* no hover on a touch screen */
   .with-info .info {
@@ -627,7 +688,7 @@ tr.mat-mdc-row.row-highlight td:first-child {
 
 .paginator {
   border-top: 1px solid var(--c-border-soft);
-  --mat-paginator-container-background-color: var(--c-surface);
+  --mat-paginator-container-background-color: var(--c-surface-2);
   --mat-paginator-container-text-color: var(--c-text-muted);
   --mat-paginator-container-text-size: 13px;
   --mat-paginator-enabled-icon-color: var(--c-text);
@@ -785,5 +846,26 @@ tr.mat-mdc-row.row-highlight td:first-child {
   .edit-button {
     width: 36px;
     padding: 0;
+  }
+
+  /* On a phone the table is a list of cards, so there is no column to stand under: the sums are
+     listed one under another, each with the name of its column. */
+  .totals-cells {
+    display: none;
+  }
+
+  .totals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 14px;
+  }
+
+  .total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
   }
 }

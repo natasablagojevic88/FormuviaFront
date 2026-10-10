@@ -1,3 +1,7 @@
+import { ColumnCondition, ConditionType } from "../shared/database-table";
+
+export type { ConditionType };
+
 /** Data types of a column; the same list as ColumnType on the server. */
 export type ModelColumnType =
   | "STRING"
@@ -10,6 +14,19 @@ export type ModelColumnType =
   | "LOCALTIME"
   | "FILE"
   | "UUID";
+
+/**
+ * One condition of a field, as the form design works with it: the same thing the entry form judges
+ * (ColumnCondition), plus the identifiers and the name of the field it depends on, which only the
+ * designer needs - the form and the table find that field by its code.
+ */
+export interface ModelColumnCondition extends ColumnCondition {
+  id?: string;
+  modelColumnId: string;
+  /** The field whose value is tested. */
+  conditionColumnId: string;
+  conditionColumnName?: string;
+}
 
 /** One field of the form, that is, a column of the table the model creates in the database. */
 export interface ModelColumn {
@@ -40,6 +57,8 @@ export interface ModelColumn {
   /** Order of this column in the sorting a table opens with; empty means it takes no part in it. */
   initSortOrder?: number | null;
   initSortDirection?: "ASC" | "DESC" | null;
+  /** Conditions of this field; only GET /model-column/{id} and the answer to a save carry them. */
+  conditions?: ModelColumnCondition[];
 }
 
 /** Limits from ModelColumnDTO (@Min/@Max on the server). */

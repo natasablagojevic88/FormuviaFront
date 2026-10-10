@@ -1,4 +1,6 @@
-import { Component, computed, effect, ElementRef, input, output, signal, untracked, viewChild } from "@angular/core";
+import {
+  AfterViewInit, Component, computed, effect, ElementRef, input, OnDestroy, output, signal, untracked, viewChild,
+} from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { PageEvent } from "@angular/material/paginator";
 import { MatSort, Sort } from "@angular/material/sort";
@@ -14,6 +16,7 @@ import { PdfDialog, PdfDialogData } from "../pdf-dialog/pdf-dialog";
 import { FileVersionsDialog, FileVersionsDialogData } from "../file-versions-dialog/file-versions-dialog";
 import { HistoryPanel } from "../history-panel/history-panel";
 import { Criterion, inputModeFor, inputTypeFor, isEnum, needsValue, quickFilter, toFilter } from "../filter-operations";
+import { conditionsHold, ConditionSourceLookup } from "../column-conditions";
 import { chainLevels, ChainLevel } from "../parent-chain";
 import { formatDate, formatDateTime, formatTime } from "../date-format";
 import { formatDecimal, isDecimalType, isNumberType, parseDecimalText, toDecimalText } from "../number-format";
@@ -54,6 +57,14 @@ export interface TrailCrumb {
 interface CellRef {
   id: string;
   fieldName: string;
+}
+
+/**
+ * Whether the column may be changed by its own option. A column with a condition is not judged by
+ * the option at all: the condition is the more exact word about it, and it decides.
+ */
+function openByOption(column: DatabaseColumn): boolean {
+  return column.editable !== false || (column.conditions?.length ?? 0) > 0;
 }
 
 /** A UUID is changed only when it has a list of values (a foreign key); the id of the row itself is never changed. */
@@ -114,7 +125,7 @@ function fromEditValue(text: any, column: DatabaseColumn): any {
   templateUrl: "./data-table.html",
   styleUrl: "./data-table.css",
 })
-export class DataTable {
+export class DataTable implements AfterViewInit, OnDestroy {
   readonly url = input.required<string>();
   /** A permanent filter (e.g. a child table by its parent row); the user cannot remove it. */
   readonly parentFilter = input<{ field: string; value: string } | null>(null);
@@ -170,6 +181,25 @@ export class DataTable {
     columnType === "BOOLEAN" || columnType === "LOCALDATE" || columnType === "LOCALDATETIME" ||
     columnType === "LOCALTIME";
 
+  /** Sums the server sends for the decimal columns; empty when the table has none. */
+  readonly totals = signal<Record<string, number | string>>({});
+  readonly hasTotals = computed(() => Object.keys(this.totals()).length > 0);
+  /** Columns the server sent a sum for, in the order of the table; a phone lists them by name. */
+  readonly totalColumns = computed(() =>
+    this.allColumns().filter((column) => this.totals()[column.fieldName] !== undefined));
+  /** One cell of the strip per column of the table, so a sum stands under the column it belongs to. */
+  readonly totalCells = computed(() =>
+    this.displayedColumns().map((fieldName) => ({
+      fieldName,
+      column: this.allColumns().find((item) => item.fieldName === fieldName) ?? null,
+    })));
+  /** Where the word Total stands: the actions cell, or the first column that has no sum of its own. */
+  readonly totalLabelField = computed(() =>
+    this.totalCells().find((cell) => !cell.column || this.totals()[cell.fieldName] === undefined)?.fieldName ?? "");
+  /** Widths taken from the header of the table; without them the strip is not drawn. */
+  readonly totalWidths = signal<number[]>([]);
+  /** How far the table is scrolled sideways; the strip follows it. */
+  readonly scrollLeft = signal(0);
   readonly columns = signal<DatabaseColumn[]>([]);
   readonly allColumns = signal<DatabaseColumn[]>([]);
   readonly rows = signal<any[]>([]);
@@ -221,6 +251,9 @@ export class DataTable {
   readonly takingTemplate = signal(false);
   readonly importing = signal(false);
   rowValues: Record<string, any> = {};
+  /** The row open for editing, and its values as they were when it was opened. */
+  private editingRow: any = null;
+  private rowStartValues: Record<string, any> = {};
   readonly rowEditMode = computed(() => this.editRowId() !== null || this.draftRow() !== null);
   readonly canEditMode = computed(() => this.hasUpdate() && !!this.saveUrl() && this.editColumns().length > 0);
   /** The row is only shown, not changed: the pencil becomes an eye and the form opens locked. */
@@ -228,7 +261,7 @@ export class DataTable {
   readonly showDelete = computed(() => this.canDelete() && this.hasDelete());
   /** Columns offered in edit mode: every editable column from allColumns, including those hidden in the table. */
   readonly editColumns = computed(() =>
-    this.allColumns().filter((column) => column.editable !== false && isEditableType(column)));
+    this.allColumns().filter((column) => openByOption(column) && isEditableType(column)));
   /** Cell definitions are built for the union: table columns + columns seen only in edit mode. */
   readonly cellColumns = computed(() => {
     const columns = this.columns();
@@ -306,6 +339,7 @@ export class DataTable {
   private loadedUrl: string | null = null;
   /** The last page of rows as the server sent it; kept for the way back from a subtable. */
   private lastTable: DatabaseTable<any> | null = null;
+  private sizeWatch?: ResizeObserver;
 
   constructor(
     private sendRequest: SendRequest,
@@ -323,6 +357,49 @@ export class DataTable {
       const url = this.url();
       untracked(() => this.showTable(url));
     });
+
+    // the columns of the strip follow the columns of the table, so they are measured again with them
+    effect(() => {
+      this.displayedColumns();
+      this.hasTotals();
+      untracked(() => this.scheduleMeasure());
+    });
+  }
+
+  /** The width of a column changes with the window, the rows and the edit mode; all of it is caught here. */
+  ngAfterViewInit(): void {
+    const table = this.host.nativeElement.querySelector("table");
+    if (!table) {
+      return;
+    }
+    this.sizeWatch = new ResizeObserver(() => this.measureTotals());
+    this.sizeWatch.observe(table);
+  }
+
+  ngOnDestroy(): void {
+    this.sizeWatch?.disconnect();
+  }
+
+  private scheduleMeasure(): void {
+    // the widths are known only once the table has drawn what changed
+    setTimeout(() => this.measureTotals());
+  }
+
+  /** Widths of the header cells, in the order of the columns. */
+  private measureTotals(): void {
+    if (!this.hasTotals()) {
+      return;
+    }
+    const header = this.host.nativeElement.querySelectorAll<HTMLElement>("thead tr:first-child th");
+    this.totalWidths.set(Array.from(header).map((cell) => cell.getBoundingClientRect().width));
+  }
+
+  totalWidth(index: number): number | null {
+    return this.totalWidths()[index] ?? null;
+  }
+
+  onTableScroll(event: Event): void {
+    this.scrollLeft.set((event.target as HTMLElement).scrollLeft);
   }
 
   /** Another table starts from the beginning: without the filters, sorting and columns of the previous one. */
@@ -470,6 +547,7 @@ export class DataTable {
   /** Draws a page of rows, whether it came from the server now or from the way back. */
   private applyTable(table: DatabaseTable<any>, highlightId: string | null, flash: boolean): void {
     this.lastTable = table;
+    this.totals.set(table.totalColumns ?? {});
     this.columns.set(table.column);
     this.saveUrl.set(table.saveUrl || null);
     this.tableName.set(table.name ?? "");
@@ -489,6 +567,7 @@ export class DataTable {
     this.allColumns.set(table.allColumns ?? table.column);
     this.rows.set(table.list);
     this.total.set(table.total);
+    this.scheduleMeasure();
     this.loaded.emit(table);
 
     if (highlightId && table.list.some((row) => row[ID_FIELD] === highlightId)) {
@@ -808,6 +887,8 @@ export class DataTable {
     this.editColumns().forEach(
       (column) => (this.rowValues[column.fieldName] = this.editValueOf(row, column))
     );
+    this.editingRow = row;
+    this.rowStartValues = { ...this.rowValues };
     this.highlightedId.set(id);
     this.highlightFlash.set(false);
   }
@@ -816,6 +897,74 @@ export class DataTable {
     this.editRowId.set(null);
     this.draftRow.set(null);
     this.rowValues = {};
+    this.editingRow = null;
+    this.rowStartValues = {};
+  }
+
+  // --- conditions: a column can depend on the value of another column of the same row ---
+
+  /**
+   * A cell in a table cannot be taken away the way a field on a form can, so a column a condition
+   * speaks against is locked, whichever of the two kinds it is.
+   */
+  private conditionsAllow(column: DatabaseColumn, source: ConditionSourceLookup): boolean {
+    return conditionsHold(column.conditions, "EDITABLE", source)
+      && conditionsHold(column.conditions, "SHOWABLE", source);
+  }
+
+  /** Conditions of the row open for editing: judged by what is being typed into it right now. */
+  private rowSource: ConditionSourceLookup = (code: string) => {
+    const column = this.allColumns().find((other) => other.fieldName === code);
+    if (!column) {
+      return null;
+    }
+    return {
+      columnType: column.columnType,
+      value: code in this.rowValues ? this.rowValues[code] : this.editingRow?.[code],
+    };
+  };
+
+  /** Conditions of a row that is only shown: judged by the values it holds. */
+  private sourceOfRow(row: any): ConditionSourceLookup {
+    return (code: string) => {
+      const column = this.allColumns().find((other) => other.fieldName === code);
+      return column ? { columnType: column.columnType, value: row?.[code] } : null;
+    };
+  }
+
+  /**
+   * Whether the row editor offers this column at all. Only the columns of editColumns are read back
+   * when the row is saved, so a column outside them must not show an editor - what was typed into it
+   * would be dropped without a word.
+   */
+  isEditColumn(column: DatabaseColumn): boolean {
+    return this.editColumns().some((item) => item.fieldName === column.fieldName);
+  }
+
+  /** Only one row is open at a time, so the conditions are always judged over that one row. */
+  rowLocked(column: DatabaseColumn): boolean {
+    return !this.conditionsAllow(column, this.rowSource);
+  }
+
+  /**
+   * A value that locks another column takes that column back to what it held when the row was
+   * opened, so nothing typed and then locked away is saved. Restoring a value can lock a further
+   * column, so it is repeated while anything keeps changing.
+   */
+  rowChanged(): void {
+    const columns = this.editColumns();
+    for (let pass = 0; pass < columns.length; pass++) {
+      let restored = false;
+      columns.forEach((column) => {
+        if (this.rowLocked(column) && this.rowValues[column.fieldName] !== this.rowStartValues[column.fieldName]) {
+          this.rowValues[column.fieldName] = this.rowStartValues[column.fieldName];
+          restored = true;
+        }
+      });
+      if (!restored) {
+        return;
+      }
+    }
   }
 
   /** Required fields (required from the server) have to be filled in. */
@@ -823,7 +972,9 @@ export class DataTable {
     if (this.savingRow()) {
       return false;
     }
-    return this.editColumns().every((column) => !column.required || (this.rowValues[column.fieldName] ?? "") !== "");
+    // a column a condition locks is not filled in by the user, so it is not asked for either
+    return this.editColumns().every(
+      (column) => !column.required || this.rowLocked(column) || (this.rowValues[column.fieldName] ?? "") !== "");
   }
 
   saveRow(): void {
@@ -839,7 +990,10 @@ export class DataTable {
 
     const changed = { ...row };
     this.editColumns().forEach((column) => {
-      changed[column.fieldName] = fromEditValue(this.rowValues[column.fieldName] ?? "", column);
+      // a locked column goes back as it came, so the row does not lose the value it had
+      changed[column.fieldName] = this.rowLocked(column)
+        ? row[column.fieldName] ?? null
+        : fromEditValue(this.rowValues[column.fieldName] ?? "", column);
     });
 
     this.savingRow.set(true);
@@ -866,10 +1020,10 @@ export class DataTable {
     return column.fieldName.toLowerCase().includes("password") ? "password" : inputTypeFor(column);
   }
 
-  canEdit(column: DatabaseColumn): boolean {
+  canEdit(row: any, column: DatabaseColumn): boolean {
     // A double click works in edit mode too; it is off only while some row is open for editing.
-    return this.hasUpdate() && !!this.saveUrl() && !this.rowEditMode() && column.editable !== false
-      && isEditableType(column);
+    return this.hasUpdate() && !!this.saveUrl() && !this.rowEditMode() && openByOption(column)
+      && isEditableType(column) && this.conditionsAllow(column, this.sourceOfRow(row));
   }
 
   /**
@@ -897,7 +1051,8 @@ export class DataTable {
   }
 
   startEdit(row: any, column: DatabaseColumn): void {
-    if (!this.canEdit(column) || this.isCell(this.editing(), row, column) || this.isCell(this.savingCell(), row, column)) {
+    if (!this.canEdit(row, column) || this.isCell(this.editing(), row, column)
+      || this.isCell(this.savingCell(), row, column)) {
       return;
     }
     this.editValue = this.editValueOf(row, column);
@@ -951,7 +1106,8 @@ export class DataTable {
       return;
     }
     this.editing.set(null);
-    const column = this.columns().find((item) => item.fieldName === cell.fieldName);
+    // allColumns, not the visible ones: in edit mode the table also shows columns hidden from it
+    const column = this.allColumns().find((item) => item.fieldName === cell.fieldName);
     const row = this.rows().find((item) => item[ID_FIELD] === cell.id);
     if (!column || !row) {
       return;
@@ -1178,6 +1334,15 @@ export class DataTable {
       default:
         return value;
     }
+  }
+
+  /** The sum of a column, in the form of the chosen language; empty for a column without one. */
+  totalOf(column: DatabaseColumn): string {
+    const value = this.totals()[column.fieldName];
+    if (value === null || value === undefined) {
+      return "";
+    }
+    return formatDecimal(value, this.language.current(), column.length);
   }
 
   /** Text of a value from the list of values of the column; the value itself when it is not in the list. */

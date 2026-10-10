@@ -81,6 +81,30 @@ Development settings are in `src/environments/environment.development.ts`:
 
 On the backend, set `cors.url` to the address where the client is served. The client and the API must be on the same site and served over HTTPS (see the backend README).
 
+## Building into the backend WAR
+
+The client can also travel inside the same WAR as the API, as one deployment. Then there is no separate web server, no CORS and no address to configure:
+
+```sh
+npm run build:war
+```
+
+The result in `dist/FormuviaFront/browser/` is added to the WAR by the backend build (`maven-war-plugin`, `webResources`), beside `WEB-INF`. Two things make that build different from the one above:
+
+- **The API address is not written down.** `src/environments/environment.war.ts` takes it from the document base, so the client always calls the address it was itself served from.
+- **The base of the document is worked out when the page opens.** `index.html` sets `<base href>` from `location.pathname`, before a single file is loaded, so the same build works at the root of the server (`ROOT.war`) and under a context (`/Formuvia/`), with no flag at build time.
+
+Everything the client loads - assets, lazy chunks, the PDF viewer - is referenced relative to that base, so nothing has to be rebuilt when the application is deployed under a different name.
+
+The server serving the WAR needs two media types for the PDF viewer, which older Tomcat versions do not know (`web.xml` of the backend):
+
+```xml
+<mime-mapping><extension>mjs</extension><mime-type>text/javascript</mime-type></mime-mapping>
+<mime-mapping><extension>wasm</extension><mime-type>application/wasm</mime-type></mime-mapping>
+```
+
+`index.html` must not be cached; the other files carry a hash in their name and can be cached for as long as you like. Without that, a browser can keep an old `index.html` after an upgrade and ask for files that are no longer there.
+
 ## Usage
 
 This is a quick reference. The full guide, with the model and the form designer explained step by step, is at **[https://natasablagojevic88.github.io/FormuviaFront/](https://natasablagojevic88.github.io/FormuviaFront/)**.

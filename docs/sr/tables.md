@@ -64,6 +64,8 @@ Dvoklik na ćeliju, izmenite vrednost, `Enter` snima a `Esc` odustaje. Na telefo
 
 Na dvoklik reaguju samo ćelije koje smeju da se menjaju; kolonu koju server označi kao nepromenljivu dvoklik ne otvara. Kolona sa fajlom reaguje: u ćeliji dobijate isto dugme za izbor fajla kao na formi, a zapis se snima čim fajl izaberete.
 
+Gde god se lista menja na ovaj način, kolona koja nosi [uslov](/sr/form-design#uslovi) iz dizajna forme prati ga: dok uslov za taj red ne važi, ćelija je zaključana — dvoklik je ne otvara i u *Brzoj izmeni* se u nju ne može kucati — pa vrednost ostaje kakva jeste.
+
 ### Brza izmena
 
 **Brza izmena** u traci služi za unos više zapisa jedan za drugim, bez otvaranja dijaloga svaki put.
@@ -87,6 +89,12 @@ Dugme ⋯ pored *Izmeni* nosi sve ostalo:
 **Export u Excel** preuzima listu kao `.xlsx` fajl.
 
 Dobijate tačno ono što filteri i redosled sortiranja opisuju, a **ne** samo stranu koja je na ekranu: suzite na prošli mesec, sortirajte po iznosu, i fajl sadrži sve te redove, tim redosledom, sa prevedenim nazivima kolona.
+
+## Zbirovi
+
+Tabela sa decimalnim kolonama na dnu ima traku sa zbirovima, odmah iznad straničenja, i svaki zbir stoji ispod kolone kojoj pripada. Zbir obuhvata **sve što filteri pogađaju**, a ne samo stranu koja je na ekranu: suzite na jednog partnera i zbir je njegov, sklonite filter i zbir je cele tabele.
+
+Traka stoji u dnu tabele, bila lista duga ili kratka, i prati kolone kad se tabela skroluje u stranu. Na telefonu, gde je lista niz kartica, zbirovi idu jedan ispod drugog, svaki sa nazivom svoje kolone.
 
 ## Šablon za unos
 

@@ -22,6 +22,11 @@
     static readonly model='/api/model';
     static readonly modelTree='/api/model/tree';
 
+    /** Records offered by the fields of one table: those linked to a codebook and those with a query of their own. */
+    static modelListOfValues(modelId: string): string {
+        return `/api/model/list-of-values/${modelId}`;
+    }
+
     static readonly modelColumn='/api/model-column';
 
     static modelColumnList(modelId: string): string {
@@ -30,6 +35,12 @@
 
     static modelColumnId(id: string): string {
         return `/api/model-column/${id}`;
+    }
+
+    static readonly modelColumnCondition='/api/model-column/condition';
+
+    static modelColumnConditionId(id: string): string {
+        return `/api/model-column/condition/${id}`;
     }
 
     static modelPreviewTable(modelId: string): string {

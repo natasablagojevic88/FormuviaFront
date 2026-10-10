@@ -1,0 +1,24 @@
+<project name="FormuviaFront" default="package" basedir=".">
+	<property name="dest" location="dist" />
+	<property name="war-dest"
+		location="${dest}/FormuviaFront/Formuvia.war" />
+	<property name="code-dest"
+		location="${dest}/FormuviaFront/browser" />
+
+	<target name="clean">
+		<delete dir="${dest}" />
+	</target>
+
+	<target name="build" depends="clean">
+		<exec executable="npm" failonerror="true">
+			<arg value="run" />
+			<arg value="build:war" />
+		</exec>
+	</target>
+
+	<target name="package" depends="build">
+		<war destfile="${war-dest}" needxmlfile="false" whenmanifestonly="fail">
+			<fileset dir="${code-dest}" />
+		</war>
+	</target>
+</project>

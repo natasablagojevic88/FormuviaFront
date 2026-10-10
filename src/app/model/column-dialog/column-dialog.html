@@ -119,7 +119,11 @@
             <span class="switch-text">{{ label('showable') }}</span>
           </label>
           @if (!column.showable) {
-            <span class="fd-help">{{ (isFile ? 'ui.column.showableFile' : 'ui.column.showableHelp') | t }}</span>
+            @if (hasShowCondition()) {
+              <span class="fd-help">{{ 'ui.column.showableCondition' | t }}</span>
+            } @else {
+              <span class="fd-help">{{ (isFile ? 'ui.column.showableFile' : 'ui.column.showableHelp') | t }}</span>
+            }
           }
         </div>
 
@@ -195,6 +199,113 @@
           }
         </div>
       }
+      <!-- conditions: the field is drawn or editable only while the value of another field says so -->
+      <div class="fd-field fd-field-wide section">
+        <span class="section-title">{{ 'ui.column.conditionsTitle' | t }}</span>
+        <span class="fd-help">{{ 'ui.column.conditionsHelp' | t }}</span>
+      </div>
+
+      <div class="fd-field fd-field-wide conditions">
+        @if (isNew) {
+          <p class="conditions-empty">{{ 'ui.column.conditionsNew' | t }}</p>
+        } @else {
+          @if (conditions().length) {
+            <ul class="condition-list">
+              @for (condition of conditions(); track condition.id) {
+                <li class="condition" [class.condition-open]="draft()?.id === condition.id">
+                  <button type="button" class="condition-main" (click)="editCondition(condition)">
+                    <span class="condition-kind">{{ conditionTypeLabel(condition) }}</span>
+                    <span class="condition-field">{{ conditionFieldLabel(condition) }}</span>
+                    <span class="condition-rule">{{ conditionText(condition) }}</span>
+                  </button>
+                  <button type="button" class="condition-remove" (click)="removeCondition(condition)"
+                    [disabled]="savingCondition()" [attr.aria-label]="'ui.delete' | t">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="conditions-empty">{{ 'ui.column.conditionEmpty' | t }}</p>
+          }
+
+          @if (draft(); as condition) {
+            <div class="condition-form">
+              <div class="fd-field">
+                <span class="fd-label">{{ 'ui.column.conditionType' | t }}</span>
+                <app-search-select [options]="conditionTypes()" [clearable]="false" [(ngModel)]="condition.type"
+                  [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-wand-magic-sparkles"
+                  [ariaLabel]="'ui.column.conditionType' | t" />
+              </div>
+
+              <div class="fd-field">
+                <span class="fd-label">{{ 'ui.column.conditionField' | t }}</span>
+                <app-search-select [options]="conditionFields()" [clearable]="false"
+                  [(ngModel)]="condition.conditionColumnId" (ngModelChange)="conditionFieldChanged()"
+                  [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-table-columns"
+                  [ariaLabel]="'ui.column.conditionField' | t" />
+              </div>
+
+              <div class="fd-field">
+                <span class="fd-label">{{ 'ui.operation' | t }}</span>
+                <app-search-select [options]="conditionOperations()" [clearable]="false"
+                  [(ngModel)]="condition.searchOperation" [ngModelOptions]="{ standalone: true }"
+                  icon="fa-solid fa-code-compare" [ariaLabel]="'ui.operation' | t" />
+              </div>
+
+              @if (draftNeedsValue()) {
+                <div class="fd-field">
+                  <label class="fd-label" for="conditionValue">{{ 'ui.column.conditionValue' | t }}</label>
+                  @if (draftIsBoolean()) {
+                    <app-search-select [options]="booleanOptions()" [clearable]="false" [(ngModel)]="condition.field1"
+                      [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-toggle-on"
+                      [ariaLabel]="'ui.column.conditionValue' | t" />
+                  } @else if (draftOptions().length) {
+                    <app-search-select [options]="draftOptions()" [clearable]="false" [(ngModel)]="condition.field1"
+                      [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-list"
+                      [ariaLabel]="'ui.column.conditionValue' | t" />
+                  } @else {
+                    <input id="conditionValue" name="conditionValue" class="fd-input" [type]="draftInputType()"
+                      [attr.inputmode]="draftInputMode()" [(ngModel)]="condition.field1"
+                      [ngModelOptions]="{ standalone: true }" autocomplete="off"
+                      (keydown.enter)="$event.preventDefault(); saveCondition()" />
+                  }
+                </div>
+              }
+
+              @if (draftNeedsValue2()) {
+                <div class="fd-field">
+                  <label class="fd-label" for="conditionValue2">{{ 'ui.column.conditionValue2' | t }}</label>
+                  <input id="conditionValue2" name="conditionValue2" class="fd-input" [type]="draftInputType()"
+                    [attr.inputmode]="draftInputMode()" [(ngModel)]="condition.field2"
+                    [ngModelOptions]="{ standalone: true }" autocomplete="off"
+                    (keydown.enter)="$event.preventDefault(); saveCondition()" />
+                </div>
+              }
+
+              <div class="condition-actions">
+                <button type="button" class="fd-button fd-button-secondary" (click)="cancelCondition()">
+                  {{ 'ui.cancel' | t }}
+                </button>
+                <button type="button" class="fd-button fd-button-primary" (click)="saveCondition()"
+                  [disabled]="!canSaveCondition()">
+                  <i class="fa-solid" [class.fa-check]="!savingCondition()" [class.fa-spinner]="savingCondition()"
+                    [class.fa-spin]="savingCondition()"></i>
+                  {{ 'ui.save' | t }}
+                </button>
+              </div>
+            </div>
+          } @else if (conditionFields().length) {
+            <button type="button" class="condition-add" (click)="startCondition()" [disabled]="savingCondition()">
+              <i class="fa-solid fa-plus"></i>
+              {{ 'ui.column.conditionAdd' | t }}
+            </button>
+          } @else {
+            <p class="conditions-empty">{{ 'ui.column.conditionNoFields' | t }}</p>
+          }
+        }
+      </div>
+
     </div>
   </div>
 

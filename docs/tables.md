@@ -64,6 +64,8 @@ Double-click a cell, change the value, `Enter` saves it and `Esc` cancels. On a 
 
 Only cells that may be changed react to a double-click; a column the server marks as read-only ignores it. A file column reacts as well: the cell offers the same file button as the form, and the record is saved the moment a file is chosen.
 
+Wherever the list is edited this way, a column that carries a [condition](/form-design#conditions) from the form design follows it: while the condition does not hold for that row, the cell is locked — a double-click does not open it and in *Quick edit* it cannot be typed into — so the value stays as it is.
+
 ### Quick edit
 
 **Quick edit** in the toolbar is for entering several records one after another without opening a dialog each time.
@@ -87,6 +89,12 @@ The ⋯ button next to *Edit* holds everything else:
 **Export to Excel** downloads the list as an `.xlsx` file.
 
 What you get is exactly what the filters and the sort order describe, **not** just the page on the screen: filter down to last month's records, sort them by amount, and the file contains all of them, in that order, with the translated column headers.
+
+## Totals
+
+A table with decimal columns closes with a strip of sums just above the paging, each one standing under the column it belongs to. The sum covers **everything the filters match**, not only the page on the screen: filter down to one partner and the total is that partner's, turn the filter off and it is the whole table's.
+
+The strip stays at the foot of the table whether the list is long or short, and follows the columns when the table is scrolled sideways. On a phone, where the list is a stack of cards, the sums stand one under another, each line naming its column.
 
 ## The entry template
 
