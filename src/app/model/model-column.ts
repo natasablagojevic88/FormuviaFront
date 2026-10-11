@@ -47,6 +47,11 @@ export interface ModelColumn {
   defaultValueSql?: string | null;
   /** A SELECT with two columns (value, text) that fills the list of choices for this field. */
   listOfValuesSql?: string | null;
+  /**
+   * A function of the database that works out the values of the record whenever this field is
+   * changed: it takes the record as json and returns it as json, changed.
+   */
+  changeValueFunction?: string | null;
   textArea: boolean;
   /** When this table is used as a codebook, the value of this field goes into the label shown. */
   inDescriptionForCodebook: boolean;
@@ -68,6 +73,10 @@ export const COLUMN_LIMITS = {
   colspan: { min: 1, max: 12 },
   initSortOrder: { min: 1 },
 };
+
+/** The change function is looked for among the routines of the database that return json. */
+export const CHANGE_FUNCTION_TYPE = "FUNCTION";
+export const CHANGE_FUNCTION_DATA_TYPE = "json";
 
 /** Code of the column: the same pattern as on the server. */
 export const COLUMN_CODE_PATTERN = /^[a-z][a-z0-9_]{0,62}$/;

@@ -22,7 +22,8 @@
             @if (column.columnType === 'BOOLEAN') {
               <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
               <label class="switch" [class.switch-disabled]="isLocked(column)">
-                <input type="checkbox" [(ngModel)]="values[column.code]" (ngModelChange)="fieldChanged()"
+                <input type="checkbox" [(ngModel)]="values[column.code]"
+                  (ngModelChange)="fieldChanged(); runChange(column)"
                   [ngModelOptions]="{ standalone: true }" [disabled]="isLocked(column)" />
                 <span class="switch-track"><span class="switch-thumb"></span></span>
                 <span class="switch-text">{{ (values[column.code] ? 'ui.yes' : 'ui.no') | t }}</span>
@@ -38,7 +39,7 @@
                 }
               </span>
               <app-chain-select [levels]="levels(column)" [showLastName]="false" [(ngModel)]="values[column.code]"
-                (ngModelChange)="fieldChanged()"
+                (ngModelChange)="fieldChanged(); runChange(column)"
                 [ngModelOptions]="{ standalone: true }" [disabled]="isLocked(column)" [ariaLabel]="column.name" />
             } @else if (hasOptions(column)) {
               <span class="fd-label-row">
@@ -51,17 +52,21 @@
                 }
               </span>
               <app-search-select [options]="options(column)" [(ngModel)]="values[column.code]"
-                (ngModelChange)="fieldChanged()"
+                (ngModelChange)="fieldChanged(); runChange(column)"
                 [ngModelOptions]="{ standalone: true }" [disabled]="isLocked(column)"
                 icon="fa-solid fa-list" [placeholder]="'ui.preview.choose' | t" [ariaLabel]="column.name" />
             } @else if (column.columnType === 'LOCALDATE' || column.columnType === 'LOCALDATETIME') {
               <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
+              <!-- a date typed in is only half a date while it is being typed, so the function waits for
+                   the field to be left or for a date to be picked from the calendar -->
               <app-date-field [withTime]="column.columnType === 'LOCALDATETIME'" [(ngModel)]="values[column.code]"
-                (ngModelChange)="fieldChanged()"
+                (ngModelChange)="fieldChanged()" (change)="runChange(column)"
                 [ngModelOptions]="{ standalone: true }" [disabled]="isLocked(column)" [ariaLabel]="column.name" />
             } @else if (column.columnType === 'FILE') {
               <span class="fd-label" [class.fd-required]="isRequired(column)">{{ column.name }}</span>
-              <app-file-field [(ngModel)]="values[column.code]" (ngModelChange)="fieldChanged()"
+              <!-- a file is reported once it is sent, and taking it out is a change of its own -->
+              <app-file-field [(ngModel)]="values[column.code]"
+                (ngModelChange)="fieldChanged(); runChange(column)"
                 [ngModelOptions]="{ standalone: true }"
                 [disabled]="isLocked(column)" [downloadUrl]="downloadUrl(column)"
                 [versionsUrl]="versionsUrl(column)" [versionUrl]="versionUrl(column)"
@@ -71,6 +76,7 @@
               <label class="fd-label" [class.fd-required]="isRequired(column)" [for]="'pf-' + column.code">{{ column.name }}</label>
               <textarea [id]="'pf-' + column.code" class="fd-input area" rows="3"
                 [(ngModel)]="values[column.code]" (ngModelChange)="fieldChanged()"
+                (change)="runChange(column)"
                 [ngModelOptions]="{ standalone: true }"
                 [disabled]="isLocked(column)" [attr.maxlength]="column.length || null"
                 autocomplete="off"></textarea>
@@ -78,6 +84,7 @@
               <label class="fd-label" [class.fd-required]="isRequired(column)" [for]="'pf-' + column.code">{{ column.name }}</label>
               <input [id]="'pf-' + column.code" class="fd-input" [type]="inputType(column)"
                 [(ngModel)]="values[column.code]" (ngModelChange)="fieldChanged()"
+                (change)="runChange(column)"
                 [ngModelOptions]="{ standalone: true }"
                 [disabled]="isLocked(column)" [attr.inputmode]="inputMode(column)"
                 [class.fd-input-error]="wrongNumber(column) || tooManyDecimals(column)"
@@ -104,7 +111,8 @@
 
   <footer class="fd-footer">
     @if (!data.readOnly) {
-      <span class="fd-hint">{{ 'ui.requiredFieldsMarked' | t }}</span>
+      <!-- while the database is working out the values there is nothing to save yet, and it is said so -->
+      <span class="fd-hint">{{ (changing() ? 'ui.preview.changing' : 'ui.requiredFieldsMarked') | t }}</span>
     }
     <div class="fd-actions">
       <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ closeLabel | t }}</button>

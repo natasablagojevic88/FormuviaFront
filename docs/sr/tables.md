@@ -66,6 +66,8 @@ Na dvoklik reaguju samo ćelije koje smeju da se menjaju; kolonu koju server ozn
 
 Gde god se lista menja na ovaj način, kolona koja nosi [uslov](/sr/form-design#uslovi) iz dizajna forme prati ga: dok uslov za taj red ne važi, ćelija je zaključana — dvoklik je ne otvara i u *Brzoj izmeni* se u nju ne može kucati — pa vrednost ostaje kakva jeste.
 
+[Funkcija koja izračunava vrednosti](/sr/form-design#vrednost-koju-izracunava-baza) se ovde **ne** pokreće. Ona pripada formi za unos, gde može da popuni ostala polja i da ih vidite pre snimanja; u listi se menja samo ćelija koju ste otvorili. Kad hoćete i ostale vrednosti izračunate, koristite **Izmeni** na redu.
+
 ### Brza izmena
 
 **Brza izmena** u traci služi za unos više zapisa jedan za drugim, bez otvaranja dijaloga svaki put.

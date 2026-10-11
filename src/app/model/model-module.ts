@@ -11,9 +11,10 @@ import { ModelPage } from "./model-page/model-page";
 import { ModelDialog } from "./model-dialog/model-dialog";
 import { ColumnsPage } from "./columns-page/columns-page";
 import { ColumnDialog } from "./column-dialog/column-dialog";
+import { FunctionHelpDialog } from "./function-help-dialog/function-help-dialog";
 
 @NgModule({
-  declarations: [ModelPage, ModelDialog, ColumnsPage, ColumnDialog],
+  declarations: [ModelPage, ModelDialog, ColumnsPage, ColumnDialog, FunctionHelpDialog],
   imports: [CommonModule, FormsModule, MatDialogModule, MatMenuModule, MatTreeModule, ModelRoutingModule, SharedModule],
 })
 export class ModelModule {}

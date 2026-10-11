@@ -199,6 +199,25 @@
           }
         </div>
       }
+      <!-- a function of the database behind the field: every change of it is handed to that function -->
+      <div class="fd-field fd-field-wide">
+        <span class="fd-label-row">
+          <span class="fd-label">{{ label('changeValueFunction') }}</span>
+          <button type="button" class="info" (click)="showFunctionHelp()"
+            [title]="'ui.column.changeHelpTitle' | t" [attr.aria-label]="'ui.column.changeHelpTitle' | t">
+            <i class="fa-solid fa-circle-info"></i>
+          </button>
+        </span>
+        <app-search-select [options]="functions()" [(ngModel)]="column.changeValueFunction"
+          [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-gears"
+          [placeholder]="'ui.column.changeNone' | t" [ariaLabel]="label('changeValueFunction')" />
+        @if (functions().length) {
+          <span class="fd-help">{{ 'ui.column.changeHelp' | t }}</span>
+        } @else {
+          <span class="fd-help">{{ 'ui.column.changeEmpty' | t }}</span>
+        }
+      </div>
+
       <!-- conditions: the field is drawn or editable only while the value of another field says so -->
       <div class="fd-field fd-field-wide section">
         <span class="section-title">{{ 'ui.column.conditionsTitle' | t }}</span>

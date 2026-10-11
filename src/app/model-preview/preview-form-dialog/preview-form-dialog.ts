@@ -74,6 +74,8 @@ export interface PreviewFormResult {
 export class PreviewFormDialog implements OnInit {
   readonly loading = signal(false);
   readonly saving = signal(false);
+  /** A change function is being worked out on the server; until it answers there is nothing to save. */
+  readonly changing = signal(false);
 
   /** Fields the user fills in: those that have a place in the grid of the form. */
   readonly fields = signal<PreviewColumn[]>([]);
@@ -92,6 +94,9 @@ export class PreviewFormDialog implements OnInit {
 
   /** Records of the codebooks above the fields, once per model. */
   private parentCodebook: Record<string, ComboOption[]> = {};
+
+  /** Every field the form arrived with, those without a place in the grid among them. */
+  private allFields: PreviewColumn[] = [];
 
   /**
    * Fields without a place in the grid (id, the link to the parent row...) are not shown, but their
@@ -150,6 +155,10 @@ export class PreviewFormDialog implements OnInit {
 
   private showForm(columns: PreviewColumn[], parentCodebook: Record<string, ComboOption[]>): void {
     this.parentCodebook = parentCodebook;
+    this.allFields = columns;
+    // the form starts over, so what was asked of a function before says nothing about it any more
+    this.lastSent.clear();
+    this.again = null;
     const fields = sortByPlace(columns.filter((column) => hasPlace(column)));
 
     this.values = {};
@@ -294,6 +303,99 @@ export class PreviewFormDialog implements OnInit {
     }
   }
 
+  /** An answer of a change function is being awaited; only one is in the air at a time. */
+  private pending = 0;
+  /** A field changed while an answer was awaited; it is asked once that answer is in. */
+  private again: PreviewColumn | null = null;
+  /** The record that was last sent for a field, so the same question is not asked twice. */
+  private lastSent = new Map<string, string>();
+
+  /**
+   * A field the form design put a function of the database on: the record as it stands goes to the
+   * server, and the record that comes back is taken over by the form, so one field can fill in or
+   * correct others. It is asked only when the user really changes the field - opening a record for
+   * editing shows what is stored, it does not work it out again.
+   *
+   * When the field is asked for is left to the template, because it follows the kind of entry: a
+   * switch, a list and a codebook the moment they are picked, everything typed in once the field is
+   * left. Two things hold it back here as well: nothing is asked while an answer is still awaited,
+   * and nothing is asked twice for the same record - so the arrows of a number field, a date picked
+   * again or leaving a field nothing was typed into cost no call at all.
+   */
+  runChange(column: PreviewColumn): void {
+    if (!column.changeValueFunction || this.data.readOnly || this.loading()) {
+      return;
+    }
+    if (this.pending > 0) {
+      this.again = column;
+      return;
+    }
+    const record = this.recordForFunction();
+    const question = JSON.stringify(record);
+    if (this.lastSent.get(column.code) === question) {
+      return;
+    }
+    this.lastSent.set(column.code, question);
+
+    this.pending++;
+    this.changing.set(true);
+    this.sendRequest
+      .post(ApiRoute.modelPreviewChange(this.data.modelId, column.code), record)
+      .then((answer: Record<string, any>) => this.applyChange(answer))
+      .finally(() => {
+        this.pending--;
+        const next = this.again;
+        this.again = null;
+        if (next) {
+          this.runChange(next);
+        }
+        this.changing.set(this.pending > 0);
+      });
+  }
+
+  /**
+   * A file column holds one identifier, so that is what goes: of the stored file, or, for a file
+   * only just chosen, of the upload it was sent as. A function can then see that a file is there,
+   * which is the point of setting it off from a file field - but until the record is saved that
+   * identifier is not yet among the stored files, so there is nothing to look up by it.
+   */
+  private recordForFunction(): Record<string, any> {
+    const record = this.currentRecord();
+    this.allFields
+      .filter((column) => column.columnType === "FILE")
+      .forEach((column) => {
+        const value = column.code in this.values ? this.values[column.code] : this.hiddenValues[column.code];
+        record[column.code] = fileId(value) || (value as FileValue)?.fileUploadFile || null;
+      });
+    return record;
+  }
+
+  /**
+   * The record the function returned becomes the form. A field the answer says nothing about keeps
+   * what stands in it, so a function may also return only what it changed; a file is left alone, and
+   * so are the identity of the record and the link to the parent row. A new value can take another
+   * field off the form, so the conditions are judged again.
+   */
+  private applyChange(answer: Record<string, any> | null): void {
+    if (!answer) {
+      return;
+    }
+    this.allFields.forEach((column) => {
+      if (column.columnType === "FILE" || !(column.code in answer)) {
+        return;
+      }
+      if (column.code === PREVIEW_ID_FIELD || column.code === PREVIEW_PARENT_FIELD) {
+        return;
+      }
+      if (column.code in this.values) {
+        this.values[column.code] = toFieldValue(answer[column.code], column, this.language.current());
+      } else {
+        this.hiddenValues[column.code] = answer[column.code] ?? null;
+      }
+    });
+    this.fieldChanged();
+  }
+
   /** A field pointing at a codebook offers the record it holds, shown in the same dialog, locked. */
   canShowRecord(column: PreviewColumn): boolean {
     return !!column.modelId && !!this.values[column.code] && !this.data.readOnly;
@@ -350,7 +452,7 @@ export class PreviewFormDialog implements OnInit {
 
   canSave(): boolean {
     // a field a condition has taken off the form is not filled in, so it is not asked for either
-    return !this.loading() && !this.saving() && this.fields().length > 0
+    return !this.loading() && !this.saving() && !this.changing() && this.fields().length > 0
       && !this.shownFields().some(
         (column) => this.missing(column) || this.wrongNumber(column) || this.tooManyDecimals(column)
       );
@@ -403,21 +505,21 @@ export class PreviewFormDialog implements OnInit {
     this.save(undefined, true);
   }
 
-  save(goTo?: SubTable, stay = false): void {
-    if (!this.canSave()) {
-      return;
-    }
-
-    // The record carries the fields that are not shown (id, parent...), so the server gets the whole picture.
+  /**
+   * The form as one record, the way the server expects it. The fields that are not shown (id, the
+   * link to the parent row...) are in it as well, so the server gets the whole picture.
+   *
+   * A field nothing has touched goes back exactly as it came, so an update is not left without its
+   * value and a value is not rounded by passing through the entry field. A field whose value did
+   * change is sent as it stands, locked or not: the form may set a value in a field the user cannot
+   * type into, and the user sees it before saving.
+   */
+  private currentRecord(): Record<string, any> {
     const record: Record<string, any> = { ...this.hiddenValues };
     record[PREVIEW_ID_FIELD] = this.data.id ?? this.hiddenValues[PREVIEW_ID_FIELD] ?? null;
     if (this.data.parent) {
       record[PREVIEW_PARENT_FIELD] = this.data.parent;
     }
-    // A field nothing has touched goes back exactly as it came, so an update is not left without
-    // its value and a value is not rounded by passing through the entry field. A field whose value
-    // did change is sent as it stands, locked or not: the form may set a value in a field the user
-    // cannot type into, and the user sees it before saving.
     this.fields().forEach((column) => {
       // a field a condition hides is cleared by the server, so it is sent empty
       if (this.hiddenByCondition(column)) {
@@ -430,6 +532,15 @@ export class PreviewFormDialog implements OnInit {
         ? column.value ?? null
         : fromFieldValue(this.values[column.code], column);
     });
+    return record;
+  }
+
+  save(goTo?: SubTable, stay = false): void {
+    if (!this.canSave()) {
+      return;
+    }
+
+    const record = this.currentRecord();
 
     const fileChanged = this.fields().some(
       (column) => column.columnType === "FILE" && !!(record[column.code] as FileValue)?.fileUploadFile

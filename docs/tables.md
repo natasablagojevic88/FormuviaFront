@@ -66,6 +66,8 @@ Only cells that may be changed react to a double-click; a column the server mark
 
 Wherever the list is edited this way, a column that carries a [condition](/form-design#conditions) from the form design follows it: while the condition does not hold for that row, the cell is locked — a double-click does not open it and in *Quick edit* it cannot be typed into — so the value stays as it is.
 
+A [function that works out values](/form-design#value-worked-out-by-the-database) is **not** run here. It belongs to the entry form, where it can fill in the other fields and let you see them before you save; in the list only the cell you opened is changed. Use **Edit** on the row when you want the other values worked out with it.
+
 ### Quick edit
 
 **Quick edit** in the toolbar is for entering several records one after another without opening a dialog each time.

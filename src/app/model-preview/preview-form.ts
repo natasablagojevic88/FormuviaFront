@@ -32,6 +32,11 @@ export interface PreviewColumn {
   colspan?: number;
   /** Conditions over other fields of this form: while they hold, the field is drawn or can be changed. */
   conditions?: ColumnCondition[];
+  /**
+   * Name of the function of the database the form design put on this field. While it is there, every
+   * change of the field sends the record to the server, which comes back with the values it worked out.
+   */
+  changeValueFunction?: string | null;
 }
 
 /**

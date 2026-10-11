@@ -132,6 +132,53 @@ Polje tipa **Da / Ne** nema listu vrednosti — njegove dve vrednosti su da i ne
 Formuvia sve ovo proverava pri snimanju i kaže šta nije u redu.
 :::
 
+## Vrednost koju izračunava baza
+
+Polje može imati **funkciju baze** iza sebe. Polje *Vrednost koju izračunava baza* nudi funkcije koje baza ima; izaberite jednu i, kad god neko promeni to polje na formi za unos, Formuvia joj preda zapis onakav kakav je u tom trenutku popunjen, a forma preuzme zapis koji funkcija vrati.
+
+Tako jedno polje popunjava ili ispravlja druga: porez iz stope i osnovice, rok plaćanja iz datuma računa, vrednost prepisana sa drugog mesta. Dugme **i** pored polja otvara celo uputstvo sa primerom; ovo je ukratko:
+
+- Funkcija prima **jedan argument tipa `json`** i vraća **`json`**. Samo takve se i nude, pa funkcija napisana drugačije uopšte ne stigne u listu.
+- Dobija zapis sa **nazivima kolona tabele**. `json_populate_record` nad tipom reda tabele ga pretvara u zapis sa kojim se radi, a `to_json` ga vraća nazad.
+- Kolona o kojoj odgovor ne kaže ništa **ostaje kako stoji na formi**, pa funkcija može vratiti ceo zapis ili samo ono što je promenila. Ključ koji tabela nema se ignoriše.
+- **Pražnjenje polja je takođe promena**: poništavanje izbora, brisanje onoga što je ukucano ili vađenje fajla pokreću funkciju isto kao i unos vrednosti, pa ono što je izračunato iz stare vrednosti može da se poništi.
+- Pokreće se **samo kad neko promeni polje**. Otvaranje zapisa na izmenu prikazuje ono što je sačuvano i ne računa ponovo, pa se sačuvana vrednost nikad ne pregazi samim otvaranjem forme.
+- Polje sa **fajlom** takođe pokreće funkciju, čim je fajl poslat i čim se izvadi iz polja — polje tada dobije vrednost, pa je to promena kao i svaka druga. Funkcija dobija identifikator fajla: sačuvanog, ili onog iz slanja za tek izabran fajl, pa se do snimanja zapisa po njemu nema šta tražiti. Postavljanje fajla funkcija ne može.
+- Funkcija **ništa ne upisuje**. Ono što vrati samo se prikaže na formi, a u bazu ide kad se zapis sačuva, kao i sve ostalo što je popunjeno.
+
+```sql
+CREATE OR REPLACE FUNCTION izracunaj_porez(zapis json)
+ RETURNS json
+ LANGUAGE plpgsql
+AS $function$
+declare
+  pRow racun%rowtype;
+  BEGIN
+    pRow := json_populate_record(null::racun, zapis);
+
+    pRow.porez := coalesce(pRow.osnovica, 0) * coalesce(pRow.stopa, 0) / 100;
+
+    return to_json(pRow);
+  END;
+$function$;
+```
+
+Polje koje funkcija popunjava obično je ono u koje niko ne treba da upisuje, pa na njemu ugasite **Može da se menja**: zaključano polje čuva ono što u njemu stoji, i to se i sačuva.
+
+Kad se funkcija pita zavisi od načina unosa, da kucanje ne bi pokretalo poziv po slovu:
+
+| Polje | Funkcija se pita |
+|---|---|
+| Da / Ne | čim se prekidač prebaci |
+| Lista vrednosti, veza na šifarnik | čim se vrednost izabere |
+| Datum, datum i vreme | kad se polje napusti, ili odmah kad se datum izabere iz kalendara |
+| Tekst, dugačak tekst, broj, vreme | kad se polje napusti |
+| Fajl | čim je fajl poslat, i čim se izvadi iz polja |
+
+Još dve stvari zadržavaju pozive. Dok se čeka odgovor, ništa se ne pita: polje promenjeno u međuvremenu pita se tek kad taj odgovor stigne, pa držanje strelica na polju sa brojem završi jednim dodatnim pozivom, a ne jednim po kliku. I ništa se ne pita dvaput za isti zapis, pa napuštanje polja u koje niste ništa ukucali, ili ponovni izbor iste vrednosti, ne košta ništa.
+
+Dok baza računa, forma to kaže u dnu, a *Sačuvaj* čeka odgovor.
+
 ## Uslovi
 
 Polje ne mora da se ponaša isto sve vreme. Otvorite već sačuvano polje i na dnu njegovog dijaloga dodajte **uslov**: polje se tada prikazuje, ili se može menjati, samo dok tako kaže vrednost **drugog polja iste forme**.

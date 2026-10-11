@@ -132,6 +132,53 @@ A **Yes / No** field has no list of values — its two values are yes and no —
 Formuvia checks all of this when you save and says what is wrong.
 :::
 
+## Value worked out by the database
+
+A field can have a **function of the database** behind it. The field *Value worked out by the database* offers the functions the database holds; pick one and, whenever someone changes that field on the entry form, Formuvia hands it the record as it is filled in at that moment and the form takes over the record the function gives back.
+
+That is how one field fills in or corrects others: a tax out of a rate and a base, a due date out of an invoice date, a value copied from somewhere else. The **i** button next to the field opens the whole instruction with an example; this is the short of it:
+
+- The function takes **one argument of type `json`** and returns **`json`**. Only such functions are offered, so a function written any other way does not appear in the list at all.
+- It is given the record with the **column names of the table**. `json_populate_record` over the row type of the table turns it into a record to work with, and `to_json` turns it back.
+- A column the answer says nothing about **keeps what stands in the form**, so the function may return the whole record or only what it changed. A key the table does not have is ignored.
+- **Emptying a field counts as a change**: clearing a picker, deleting what was typed in or taking a file out sets the function off just as entering a value does, so what was worked out from the old value can be undone.
+- It runs **only when someone changes the field**. Opening a record for editing shows what is stored and does not work it out again, so a saved value is never overwritten by the mere opening of the form.
+- A **file** field sets the function off as well, the moment the file is sent and the moment it is taken out — the field gets a value, so it is a change like any other. The function is given the identifier of the file: of the stored one, or of the upload for a file only just chosen, so until the record is saved there is nothing to look up by it. Setting a file is not something a function can do.
+- The function **stores nothing**. What it returns is only shown on the form, and it reaches the database when the record is saved, like anything else filled in.
+
+```sql
+CREATE OR REPLACE FUNCTION calculate_tax(record json)
+ RETURNS json
+ LANGUAGE plpgsql
+AS $function$
+declare
+  pRow invoice%rowtype;
+  BEGIN
+    pRow := json_populate_record(null::invoice, record);
+
+    pRow.tax := coalesce(pRow.base, 0) * coalesce(pRow.rate, 0) / 100;
+
+    return to_json(pRow);
+  END;
+$function$;
+```
+
+A field the function fills in is usually one nobody should type into, so turn **Can be changed** off on it: a locked field keeps what stands in it, and that is what gets saved.
+
+When the function is asked follows the kind of entry, so that typing does not set off a call per letter:
+
+| Field | The function is asked |
+|---|---|
+| Yes / No | the moment the switch is flipped |
+| List of values, link to a codebook | the moment a value is picked |
+| Date, date and time | when the field is left, or at once when the date is picked from the calendar |
+| Text, long text, number, time | when the field is left |
+| File | the moment the file is sent, and the moment it is taken out |
+
+Two more things hold the calls back. Nothing is asked while an answer is still awaited: a field changed in the meantime is asked once that answer is in, so holding down the arrows of a number field ends in one more call and not in one per click. And nothing is asked twice for the same record, so leaving a field you typed nothing into, or picking the same value again, costs nothing at all.
+
+While the database is working the values out, the form says so at the bottom and *Save* waits for the answer.
+
 ## Conditions
 
 A field does not have to behave the same way all the time. Open a field you have already saved and, at the bottom of its dialog, add a **condition**: the field is then shown, or can be changed, only while the value of **another field of the same form** says so.

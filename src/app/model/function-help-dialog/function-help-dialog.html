@@ -1,0 +1,34 @@
+<div class="fd">
+  <header class="fd-header">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ 'ui.column.changeHelpTitle' | t }}</h2>
+      <p class="fd-subtitle">{{ 'ui.column.changeHelpSubtitle' | t }}</p>
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    <p class="intro">{{ 'ui.column.changeIntro' | t }}</p>
+
+    <ul class="rules">
+      @for (rule of rules; track rule) {
+        <li>
+          <i class="fa-solid fa-check"></i>
+          <span>{{ rule | t }}</span>
+        </li>
+      }
+    </ul>
+
+    <span class="example-title">{{ 'ui.column.changeExample' | t }}</span>
+    <pre class="example"><code>{{ example }}</code></pre>
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint"></span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-primary" (click)="close()">{{ 'ui.close' | t }}</button>
+    </div>
+  </footer>
+</div>

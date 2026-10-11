@@ -12,8 +12,10 @@ import {
 } from "../../shared/filter-operations";
 import { ModelNode } from "../model";
 import {
-  COLUMN_CODE_PATTERN, COLUMN_LIMITS, ConditionType, ModelColumn, ModelColumnCondition, ModelColumnType,
+  CHANGE_FUNCTION_DATA_TYPE, CHANGE_FUNCTION_TYPE, COLUMN_CODE_PATTERN, COLUMN_LIMITS, ConditionType,
+  ModelColumn, ModelColumnCondition, ModelColumnType,
 } from "../model-column";
+import { FunctionHelpDialog } from "../function-help-dialog/function-help-dialog";
 
 export interface ColumnDialogData {
   column: ModelColumn;
@@ -40,6 +42,8 @@ export class ColumnDialog implements OnInit {
   readonly limits = COLUMN_LIMITS;
   readonly saving = signal(false);
   readonly codebooks = signal<SelectOption[]>([]);
+  /** Functions of the database the field can be given, by name. */
+  readonly functions = signal<SelectOption[]>([]);
 
   /** Conditions of this field; they are saved on their own, not together with the field. */
   readonly conditions = signal<ModelColumnCondition[]>([]);
@@ -74,6 +78,10 @@ export class ColumnDialog implements OnInit {
     this.conditions.set(this.data.column.conditions ?? []);
     // any table of the model can be a codebook
     this.sendRequest.get(ApiRoute.modelTree).then((root: ModelNode) => this.codebooks.set(this.tables(root, [])));
+    // only a function that takes the record as json and returns json can be used on a field
+    this.sendRequest
+      .get(ApiRoute.databaseFunctions(CHANGE_FUNCTION_TYPE, CHANGE_FUNCTION_DATA_TYPE))
+      .then((names: string[]) => this.functions.set((names ?? []).map((name) => ({ value: name, label: name }))));
   }
 
   private tables(node: ModelNode, found: SelectOption[]): SelectOption[] {
@@ -103,6 +111,11 @@ export class ColumnDialog implements OnInit {
   /** A file field holds the identifier of the stored file, so it has no list of values of its own. */
   get isFile(): boolean {
     return this.column.columnType === "FILE";
+  }
+
+  /** What such a function has to look like; it is a page of its own, not a hint under the field. */
+  showFunctionHelp(): void {
+    this.dialog.open(FunctionHelpDialog, { width: "680px" });
   }
 
   /** A column whose value is an identifier cannot be sorted by in a way that means anything. */

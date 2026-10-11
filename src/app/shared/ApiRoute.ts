@@ -127,6 +127,19 @@
         return `/api/preview/update/${modelId}`;
     }
 
+    /**
+     * The record as it is filled in at that moment goes to the function the design put on that field,
+     * and comes back with the values the database worked out.
+     */
+    static modelPreviewChange(modelId: string, columnName: string): string {
+        return `/api/preview/change/${modelId}/${columnName}`;
+    }
+
+    /** Routines of the database, by kind (FUNCTION, PROCEDURE) and by the data type they return. */
+    static databaseFunctions(functionType: string, dataType: string): string {
+        return `/api/function/${functionType}/${dataType}`;
+    }
+
     static modelId(id: string): string {
         return `/api/model/${id}`;
     }
