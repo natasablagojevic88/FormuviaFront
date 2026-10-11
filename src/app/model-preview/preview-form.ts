@@ -1,6 +1,5 @@
-import {
-  ColumnCondition, ColumnType, ComboOption, ConditionType, FileValue, fileId, ParentLevel,
-} from "../shared/database-table";
+import { ColumnCondition, ColumnType, ComboOption, FileValue, fileId, ParentLevel } from "../shared/database-table";
+import { hasConditions } from "../shared/column-conditions";
 import { isDecimalType, isNumberText, parseDecimalText, toDecimalText, tooManyDecimals } from "../shared/number-format";
 
 /** The id column and the column that links to the parent row; the server adds them before the fields. */
@@ -54,11 +53,6 @@ export interface FormLayout {
   width: number;
 }
 
-/** Whether the field carries a condition of that kind; where it does, the condition decides. */
-export function hasConditions(column: PreviewColumn, type: ConditionType): boolean {
-  return (column.conditions ?? []).some((condition) => condition.type === type);
-}
-
 /**
  * A field is part of the form when it has a place in the grid (a row and a column). A field without
  * one - the id, the link to the parent row, and any other field the server sends without a place -
@@ -69,7 +63,7 @@ export function hasConditions(column: PreviewColumn, type: ConditionType): boole
  */
 export function hasPlace(column: PreviewColumn): boolean {
   return (column.rowIndex ?? 0) > 0 && (column.columnIndex ?? 0) > 0
-    && (column.showable !== false || hasConditions(column, "SHOWABLE"));
+    && (column.showable !== false || hasConditions(column.conditions, "SHOWABLE"));
 }
 
 /** A field has a list of values when it is a codebook or when its list is given by a query. */
@@ -77,7 +71,7 @@ export function hasOptions(column: PreviewColumn): boolean {
   return (column.listOfValues?.length ?? 0) > 0;
 }
 
-/** A field is required when the server does not allow it to be empty (nullable = false). */
+/** A field the design made required: the column does not allow an empty value (nullable = false). */
 export function isRequired(column: PreviewColumn): boolean {
   return column.nullable === false;
 }

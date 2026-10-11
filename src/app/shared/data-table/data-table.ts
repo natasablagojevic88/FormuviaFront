@@ -16,7 +16,7 @@ import { PdfDialog, PdfDialogData } from "../pdf-dialog/pdf-dialog";
 import { FileVersionsDialog, FileVersionsDialogData } from "../file-versions-dialog/file-versions-dialog";
 import { HistoryPanel } from "../history-panel/history-panel";
 import { Criterion, inputModeFor, inputTypeFor, isEnum, needsValue, quickFilter, toFilter } from "../filter-operations";
-import { conditionsHold, ConditionSourceLookup } from "../column-conditions";
+import { conditionsHold, ConditionSourceLookup, hasConditions } from "../column-conditions";
 import { chainLevels, ChainLevel } from "../parent-chain";
 import { formatDate, formatDateTime, formatTime } from "../date-format";
 import { formatDecimal, isDecimalType, isNumberType, parseDecimalText, toDecimalText } from "../number-format";
@@ -947,6 +947,19 @@ export class DataTable implements AfterViewInit, OnDestroy {
   }
 
   /**
+   * Required for the row being edited: where the column carries a condition it decides, otherwise
+   * the column says so itself. A locked column is never asked for, as on the form.
+   */
+  rowRequired(column: DatabaseColumn): boolean {
+    if (this.rowLocked(column)) {
+      return false;
+    }
+    return hasConditions(column.conditions, "REQUIRED")
+      ? conditionsHold(column.conditions, "REQUIRED", this.rowSource)
+      : column.required === true;
+  }
+
+  /**
    * A value that locks another column takes that column back to what it held when the row was
    * opened, so nothing typed and then locked away is saved. Restoring a value can lock a further
    * column, so it is repeated while anything keeps changing.
@@ -974,7 +987,7 @@ export class DataTable implements AfterViewInit, OnDestroy {
     }
     // a column a condition locks is not filled in by the user, so it is not asked for either
     return this.editColumns().every(
-      (column) => !column.required || this.rowLocked(column) || (this.rowValues[column.fieldName] ?? "") !== "");
+      (column) => !this.rowRequired(column) || (this.rowValues[column.fieldName] ?? "") !== "");
   }
 
   saveRow(): void {

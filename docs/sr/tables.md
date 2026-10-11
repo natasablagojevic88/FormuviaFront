@@ -100,6 +100,8 @@ Traka stoji u dnu tabele, bila lista duga ili kratka, i prati kolone kad se tabe
 
 **Šablon**, pored izvoza, preuzima prazan `.xlsx` fajl za unos podataka u ovu tabelu. Pojavljuje se samo kod tabele u koju smete da dodajete zapise.
 
+Šablon nosi polja koja se na formi za unos mogu popuniti: ona koja su prikazana i mogu se menjati, i ona koja uslov za neke zapise prikaže ili otključa. Polja koja forma nikad ne nudi — sklonjena sa nje, nepromenljiva, ili ona koja drže fajl — u njemu nisu. Zato šablon prati izgled tabele onakav kakav je bio kad ste ga preuzeli; pošto se izgled promeni, preuzmite ga ponovo, inače će uvoz reći da ne prepoznaje kolonu.
+
 U prvom redu su nazivi kolona — crveni tamo gde je polje obavezno — a sve ispod toga je vaše za popunjavanje. Svaka kolona već zna šta u nju ide: u broj se može upisati samo broj, u datum samo datum, a kolona vezana za šifarnik ili za listu vrednosti nudi izbor umesto kucanja. Vrednosti tih lista putuju sa fajlom, na listovima koji su skriveni, pa šablon radi i bez veze sa aplikacijom.
 
 Red sa nazivima je zaštićen i ne može se prepisati, a fajl pamti kojem polju koja kolona pripada. Popunjavajte kolone kako stoje: nemojte ih dodavati, brisati ni premeštati, jer bi podaci stigli u pogrešna polja. Širenje kolone ili sortiranje onoga što ste uneli ne smeta.
@@ -108,7 +110,7 @@ Red sa nazivima je zaštićen i ne može se prepisati, a fajl pamti kojem polju 
 
 **Uvoz**, pored šablona, traži popunjen fajl i upisuje njegove redove u tabelu. Pojavljuje se pod istim pravom kao i šablon, a u podtabeli se redovi dodaju pod zapis iz kog ste je otvorili.
 
-Fajl ulazi u celini: ako server ne može da prihvati neki red, ne upiše se ništa, a poruka kaže koji je to red i šta u njemu ne valja. Ispravite taj red i pošaljite fajl ponovo — nema polovično uvezenih podataka koje treba čistiti. Kad prođe, lista se otvara na prvoj strani, bez filtera, od najnovijeg — pa su uvezeni zapisi baš ono što vidite.
+Fajl ulazi u celini: ako server ne može da prihvati neki red, ne upiše se ništa, a poruka kaže koji je to red i šta u njemu ne valja. Ispravite taj red i pošaljite fajl ponovo — nema polovično uvezenih podataka koje treba čistiti. Uslovi se računaju za svaki red posebno, nad onim što taj red nosi: vrednost u koloni čiji uslov *Prikazano dok* za taj red ne važi se ne zadržava, isto kao što to polje za takav zapis ne bi ni bilo na formi. Kad prođe, lista se otvara na prvoj strani, bez filtera, od najnovijeg — pa su uvezeni zapisi baš ono što vidite.
 
 ## Brojevi
 

@@ -258,7 +258,7 @@ export class ColumnDialog implements OnInit {
     .map((other) => ({ value: other.id!, label: other.name })));
 
   readonly conditionTypes = computed<SelectOption[]>(() =>
-    (["SHOWABLE", "EDITABLE"] as ConditionType[]).map((type) => ({
+    (["SHOWABLE", "EDITABLE", "REQUIRED"] as ConditionType[]).map((type) => ({
       value: type,
       label: this.translate.get("ui.column.conditionType." + type),
     })));

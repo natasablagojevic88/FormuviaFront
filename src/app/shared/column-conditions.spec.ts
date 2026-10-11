@@ -76,6 +76,17 @@ describe("conditionsHold", () => {
     expect(conditionsHold([condition({ field1: "false" })], "SHOWABLE", source("BOOLEAN", true))).toBe(false);
   });
 
+  it("two conditions of the kind Required ask for the field only when both hold", () => {
+    const conditions: ColumnCondition[] = [
+      { type: "REQUIRED", conditionColumnCode: "other", searchOperation: "IS_NOT_NULL" },
+      { type: "REQUIRED", conditionColumnCode: "other", searchOperation: "EQUALS", field1: "PAID" },
+    ];
+    expect(conditionsHold(conditions, "REQUIRED", source("STRING", "PAID"))).toBe(true);
+    expect(conditionsHold(conditions, "REQUIRED", source("STRING", "UNPAID"))).toBe(false);
+    // a condition of another kind says nothing about this one
+    expect(conditionsHold(conditions, "SHOWABLE", source("STRING", "UNPAID"))).toBe(true);
+  });
+
   it("a condition over a field that is not in the record is left alone", () => {
     expect(conditionsHold([condition({ conditionColumnCode: "gone", field1: "A" })], "SHOWABLE",
       source("STRING", "A"))).toBe(true);

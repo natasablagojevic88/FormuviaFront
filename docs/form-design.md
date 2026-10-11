@@ -140,7 +140,7 @@ A condition is one line and reads as a sentence:
 
 | Part | Meaning |
 |---|---|
-| **Effect** | *Shown while* hides the field when the condition does not hold; *Editable while* leaves it on the form but locked |
+| **Effect** | *Shown while* hides the field when the condition does not hold; *Editable while* leaves it on the form but locked; *Required while* asks for the field only while the condition holds |
 | **Depends on the field** | the other field of this form whose value is looked at |
 | **Condition** | the comparison — equals, contains, greater than, is empty… exactly the ones the advanced search offers for that data type |
 | **Value** | what the value is compared against; *between* asks for two |
@@ -152,25 +152,27 @@ Only the comparisons that make sense for the data type of the other field are of
 When the field the condition depends on is a **link to a codebook** or has a **list of values**, the value is not typed in but chosen from the same list the entry form offers, so you pick *Acme d.o.o.* and not the identifier stored under it. The condition in the list then reads with that text as well.
 
 
-A field can have several conditions. They all have to hold, and the two effects are counted separately: a field may be shown and still be locked.
+A field can have several conditions. Within one effect they all have to hold at once — two *Required while* conditions mean the field is asked for only when both are true — and the three effects are counted separately, so a field may be shown, locked and still required.
 
 Conditions are saved on their own, the moment you confirm them, not together with the rest of the field — which is why they can only be added to a field that already exists. Click a condition in the list to change it, or the bin to remove it. A field with no condition behaves exactly as its options say.
 
 ### What a condition does while a record is entered
 
-A condition is the more exact word about a field, so where there is one it decides and the switch above does not: a field with **Show on the form** off but with a *Shown while* condition is drawn whenever that condition holds, and a field with **Can be changed** off but with an *Editable while* condition can be changed whenever that one holds. The switches decide only for a field that carries no condition of that kind.
+A condition is the more exact word about a field, so where there is one it decides and the switch above does not: a field with **Show on the form** off but with a *Shown while* condition is drawn whenever that condition holds, and a field with **Can be changed** off but with an *Editable while* condition can be changed whenever that one holds. The switches decide only for a field that carries no condition of that kind. A *Required while* condition can only add a demand, never take one away: a field the database does not allow to be empty stays required whatever the condition says. For the same reason a column that does not allow an empty value should not carry a *Shown while* condition — a hidden field is saved empty and the database then refuses the whole record. Let such a column allow an empty value and ask for it with *Required while*. Leaving **Optional** off is for the few columns a record truly cannot exist without.
 
 On the entry form the conditions are judged at every keystroke, against the values standing in the form at that moment:
 
 - A field whose *Shown while* conditions do not hold **disappears from the form**. Its place in the grid stays empty and the field comes back the moment the condition holds again.
 - A field whose *Editable while* conditions do not hold stays on the form but is **locked**, with a note under it saying why.
-- A field that is not on the form is **not asked for** even when it is required, so a record is never held back by a field nobody can see.
+- A field whose *Required while* conditions hold **has to be filled in**: it carries the red mark and the record cannot be saved without it. When they stop holding, the mark goes and the field may stay empty.
+- A field that is not on the form is **not asked for** even when it is required, so a record is never held back by a field nobody can see. Being hidden beats being required.
 - A row left without a single drawn field **takes no space**: the rows below it move up, so the form does not open with a gap in the middle.
-- A hidden field **goes back to the value the form opened with** — the default value for a new record, the stored value for an existing one. Whatever was typed into it before it disappeared is not saved.
+- A field a condition hides is **emptied**, and the record is saved without that value: you see the value go before you save, so the form never shows something the record does not hold. A field the design itself never shows — **Show on the form** off and no condition — is not touched, and keeps its value.
+- A locked field **keeps what stands in it**, and that is what is saved. The lock is about typing, not about the value: the form may put a value into a field by itself, and you see it before you save.
 
 An empty field matches no comparison: while nothing is chosen in *Status*, a condition *Status equals PAID* does not hold, and the field that depends on it is hidden or locked. That is the same rule the search follows.
 
-In the list, where records are changed straight in the table, a single cell cannot be taken away while the rest of the column stays. There **both kinds of condition lock the cell**: a column whose condition does not hold for that row is not opened by a double click and is locked in *Quick edit*, and its value goes back to the server unchanged.
+In the list, where records are changed straight in the table, a single cell cannot be taken away while the rest of the column stays. There **shown and editable both lock the cell**: a column whose condition does not hold for that row is not opened by a double click and is locked in *Quick edit*. *Required while* works there as it does on the form — the row cannot be saved while such a cell is empty.
 
 ## Deleting a field
 

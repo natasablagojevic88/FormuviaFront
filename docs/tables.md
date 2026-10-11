@@ -100,6 +100,8 @@ The strip stays at the foot of the table whether the list is long or short, and 
 
 **Template**, beside the export, downloads an empty `.xlsx` file for entering data into this table. It appears only for a table you may add records to.
 
+The template carries the fields that can be filled in on the entry form: those that are shown and can be changed, and those that a condition shows or unlocks for some records. Fields the form never offers — kept off it, not changeable by anyone, or holding a file — are not in it. The template therefore follows the design of the table as it stood when it was downloaded; after the design changes, download it again, or the import will say it does not recognise a column.
+
 The first row holds the column names — red where the field is required — and everything below it is yours to fill in. Each column already knows what belongs in it: a number column takes only numbers, a date column only dates, and a column tied to a codebook or to a list of values offers a drop-down instead of typing. The values of those lists travel with the file, on sheets that are hidden, so the template works without a connection to the application.
 
 The row of names is protected and cannot be overwritten, and the file remembers which field each column belongs to. Fill in the columns as they stand: do not add, remove or move them, or the data will arrive in the wrong fields. Widening a column, or sorting what you have typed, changes nothing.
@@ -108,7 +110,7 @@ The row of names is protected and cannot be overwritten, and the file remembers 
 
 **Import**, beside the template, asks for the filled-in file and writes its rows into the table. It appears under the same right as the template, and in a subtable the rows are added under the record you opened it from.
 
-The file goes in as a whole: if the server cannot accept a row, nothing at all is written and the message says which row it was and what is wrong with it. Fix that row and send the file again — there is no half-finished import to clean up. When it goes through, the list opens on the first page, without filters, newest first, so the imported records are the ones you see.
+The file goes in as a whole: if the server cannot accept a row, nothing at all is written and the message says which row it was and what is wrong with it. Fix that row and send the file again — there is no half-finished import to clean up. Conditions are judged for each row on its own, against what that row holds: a value in a column whose *Shown while* condition does not hold for that row is not kept, just as the field would not be on the form for such a record. When it goes through, the list opens on the first page, without filters, newest first, so the imported records are the ones you see.
 
 ## Numbers
 

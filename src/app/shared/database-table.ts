@@ -46,7 +46,7 @@ export interface ParentLevel {
 }
 
 /** What a condition decides about the field it belongs to. */
-export type ConditionType = "EDITABLE" | "SHOWABLE";
+export type ConditionType = "EDITABLE" | "SHOWABLE" | "REQUIRED";
 
 /**
  * One condition of a field, set in the form design: while it holds, the field is drawn on the form

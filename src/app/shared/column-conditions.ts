@@ -20,6 +20,11 @@ export interface ConditionSource {
 /** Conditions name the other field by its code, so the caller says where that field is found. */
 export type ConditionSourceLookup = (code: string) => ConditionSource | null;
 
+/** Whether the field carries a condition of that kind; where it does, the condition decides. */
+export function hasConditions(conditions: ColumnCondition[] | undefined, type: ConditionType): boolean {
+  return (conditions ?? []).some((condition) => condition.type === type);
+}
+
 /**
  * Whether every condition of one kind holds. They are joined by AND, so a field without a condition
  * of that kind behaves exactly as its own option says.

@@ -5,7 +5,7 @@ import { SendRequest } from "../../services/send-request";
 import { ApiRoute } from "../../shared/ApiRoute";
 import { SelectOption } from "../../shared/search-select/search-select";
 import { ComboOption, FileValue, fileId, SubTable } from "../../shared/database-table";
-import { conditionsHold, ConditionSourceLookup } from "../../shared/column-conditions";
+import { conditionsHold, ConditionSourceLookup, hasConditions } from "../../shared/column-conditions";
 import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
 import { Translate } from "../../services/translate";
 import { Notify } from "../../services/notify";
@@ -13,13 +13,12 @@ import { chainLevels, ChainLevel } from "../../shared/parent-chain";
 import {
   DEFAULT_FORM_WIDTH,
   fromFieldValue,
-  hasConditions,
   hasOptions,
   hasPlace,
   inputModeOf,
   inputTypeOf,
   hasTooManyDecimals,
-  isRequired,
+  isRequired as requiredByDesign,
   isWrongNumber,
   layoutOf,
   PREVIEW_ID_FIELD,
@@ -103,7 +102,6 @@ export class PreviewFormDialog implements OnInit {
   /** Where a condition finds the field it depends on; it names it by code, over the whole form. */
   private source: ConditionSourceLookup = () => null;
 
-  readonly isRequired = isRequired;
   readonly hasOptions = hasOptions;
   readonly inputType = inputTypeOf;
   readonly inputMode = inputModeOf;
@@ -232,14 +230,27 @@ export class PreviewFormDialog implements OnInit {
       return true;
     }
     // where there is a condition it decides, so a field is unlocked by it as well as locked
-    return hasConditions(column, "EDITABLE")
+    return hasConditions(column.conditions, "EDITABLE")
       ? !conditionsHold(column.conditions, "EDITABLE", this.source)
       : column.editable === false;
   }
 
+  /**
+   * Required where a condition says so, otherwise as the design set it. A field a condition has
+   * taken off the form is never asked for: what cannot be seen cannot be demanded.
+   */
+  isRequired(column: PreviewColumn): boolean {
+    if (!this.shown(column)) {
+      return false;
+    }
+    return hasConditions(column.conditions, "REQUIRED")
+      ? conditionsHold(column.conditions, "REQUIRED", this.source)
+      : requiredByDesign(column);
+  }
+
   /** A field is drawn while its conditions hold; without any it is drawn as it always was. */
   shown(column: PreviewColumn): boolean {
-    return hasConditions(column, "SHOWABLE")
+    return hasConditions(column.conditions, "SHOWABLE")
       ? conditionsHold(column.conditions, "SHOWABLE", this.source)
       : column.showable !== false;
   }
@@ -251,25 +262,33 @@ export class PreviewFormDialog implements OnInit {
 
   /** Locked by a condition, not by the field itself: then it is said why. */
   lockedByCondition(column: PreviewColumn): boolean {
-    return !this.data.readOnly && hasConditions(column, "EDITABLE") && this.isLocked(column);
+    return !this.data.readOnly && hasConditions(column.conditions, "EDITABLE") && this.isLocked(column);
+  }
+
+  /** Taken off the form by a condition, not by the design: the server clears such a field. */
+  private hiddenByCondition(column: PreviewColumn): boolean {
+    return hasConditions(column.conditions, "SHOWABLE") && !this.shown(column);
   }
 
   /**
-   * A changed value may take another field off the form. Such a field goes back to the value the
-   * form opened with - the default value for a new record, the stored one for an existing record -
-   * so that nothing typed into it and then hidden is saved. Restoring a value can take away a
-   * further field, so it is repeated while anything keeps changing.
+   * A changed value may take another field off the form. The server does not keep the value of a
+   * field a condition hides, so the form empties it as well and the value is seen going before the
+   * record is saved. A field the design itself never shows is left alone, and a field that is only
+   * locked keeps what stands in it: the form may put a value into a field the user cannot type
+   * into, and that value is saved. Emptying a field can take away a further one, so it is repeated
+   * while anything keeps changing.
    */
   fieldChanged(): void {
     for (let pass = 0; pass < this.fields().length; pass++) {
-      let restored = false;
+      let cleared = false;
       this.fields().forEach((column) => {
-        if (!this.shown(column) && this.values[column.code] !== this.loadedValues[column.code]) {
-          this.values[column.code] = this.loadedValues[column.code];
-          restored = true;
+        const empty = toFieldValue(null, column, this.language.current());
+        if (this.hiddenByCondition(column) && this.values[column.code] !== empty) {
+          this.values[column.code] = empty;
+          cleared = true;
         }
       });
-      if (!restored) {
+      if (!cleared) {
         return;
       }
     }
@@ -326,7 +345,7 @@ export class PreviewFormDialog implements OnInit {
   }
 
   missing(column: PreviewColumn): boolean {
-    return isRequired(column) && !this.isLocked(column) && this.isEmpty(column);
+    return this.isRequired(column) && !this.isLocked(column) && this.isEmpty(column);
   }
 
   canSave(): boolean {
@@ -395,14 +414,22 @@ export class PreviewFormDialog implements OnInit {
     if (this.data.parent) {
       record[PREVIEW_PARENT_FIELD] = this.data.parent;
     }
-    // A locked field, and one a condition has taken off the form, go back as they came, so that an
-    // update is not left without its value and nothing typed into a hidden field is stored.
-    this.fields().forEach(
-      (column) =>
-        (record[column.code] = this.isLocked(column) || !this.shown(column)
-          ? column.value ?? null
-          : fromFieldValue(this.values[column.code], column))
-    );
+    // A field nothing has touched goes back exactly as it came, so an update is not left without
+    // its value and a value is not rounded by passing through the entry field. A field whose value
+    // did change is sent as it stands, locked or not: the form may set a value in a field the user
+    // cannot type into, and the user sees it before saving.
+    this.fields().forEach((column) => {
+      // a field a condition hides is cleared by the server, so it is sent empty
+      if (this.hiddenByCondition(column)) {
+        record[column.code] = null;
+        return;
+      }
+      const closed = this.isLocked(column) || !this.shown(column);
+      const untouched = this.values[column.code] === this.loadedValues[column.code];
+      record[column.code] = closed && untouched
+        ? column.value ?? null
+        : fromFieldValue(this.values[column.code], column);
+    });
 
     const fileChanged = this.fields().some(
       (column) => column.columnType === "FILE" && !!(record[column.code] as FileValue)?.fileUploadFile
