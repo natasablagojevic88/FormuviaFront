@@ -94,7 +94,7 @@ What you get is exactly what the filters and the sort order describe, **not** ju
 
 A table with decimal columns closes with a strip of sums just above the paging, each one standing under the column it belongs to. The sum covers **everything the filters match**, not only the page on the screen: filter down to one partner and the total is that partner's, turn the filter off and it is the whole table's.
 
-The strip stays at the foot of the table whether the list is long or short, and follows the columns when the table is scrolled sideways. On a phone, where the list is a stack of cards, the sums stand one under another, each line naming its column.
+When an amount is changed straight in the list, the sum is worked out again at once, over the same filters — what stands under the column always matches what is in it. The strip stays at the foot of the table whether the list is long or short, and follows the columns when the table is scrolled sideways. On a phone, where the list is a stack of cards, the sums stand one under another, each line naming its column.
 
 ## The entry template
 

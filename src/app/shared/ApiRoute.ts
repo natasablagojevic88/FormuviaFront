@@ -52,6 +52,16 @@
         return `/api/preview/model/${modelId}/${parentId}`;
     }
 
+    /** Sums of the number columns of the table, for the filters the list is showing. */
+    static modelPreviewTableTotal(modelId: string): string {
+        return `/api/preview/model/${modelId}/total`;
+    }
+
+    /** Sums of a child model table, for the rows of one row of the parent table. */
+    static modelPreviewTableWithParentTotal(modelId: string, parentId: string): string {
+        return `/api/preview/model/${modelId}/${parentId}/total`;
+    }
+
     /** Form for a new record. */
     static modelPreviewForm(modelId: string): string {
         return `/api/preview/form/${modelId}`;

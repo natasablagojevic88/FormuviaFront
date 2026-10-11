@@ -153,6 +153,9 @@ export class DataTable implements AfterViewInit, OnDestroy {
   readonly newRowValues = input<Record<string, any> | null>(null);
   /** Path to the Excel template for entering data; without it the toolbar has no such button. */
   readonly templateUrl = input<string | null>(null);
+
+  /** Where the sums are read again after a row is changed in place, with the filters of the list. */
+  readonly totalUrl = input<string | null>(null);
   /** Path the filled-in template is sent to, built from the identifier the file upload returned. */
   readonly importUrl = input<((fileId: string) => string) | null>(null);
   /** Path to the file stored in a column of a row; without it a file column only shows its name. */
@@ -577,16 +580,40 @@ export class DataTable implements AfterViewInit, OnDestroy {
     }
   }
 
-  reload(highlightId: string | null = null, flash = true): void {
-    const requestId = ++this.requestId;
-    this.highlightedId.set(null);
+  /** Page, filters and sorting as the server expects them; the list and the sums ask with the same. */
+  private tableParameter(): DatabaseParameter {
     const order = this.order();
-    const parameter: DatabaseParameter = {
+    return {
       pageIndex: this.pageIndex(),
       pageSize: this.pageSize(),
       filters: this.allFilters(),
       orders: order ? [order] : [],
     };
+  }
+
+  /**
+   * The sums cover the whole filtered list, not the page, so they cannot be worked out from the row
+   * that was just saved - they are read again from the server. It is the same wherever a row is
+   * changed in place: a cell, a row in edit mode, or the entry form. Only a change in a column that
+   * has a sum is worth the request, and only a table whose page offers the address for it.
+   */
+  private refreshTotals(before: any, after: any): void {
+    const url = this.totalUrl();
+    if (!url || !this.hasTotals()) {
+      return;
+    }
+    const changed = Object.keys(this.totals()).some((fieldName) => before?.[fieldName] !== after?.[fieldName]);
+    if (!changed) {
+      return;
+    }
+    this.sendRequest.post(url, this.tableParameter())
+      .then((totals: Record<string, number | string>) => this.totals.set(totals ?? {}));
+  }
+
+  reload(highlightId: string | null = null, flash = true): void {
+    const requestId = ++this.requestId;
+    this.highlightedId.set(null);
+    const parameter = this.tableParameter();
 
     this.loading.set(true);
     this.sendRequest.post(this.url(), parameter)
@@ -1018,9 +1045,11 @@ export class DataTable implements AfterViewInit, OnDestroy {
           this.showNew(saved[ID_FIELD]);
           return;
         }
-        this.replaceRow(this.mergeSaved(changed, saved));
+        const merged = this.mergeSaved(changed, saved);
+        this.replaceRow(merged);
         this.highlightedId.set(saved[ID_FIELD] ?? id);
         this.highlightFlash.set(true);
+        this.refreshTotals(row, merged);
         if (this.hasNewFile(sent)) {
           this.refreshRow(saved[ID_FIELD] ?? id);
         }
@@ -1136,8 +1165,10 @@ export class DataTable implements AfterViewInit, OnDestroy {
     const sent = this.rowForSave(changed);
     this.sendRequest.post("/api" + this.saveUrl(), sent)
       .then((saved: any) => {
-        this.replaceRow(this.mergeSaved(changed, saved));
+        const merged = this.mergeSaved(changed, saved);
+        this.replaceRow(merged);
         this.savedCell.set(cell);
+        this.refreshTotals(row, merged);
         if (this.hasNewFile(sent)) {
           this.refreshRow(cell.id);
         }
@@ -1221,9 +1252,11 @@ export class DataTable implements AfterViewInit, OnDestroy {
     // A new file comes back only as an identifier, and the name it had before is no longer the right
     // one - a file that replaces another keeps its identifier - so that one row is read again.
     const newFile = fileChanged || this.fileChanged(current, saved);
-    this.replaceRow(newFile ? { ...current, ...saved } : this.mergeSaved(current, saved));
+    const merged = newFile ? { ...current, ...saved } : this.mergeSaved(current, saved);
+    this.replaceRow(merged);
     this.highlightedId.set(id);
     this.highlightFlash.set(true);
+    this.refreshTotals(current, merged);
 
     if (newFile) {
       this.refreshRow(id);

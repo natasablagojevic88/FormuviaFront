@@ -99,6 +99,18 @@ export class ModelPreviewPage {
       ? ApiRoute.modelPreviewImportWithParent(this.modelId(), fileId, this.parent()!)
       : ApiRoute.modelPreviewImport(this.modelId(), fileId);
 
+  /**
+   * Where the sums of the number columns are read again after a row is changed in the table itself.
+   * Such a change does not load the list again, so the sums would otherwise stay as they were.
+   */
+  readonly totalUrl = computed(() =>
+    this.modelId()
+      ? this.parent()
+        ? ApiRoute.modelPreviewTableWithParentTotal(this.modelId(), this.parent()!)
+        : ApiRoute.modelPreviewTableTotal(this.modelId())
+      : null
+  );
+
   /** The Excel template for entering data into this table. */
   readonly templateUrl = computed(() => (this.modelId() ? ApiRoute.modelPreviewTemplate(this.modelId()) : null));
 

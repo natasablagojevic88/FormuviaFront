@@ -94,7 +94,7 @@ Dobijate tačno ono što filteri i redosled sortiranja opisuju, a **ne** samo st
 
 Tabela sa decimalnim kolonama na dnu ima traku sa zbirovima, odmah iznad straničenja, i svaki zbir stoji ispod kolone kojoj pripada. Zbir obuhvata **sve što filteri pogađaju**, a ne samo stranu koja je na ekranu: suzite na jednog partnera i zbir je njegov, sklonite filter i zbir je cele tabele.
 
-Traka stoji u dnu tabele, bila lista duga ili kratka, i prati kolone kad se tabela skroluje u stranu. Na telefonu, gde je lista niz kartica, zbirovi idu jedan ispod drugog, svaki sa nazivom svoje kolone.
+Kad se iznos promeni pravo u listi, zbir se odmah računa ponovo, nad istim filterima — ono što stoji ispod kolone uvek odgovara onome što je u njoj. Traka stoji u dnu tabele, bila lista duga ili kratka, i prati kolone kad se tabela skroluje u stranu. Na telefonu, gde je lista niz kartica, zbirovi idu jedan ispod drugog, svaki sa nazivom svoje kolone.
 
 ## Šablon za unos
 
