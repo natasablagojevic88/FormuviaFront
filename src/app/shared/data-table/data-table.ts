@@ -11,7 +11,8 @@ import { Translate } from "../../services/translate";
 import { Language } from "../../services/language";
 import { Notify } from "../../services/notify";
 import { AdvancedSearchDialog, AdvancedSearchDialogData } from "../advanced-search-dialog/advanced-search-dialog";
-import { ComboOption, DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, FileValue, fileId, fileName, isPdf, QueryDatabaseOrder, SubTable, TableChild } from "../database-table";
+import { ComboOption, DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, FileValue, fileId, fileName, isPdf, QueryDatabaseOrder, SubTable, TableChild, TableProcedure } from "../database-table";
+import { ConfirmDialog, ConfirmDialogData } from "../confirm-dialog/confirm-dialog";
 import { PdfDialog, PdfDialogData } from "../pdf-dialog/pdf-dialog";
 import { FileVersionsDialog, FileVersionsDialogData } from "../file-versions-dialog/file-versions-dialog";
 import { HistoryPanel } from "../history-panel/history-panel";
@@ -166,6 +167,8 @@ export class DataTable implements AfterViewInit, OnDestroy {
   readonly fileVersionUrl = input<((id: string, fieldName: string, versionId: string) => string) | null>(null);
   /** Path to the history of a row for tables without a className (tables from the model). */
   readonly historyUrl = input<((id: string) => string) | null>(null);
+  /** Path that runs a procedure of the table over one row; without it the row menu does not offer any. */
+  readonly procedureUrl = input<((procedureId: string, id: string) => string) | null>(null);
   readonly edit = output<any>();
   readonly remove = output<any>();
   readonly loaded = output<DatabaseTable<any>>();
@@ -220,6 +223,10 @@ export class DataTable implements AfterViewInit, OnDestroy {
   readonly children = signal<TableChild[]>([]);
   /** Subtables of a model table; the row they are opened from becomes their parent. */
   readonly subTables = signal<SubTable[]>([]);
+  /** Procedures of the database the model put on this table, as the row menu offers them. */
+  readonly procedures = signal<TableProcedure[]>([]);
+  /** The row a procedure is running over; until it answers the menu offers nothing more. */
+  readonly runningProcedure = signal<string | null>(null);
   /** Records of the codebooks above the columns, once per model. */
   readonly parentCodebook = signal<Record<string, ComboOption[]>>({});
 
@@ -540,6 +547,7 @@ export class DataTable implements AfterViewInit, OnDestroy {
     this.children.set([]);
     this.lastTable = null;
     this.subTables.set([]);
+    this.procedures.set([]);
     this.parentCodebook.set({});
     this.hasAdd.set(true);
     this.hasUpdate.set(true);
@@ -557,6 +565,7 @@ export class DataTable implements AfterViewInit, OnDestroy {
     this.className.set(table.className || null);
     this.children.set(table.children ?? []);
     this.subTables.set(table.subTables ?? []);
+    this.procedures.set(table.procedures ?? []);
     this.parentCodebook.set(table.parentCodebook ?? {});
     this.hasAdd.set(table.hasAdd !== false);
     this.hasUpdate.set(table.hasUpdate !== false);
@@ -700,6 +709,13 @@ export class DataTable implements AfterViewInit, OnDestroy {
     });
   }
 
+  /**
+   * Procedures offered on a row. The server asks for the right to change the record before it runs
+   * one, so a user who may only look at the table is not offered what would be refused.
+   */
+  readonly rowProcedures = computed<TableProcedure[]>(() =>
+    this.procedureUrl() && this.hasUpdate() ? this.procedures() : []);
+
   /** The ⋯ menu is shown only when there is something in it: history, a subtable or deleting. */
   readonly hasRowMenu = computed(
     () =>
@@ -707,8 +723,40 @@ export class DataTable implements AfterViewInit, OnDestroy {
       !!this.historyUrl() ||
       this.children().length > 0 ||
       this.subTables().length > 0 ||
+      this.rowProcedures().length > 0 ||
       this.showDelete()
   );
+
+  /**
+   * Runs a procedure of the database over one row. It changes the record, so it is asked for first;
+   * the server answers with the row as it stands after it, and only that row is drawn again.
+   */
+  runProcedure(procedure: TableProcedure, row: any): void {
+    const id = row?.[ID_FIELD];
+    const url = this.procedureUrl();
+    if (!id || !url || this.runningProcedure()) {
+      return;
+    }
+    const data: ConfirmDialogData = {
+      title: procedure.name,
+      message: this.translate.get("ui.procedureConfirm").replace("{0}", procedure.name),
+      confirmText: this.translate.get("ui.procedureRun"),
+    };
+    this.dialog.open(ConfirmDialog, { width: "520px", data })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+        this.runningProcedure.set(id);
+        this.sendRequest.post(url(procedure.id, id), null)
+          .then((saved: any) => {
+            this.showChanged(saved);
+            this.notify.success(this.translate.get("ui.procedureDone").replace("{0}", procedure.name));
+          })
+          .finally(() => this.runningProcedure.set(null));
+      });
+  }
 
   /**
    * Opens a subtable of a model table: the row it is opened from is sent as the parent, and the trail

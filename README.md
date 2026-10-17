@@ -14,6 +14,7 @@ It requires the backend API from the separate repository: **Formuvia** (Java).
 - Role administration: add, edit and delete the roles that grant access
 - Form designer: arrange the fields of a table in the grid of its entry dialog, choose each field's data type and options, give it a default value or a list of values from the database, and delete a field together with its database column
 - Values worked out by the database: a field of a form can be given a function of the database (one that takes the record as json and returns json), and whenever that field is changed on the entry form the record is handed to it, so one field fills in or corrects the others
+- Procedures of the database on a table: a table from the Model can be given procedures under names and icons of your own, and the ⋯ menu of a row runs one over that record and draws the row again with the result
 - Model: a tree of menus and tables; a table added to the tree is created in the database, with the roles that may view, add, edit and delete its data
 - Data entry in the tables you define: the form is drawn from the model — fields in the grid you designed, translated labels, lists of values and default values — and records are added, changed and deleted from the table screen
 - Files on a record: a field of type File sends the chosen file to the server, and the file stored with a record is taken back from the form or straight from the row in the table; a PDF opens in a reader inside the application, and every file that stood in the field is kept as a version and can be listed
@@ -80,6 +81,16 @@ Development settings are in `src/environments/environment.development.ts`:
 
 3. Deploy the contents of `dist/FormuviaFront/browser/` to any static web server (nginx, Apache, ...). The app uses hash-based URLs (`/#/users`), so no special server rewrite rules are needed.
 
+4. Turn on gzip for the text files on that server. The build is almost all JavaScript, CSS and JSON, which go down to about a fifth of their size - the largest chunk from 748 KB to 190 KB, the worker of the PDF viewer from 2.2 MB to 477 KB. In nginx:
+
+   ```nginx
+   gzip on;
+   gzip_min_length 1024;
+   gzip_types text/css text/javascript application/javascript application/json application/wasm image/svg+xml;
+   ```
+
+   `text/html` is compressed always and must not be listed. Images, fonts and PDF files are compressed already - leave them out.
+
 On the backend, set `cors.url` to the address where the client is served. The client and the API must be on the same site and served over HTTPS (see the backend README).
 
 ## Building into the backend WAR
@@ -106,6 +117,22 @@ The server serving the WAR needs two media types for the PDF viewer, which older
 
 `index.html` must not be cached; the other files carry a hash in their name and can be cached for as long as you like. Without that, a browser can keep an old `index.html` after an upgrade and ask for files that are no longer there.
 
+Tomcat compresses nothing of its own accord. The connector has to be told to, and `useSendfile` has to be turned off in the same breath: a file over 48 KB is otherwise sent straight from the file system, past the compression - which is exactly the files worth compressing.
+
+```xml
+<Connector port="8080" protocol="HTTP/1.1"
+           connectionTimeout="20000"
+           redirectPort="8443"
+           useSendfile="false"
+           compression="on"
+           compressionMinSize="1024"
+           compressibleMimeType="text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml,application/wasm,image/svg+xml" />
+```
+
+The same connector carries the answers of the API, so this covers them too. Of the types listed, `application/wasm` and `image/svg+xml` are the two Tomcat does not compress on its own. On an HTTP/2 connector the four attributes belong on the `<UpgradeProtocol>` element as well.
+
+In a container, where `server.xml` is not yours to change, compress at the edge instead and leave Tomcat alone - the directives above in nginx, or a `compress` middleware in Traefik. The same media types matter there: the list of a proxy rarely has `application/wasm` in it, and the PDF viewer loads two `.wasm` files of 469 KB and 252 KB.
+
 ## Usage
 
 This is a quick reference. The full guide, with the model and the form designer explained step by step, is at **[https://natasablagojevic88.github.io/FormuviaFront/](https://natasablagojevic88.github.io/FormuviaFront/)**.
@@ -122,6 +149,7 @@ This is a quick reference. The full guide, with the model and the form designer 
 - **Model** – the tree starts at *Model*; add a menu under it, then tables under a menu and subtables under a table. Use ⋯ on a node to edit or delete it. Deleting a table also deletes it from the database with all its data.
 - **Your own tables** – a table from the model opens from the menu. *Add* and *Edit* open the form you designed for it, ⋯ → *History* shows who changed the record and when, ⋯ lists the subtables of that table, and ⋯ → *Delete* removes the record together with the rows of its subtables. What is offered follows the roles of the model: without the right to add, change or delete, the matching button simply is not there, and a record you may only view opens as a locked form. A list you come back to is restored as you left it — page, filters, sorting and the row you were on. Editing in the list is not available on these tables yet.
 - **Form design** – open ⋯ on a table in the model tree and choose *Form design*. Click an empty place in the grid to add a field, click a field to change it. A field can be a text, a number, a date, a time, a yes/no switch, a file or a link to another table used as a codebook; it can be hidden from the table or from the form itself, made read-only, filled with a default value or offered as a list of values (each of those is a single `SELECT`, written without `*`). It can also be given a function of the database that works out the values of the whole record whenever that field is changed; the info button beside the field shows what such a function has to look like. Deleting a field also deletes its column and its data from the database. The grid cannot be made smaller than the fields already placed in it.
+- **Procedures** – at the bottom of a table's form in the model, *Procedures* ties procedures of the database to that table, each under a name and an icon of your own; only a procedure that takes the identifier of a record as its one parameter can be used. In the list of that table, ⋯ then offers them by name: it asks first, runs the procedure over that record and draws the row again with what the procedure left behind. The tab next to *Save* in the entry dialog offers the same ones as *Save and run*: the record is stored, the procedure runs over it and the form is filled in again with its result. Offered only to someone who may change the record.
 - **Roles** – in the user form, add a role from the list and remove one with the × on its chip.
 - **Change password** – click your name at the bottom of the menu.
 - **Log out** – the icon next to your name.

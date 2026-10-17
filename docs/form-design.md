@@ -177,7 +177,9 @@ When the function is asked follows the kind of entry, so that typing does not se
 
 Two more things hold the calls back. Nothing is asked while an answer is still awaited: a field changed in the meantime is asked once that answer is in, so holding down the arrows of a number field ends in one more call and not in one per click. And nothing is asked twice for the same record, so leaving a field you typed nothing into, or picking the same value again, costs nothing at all.
 
-While the database is working the values out, the form says so at the bottom and *Save* waits for the answer.
+While the database is working the values out, the form says so at the bottom. *Save* stays on: press it and the record is stored the moment the answer is in, with the values the function worked out.
+
+Only what the function really changed is taken over. A function usually returns the whole record, and a field it hands back as it got it is left exactly as it stands - so a value you type into another field while the database is working is not overwritten by the answer.
 
 ## Conditions
 

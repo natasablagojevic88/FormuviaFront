@@ -67,6 +67,20 @@ If the table already has fields, the grid cannot be made smaller than what those
 
 The table is created in the database the moment you save.
 
+### Procedures
+
+At the bottom of the dialog stands **Procedures**: procedures of the database that can be run over one record of this table. A procedure is work the database does by itself — recalculating a document, closing a period, numbering an invoice — and Formuvia only sets it off and shows the result.
+
+This part appears once the table is saved. **Add a procedure** asks for three things:
+
+- **Name** — what the user will see in the ⋯ menu of the list. Give it a name that says what it does: *Recalculate*, *Close*.
+- **Icon** — the picture that stands beside that name in the menu, chosen the same way as the icon of a table. Left empty, the procedure gets the gears.
+- **Procedure of the database** — chosen from the procedures the database holds. Only a procedure that takes **one parameter, the identifier of the record**, can be used here; Formuvia refuses a name the database does not know.
+
+Click a procedure in the list to change it, or the basket to take it off the table. Taking it off removes only the entry in Formuvia — the procedure itself stays in the database.
+
+Who may run it follows the table: the same role that may **change** a record may run a procedure over it, because that is what a procedure does. It is offered in two places: the ⋯ menu of the list, and the tab next to *Save* in the entry dialog. How it is run is in [Working with tables](/tables#what-else-a-row-can-do).
+
 ## Editing
 
 ⋯ → *Edit* opens the same form. The name, the description, the icon, the roles and the size of the entry dialog can all be changed at any time.

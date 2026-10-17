@@ -1,12 +1,22 @@
 import { Component, computed, Inject, OnInit, signal } from "@angular/core";
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { SendRequest } from "../../services/send-request";
 import { ApiRoute } from "../../shared/ApiRoute";
 import { ModelColumn } from "../model-column";
 import { Role } from "../../administration/app-user-dialog/app-user-dialog";
 import { Translate } from "../../services/translate";
+import { Notify } from "../../services/notify";
+import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
 import { SelectOption } from "../../shared/search-select/search-select";
-import { DIALOG_DEFAULTS, DIALOG_LIMITS, ModelNode, ModelType, TABLE_CODE_PATTERN } from "../model";
+import {
+  DIALOG_DEFAULTS,
+  DIALOG_LIMITS,
+  ModelNode,
+  ModelProcedure,
+  ModelType,
+  PROCEDURE_TYPE,
+  TABLE_CODE_PATTERN,
+} from "../model";
 
 export interface ModelDialogData {
   /** The node being edited; undefined for a new node. */
@@ -35,8 +45,10 @@ export class ModelDialog implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ModelDialogData,
     private dialogRef: MatDialogRef<ModelDialog, ModelNode | false>,
+    private dialog: MatDialog,
     private sendRequest: SendRequest,
-    private translate: Translate
+    private translate: Translate,
+    private notify: Notify
   ) {
     const node = data.node;
     this.model = node
@@ -85,6 +97,83 @@ export class ModelDialog implements OnInit {
       this.minColumns.set(Math.max(1, ...(columns ?? []).map((column) => column.columnIndex + column.colspan - 1)));
       this.minRows.set(Math.max(1, ...(columns ?? []).map((column) => column.rowIndex)));
     }).finally(() => this.loadingColumns.set(false));
+
+    // the table carries its procedures, and the database says which ones there are to choose from
+    this.sendRequest.get(ApiRoute.modelId(id))
+      .then((model: { procedures?: ModelProcedure[] }) => this.procedures.set(model?.procedures ?? []));
+    this.sendRequest.get(ApiRoute.databaseRoutines(PROCEDURE_TYPE)).then((names: string[]) =>
+      this.routines.set((names ?? []).map((name) => ({ value: name, label: name }))));
+  }
+
+  // --- procedures of the database over one record of this table ---
+
+  readonly procedures = signal<ModelProcedure[]>([]);
+  /** Procedures the database holds; one of them stands behind the name the user gives it. */
+  readonly routines = signal<SelectOption[]>([]);
+  /** The procedure being entered or changed; empty when the list is only being looked at. */
+  readonly draft = signal<ModelProcedure | null>(null);
+  readonly savingProcedure = signal(false);
+
+  startProcedure(): void {
+    this.draft.set({ name: "", modelId: this.data.node!.id!, icon: "", procedure: "" });
+  }
+
+  editProcedure(procedure: ModelProcedure): void {
+    this.draft.set({ ...procedure });
+  }
+
+  cancelProcedure(): void {
+    this.draft.set(null);
+  }
+
+  canSaveProcedure(): boolean {
+    const draft = this.draft();
+    return !!draft?.name.trim() && !!draft.procedure && !this.savingProcedure();
+  }
+
+  saveProcedure(): void {
+    const draft = this.draft();
+    if (!draft || !this.canSaveProcedure()) {
+      return;
+    }
+    this.savingProcedure.set(true);
+    this.sendRequest.post(ApiRoute.modelProcedure, { ...draft, name: draft.name.trim() })
+      .then((saved: ModelProcedure) => {
+        const list = this.procedures();
+        const place = list.findIndex((other) => other.id === saved.id);
+        this.procedures.set(place < 0
+          ? [...list, saved].sort((first, second) => first.name.localeCompare(second.name))
+          : list.map((other, index) => (index === place ? saved : other)));
+        this.draft.set(null);
+        this.notify.success(this.translate.get("ui.saved"));
+      })
+      .finally(() => this.savingProcedure.set(false));
+  }
+
+  removeProcedure(procedure: ModelProcedure): void {
+    const data: ConfirmDialogData = {
+      title: this.translate.get("ui.model.procedureDeleteTitle"),
+      message: this.translate.get("ui.model.procedureDeleteConfirm").replace("{0}", procedure.name),
+      confirmText: this.translate.get("ui.delete"),
+      danger: true,
+    };
+    this.dialog.open(ConfirmDialog, { width: "520px", data })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+        this.savingProcedure.set(true);
+        this.sendRequest.delete(ApiRoute.modelProcedureId(procedure.id!))
+          .then(() => {
+            this.procedures.set(this.procedures().filter((other) => other.id !== procedure.id));
+            if (this.draft()?.id === procedure.id) {
+              this.draft.set(null);
+            }
+            this.notify.success(this.translate.get("ui.deleted"));
+          })
+          .finally(() => this.savingProcedure.set(false));
+      });
   }
 
   /** The grid must not shrink below what the fields already take. */

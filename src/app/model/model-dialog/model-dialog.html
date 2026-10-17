@@ -104,6 +104,81 @@
               icon="fa-solid fa-user-shield" [placeholder]="label(field)" [ariaLabel]="label(field)" />
           </div>
         }
+
+        <!-- procedures of the database over one record; the row menu of the list runs them -->
+        <div class="fd-field fd-field-wide section">
+          <span class="section-title">{{ 'ui.model.proceduresTitle' | t }}</span>
+          <span class="fd-help">{{ 'ui.model.proceduresHelp' | t }}</span>
+        </div>
+
+        <div class="fd-field fd-field-wide procedures">
+          @if (isNew) {
+            <p class="procedures-empty">{{ 'ui.model.proceduresNew' | t }}</p>
+          } @else {
+            @if (procedures().length) {
+              <ul class="procedure-list">
+                @for (procedure of procedures(); track procedure.id) {
+                  <li class="procedure" [class.procedure-open]="draft()?.id === procedure.id">
+                    <button type="button" class="procedure-main" (click)="editProcedure(procedure)">
+                      <i class="fa-solid procedure-glyph" [class]="procedure.icon || 'fa-solid fa-gears'"></i>
+                      <span class="procedure-name">{{ procedure.name }}</span>
+                      <span class="procedure-code">{{ procedure.procedure }}</span>
+                    </button>
+                    <button type="button" class="procedure-remove" (click)="removeProcedure(procedure)"
+                      [disabled]="savingProcedure()" [attr.aria-label]="'ui.delete' | t">
+                      <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="procedures-empty">{{ 'ui.model.procedureEmpty' | t }}</p>
+            }
+
+            @if (draft(); as procedure) {
+              <div class="procedure-form">
+                <div class="fd-field">
+                  <label class="fd-label fd-required" for="procedureName">{{ 'ui.model.procedureName' | t }}</label>
+                  <input id="procedureName" name="procedureName" class="fd-input" [(ngModel)]="procedure.name"
+                    [ngModelOptions]="{ standalone: true }" autocomplete="off"
+                    (keydown.enter)="$event.preventDefault(); saveProcedure()" />
+                </div>
+
+                <div class="fd-field">
+                  <span class="fd-label">{{ 'ui.model.procedureIcon' | t }}</span>
+                  <app-icon-select [(ngModel)]="procedure.icon" [ngModelOptions]="{ standalone: true }"
+                    [ariaLabel]="'ui.model.procedureIcon' | t" />
+                </div>
+
+                <div class="fd-field">
+                  <span class="fd-label fd-required">{{ 'ui.model.procedureOfDatabase' | t }}</span>
+                  <app-search-select [options]="routines()" [clearable]="false" [(ngModel)]="procedure.procedure"
+                    [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-gears"
+                    [placeholder]="'ui.model.procedureChoose' | t"
+                    [ariaLabel]="'ui.model.procedureOfDatabase' | t" />
+                  <span class="fd-help">{{ (routines().length ? 'ui.model.procedureHelp' : 'ui.model.procedureNone') | t }}</span>
+                </div>
+
+                <div class="procedure-actions">
+                  <button type="button" class="fd-button fd-button-secondary" (click)="cancelProcedure()">
+                    {{ 'ui.cancel' | t }}
+                  </button>
+                  <button type="button" class="fd-button fd-button-primary" (click)="saveProcedure()"
+                    [disabled]="!canSaveProcedure()">
+                    <i class="fa-solid" [class.fa-check]="!savingProcedure()" [class.fa-spinner]="savingProcedure()"
+                      [class.fa-spin]="savingProcedure()"></i>
+                    {{ 'ui.save' | t }}
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <button type="button" class="procedure-add" (click)="startProcedure()" [disabled]="savingProcedure()">
+                <i class="fa-solid fa-plus"></i>
+                {{ 'ui.model.procedureAdd' | t }}
+              </button>
+            }
+          }
+        </div>
       }
     </div>
   </div>

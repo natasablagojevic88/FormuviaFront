@@ -97,9 +97,11 @@
                 <span class="edit-label">{{ (viewOnly() ? 'ui.view' : 'ui.edit') | t }}</span>
               </button>
               @if (hasRowMenu()) {
-                <button type="button" class="more-button" [matMenuTriggerFor]="rowMenu" [disabled]="rowEditMode()"
+                <button type="button" class="more-button" [matMenuTriggerFor]="rowMenu"
+                  [disabled]="rowEditMode() || !!runningProcedure()"
                   (click)="selectRow(row)" [title]="'ui.moreActions' | t" [attr.aria-label]="'ui.moreActions' | t">
-                  <i class="fa-solid fa-ellipsis"></i>
+                  <i class="fa-solid" [class.fa-ellipsis]="runningProcedure() !== row.id"
+                    [class.fa-spinner]="runningProcedure() === row.id" [class.fa-spin]="runningProcedure() === row.id"></i>
                 </button>
               }
               <mat-menu #rowMenu="matMenu" class="row-menu">
@@ -107,6 +109,13 @@
                   <button type="button" mat-menu-item (click)="openHistory(row)">
                     <i class="fa-solid fa-clock-rotate-left menu-icon"></i>
                     <span>{{ 'ui.history.title' | t }}</span>
+                  </button>
+                }
+                <!-- procedures of the database over this record; they change it, so they are asked for first -->
+                @for (procedure of rowProcedures(); track procedure.id) {
+                  <button type="button" mat-menu-item (click)="runProcedure(procedure, row)">
+                    <i class="fa-solid menu-icon" [class]="procedure.icon || 'fa-solid fa-gears'"></i>
+                    <span>{{ procedure.name }}</span>
                   </button>
                 }
                 @for (subTable of subTables(); track subTable.modelId) {

@@ -50,6 +50,8 @@ Tabela iz Modela ima četiri odvojena prava: pregled, unos, izmena i brisanje. B
 
 Dugme **Sačuvaj** ima mali jezičak sa desne strane. U njemu je uvek **Sačuvaj i ostani** — zapis se snimi, a forma ostane otvorena i ponovo se popuni onim što je server upisao, pa se dugačka forma može snimati usput, a nov zapis jednostavno postane postojeći. Kad tabela ima podtabele, u jezičku stoji i po jedna stavka za svaku od njih. Kod **novog** zapisa piše *Sačuvaj i otvori: …* — zapis se snimi, a podtabela se otvori sa njim kao nadređenim, pa se zaglavlje i stavke unesu u jednom potezu. Kod **postojećeg** zapisa piše *Otvori: …*, jer je zapis već snimljen, a vi možda samo hoćete da ga pogledate i pređete na stavke; ako ste pre toga nešto izmenili na formi, dobićete upozorenje da te izmene neće biti sačuvane.
 
+Ako tabela ima procedure, i one stoje u ježičku, kao *Sačuvaj i pokreni: …*. Prvo pita, kao i u listi, jer procedura menja zapis i to se ne može poništiti. Zapis se prvo snimi, pa procedura radi nad onim što stoji na formi, a nov zapis do tada već postoji; kad završi, forma se ponovo popuni onim što je procedura ostavila i ostaje otvorena. Procedure su u ježičku samo dok zapis sme da se menja — zapis koji samo gledate nema ni dugme Sačuvaj. Iste te procedure stoje i u ⋯ meniju liste, za zapis koji ne morate da otvarate.
+
 Nazivi polja na toj formi dolaze sa servera, na jeziku koji ste izabrali, pa forma i tabela uvek koriste iste reči za istu stvar.
 
 Vrednost izabrana iz liste poništava se **×** na desnom kraju polja — isto radi i na formi, i u tabeli, i u filterima.
@@ -83,6 +85,8 @@ Dugme ⋯ pored *Izmeni* nosi sve ostalo:
 **Podtabele** — ako tabela ima podtabele, svaka je navedena ovde. Kad je otvorite, vidite samo redove koji pripadaju zapisu iz kog ste došli, a u zaglavlju piše koji je to zapis: *Komitenti: Acme d.o.o.*, sa dugmetom **Nazad** pored. Lanac može ići koliko god duboko model ide.
 
 **Nazad** vraća listu tačno onakvu kakvu ste ostavili — ista strana, isti filteri i sortiranje, i red u koji ste ušli i dalje označen — pa ne morate ponovo da tražite gde ste stali. Kad tu tabelu ponovo otvorite iz menija, ili osvežite stranu, kreće ispočetka.
+
+**Procedure** — ako je model postavio procedure na ovu tabelu, svaka stoji ovde pod nazivom i ikonom koje je dobila: *Preračunaj*, *Zatvori*. Kad izaberete jednu, Formuvia prvo pita, jer procedura menja zapis u bazi. Dok radi, ⋯ dugme tog reda se vrti; kad završi, red se ponovo iscrta sa onim što je procedura ostavila, a ostatak liste ostaje kakav je bio. Procedura se nudi samo onome ko sme da menja zapis, jer to i radi. Iste procedure stoje i u ježičku pored dugmeta *Sačuvaj* u dijalogu za unos, kao *Sačuvaj i pokreni: …*, za zapis koji ste ionako otvorili. Koje procedure tabela ima podešava se u [Modelu](/sr/model#procedure).
 
 **Obriši** — prvo traži potvrdu, jer se ne može poništiti.
 

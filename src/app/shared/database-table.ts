@@ -119,6 +119,16 @@ export interface DatabaseTable<T> {
   subTables?: SubTable[];
   /** Subtables; the row menu opens the child table filtered by that row. */
   children?: TableChild[];
+  /** Procedures of the database the model put on this table; the row menu runs one over a row. */
+  procedures?: TableProcedure[];
+}
+
+/** A procedure of a model table, as the row menu offers it; the name is already translated. */
+export interface TableProcedure {
+  id: string;
+  name: string;
+  /** Font Awesome classes chosen on the model; without it the menu shows the gears. */
+  icon?: string;
 }
 
 /** A subtable of a model table; the row it is opened from becomes its parent. */

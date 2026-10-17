@@ -67,6 +67,20 @@ Ako tabela već ima polja, mreža ne može da se smanji ispod onoga što ta polj
 
 Tabela se pravi u bazi onog trenutka kad snimite.
 
+### Procedure
+
+U dnu dijaloga stoje **Procedure**: procedure baze koje se mogu pokrenuti nad jednim zapisom ove tabele. Procedura je posao koji baza radi sama — preračunavanje dokumenta, zatvaranje perioda, numerisanje fakture — a Formuvia je samo okida i prikazuje rezultat.
+
+Ovaj deo se pojavljuje kad je tabela sačuvana. **Dodaj proceduru** traži tri stvari:
+
+- **Naziv** — ono što korisnik vidi u ⋯ meniju liste. Dajte naziv koji kaže šta radi: *Preračunaj*, *Zatvori*.
+- **Ikona** — sličica koja stoji uz taj naziv u meniju, bira se isto kao ikona tabele. Ako se ostavi prazna, procedura dobija zupčanike.
+- **Procedura baze** — bira se među procedurama koje baza ima. Ovde može da stoji samo procedura koja prima **jedan parametar, identifikator zapisa**; naziv koji baza ne poznaje Formuvia odbija.
+
+Klik na proceduru u spisku je otvara za izmenu, a korpa je skida sa tabele. Skidanjem se briše samo stavka u Formuvia-i — sama procedura ostaje u bazi.
+
+Ko sme da je pokrene prati tabelu: ista uloga koja sme da **menja** zapis sme i da pokrene proceduru nad njim, jer to procedura i radi. Nudi se na dva mesta: u ⋯ meniju liste i u ježičku pored dugmeta *Sačuvaj* u dijalogu za unos. Kako se pokreće piše u [Rad sa tabelama](/sr/tables#sta-jos-red-moze).
+
 ## Izmena
 
 ⋯ → *Izmeni* otvara istu formu. Naziv, opis, ikona, uloge i veličina dijaloga za unos mogu se menjati kad god.

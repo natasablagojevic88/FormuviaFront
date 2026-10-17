@@ -4,7 +4,7 @@ import { Language } from "../../services/language";
 import { SendRequest } from "../../services/send-request";
 import { ApiRoute } from "../../shared/ApiRoute";
 import { SelectOption } from "../../shared/search-select/search-select";
-import { ComboOption, FileValue, fileId, SubTable } from "../../shared/database-table";
+import { ComboOption, FileValue, fileId, SubTable, TableProcedure } from "../../shared/database-table";
 import { conditionsHold, ConditionSourceLookup, hasConditions } from "../../shared/column-conditions";
 import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
 import { Translate } from "../../services/translate";
@@ -41,6 +41,10 @@ export interface PreviewFormDialogData {
   readOnly?: boolean;
   /** Subtables of this table; saving can lead straight into one of them. */
   subTables?: SubTable[];
+  /** Procedures of this table; saving can run one of them over the record at once. */
+  procedures?: TableProcedure[];
+  /** Path that runs a procedure over the record; without it no procedure is offered. */
+  procedureUrl?: (procedureId: string, id: string) => string;
 }
 
 /** What the dialog closes with: the stored record, and the subtable to open next when one was chosen. */
@@ -156,9 +160,12 @@ export class PreviewFormDialog implements OnInit {
   private showForm(columns: PreviewColumn[], parentCodebook: Record<string, ComboOption[]>): void {
     this.parentCodebook = parentCodebook;
     this.allFields = columns;
-    // the form starts over, so what was asked of a function before says nothing about it any more
+    // the form starts over, so what was asked of a function before says nothing about it any more,
+    // and an answer still in the air is about the record as it stood before this read
     this.lastSent.clear();
-    this.again = null;
+    this.waiting = [];
+    this.waitingSave = null;
+    this.round++;
     const fields = sortByPlace(columns.filter((column) => hasPlace(column)));
 
     this.values = {};
@@ -305,10 +312,14 @@ export class PreviewFormDialog implements OnInit {
 
   /** An answer of a change function is being awaited; only one is in the air at a time. */
   private pending = 0;
-  /** A field changed while an answer was awaited; it is asked once that answer is in. */
-  private again: PreviewColumn | null = null;
+  /** Fields changed while an answer was awaited; they are asked in turn once that answer is in. */
+  private waiting: PreviewColumn[] = [];
   /** The record that was last sent for a field, so the same question is not asked twice. */
   private lastSent = new Map<string, string>();
+  /** A save asked for while a function was still working; it goes through once the answer is in. */
+  private waitingSave: { goTo?: SubTable; stay: boolean; run?: TableProcedure } | null = null;
+  /** The form is counted, so an answer belonging to the form before it was read again is dropped. */
+  private round = 0;
 
   /**
    * A field the form design put a function of the database on: the record as it stands goes to the
@@ -318,16 +329,20 @@ export class PreviewFormDialog implements OnInit {
    *
    * When the field is asked for is left to the template, because it follows the kind of entry: a
    * switch, a list and a codebook the moment they are picked, everything typed in once the field is
-   * left. Two things hold it back here as well: nothing is asked while an answer is still awaited,
-   * and nothing is asked twice for the same record - so the arrows of a number field, a date picked
-   * again or leaving a field nothing was typed into cost no call at all.
+   * left. Two things hold it back here as well: nothing is asked while an answer is still awaited -
+   * a field changed in the meantime waits its turn - and nothing is asked twice for the same record,
+   * so the arrows of a number field, a date picked again or leaving a field nothing was typed into
+   * cost no call at all.
    */
   runChange(column: PreviewColumn): void {
     if (!column.changeValueFunction || this.data.readOnly || this.loading()) {
       return;
     }
     if (this.pending > 0) {
-      this.again = column;
+      // the same field changed twice while one answer is awaited is still one question
+      if (!this.waiting.includes(column)) {
+        this.waiting.push(column);
+      }
       return;
     }
     const record = this.recordForFunction();
@@ -335,21 +350,32 @@ export class PreviewFormDialog implements OnInit {
     if (this.lastSent.get(column.code) === question) {
       return;
     }
-    this.lastSent.set(column.code, question);
 
+    const round = this.round;
     this.pending++;
     this.changing.set(true);
     this.sendRequest
       .post(ApiRoute.modelPreviewChange(this.data.modelId, column.code), record)
-      .then((answer: Record<string, any>) => this.applyChange(answer))
+      .then((answer: Record<string, any>) => {
+        // the form was read again while the question was in the air, so this answer is about the
+        // record as it stood before that and says nothing about the one on the form now
+        if (round !== this.round) {
+          return;
+        }
+        // written down only once it has worked out: a question that failed may be asked again
+        this.lastSent.set(column.code, question);
+        this.applyChange(answer, record);
+      })
       .finally(() => {
         this.pending--;
-        const next = this.again;
-        this.again = null;
-        if (next) {
-          this.runChange(next);
+        // a question that is not asked after all (the same record again) must not stop the others
+        while (this.pending === 0 && this.waiting.length > 0) {
+          this.runChange(this.waiting.shift()!);
         }
         this.changing.set(this.pending > 0);
+        if (this.pending === 0) {
+          this.saveWhenAsked();
+        }
       });
   }
 
@@ -375,8 +401,12 @@ export class PreviewFormDialog implements OnInit {
    * what stands in it, so a function may also return only what it changed; a file is left alone, and
    * so are the identity of the record and the link to the parent row. A new value can take another
    * field off the form, so the conditions are judged again.
+   *
+   * Only what the function really changed is taken over. A function written the way the example
+   * shows returns the whole record, while the user may have typed into another field in the
+   * meantime; a field the answer hands back as it got it is therefore left exactly as it stands.
    */
-  private applyChange(answer: Record<string, any> | null): void {
+  private applyChange(answer: Record<string, any> | null, sent: Record<string, any>): void {
     if (!answer) {
       return;
     }
@@ -387,6 +417,9 @@ export class PreviewFormDialog implements OnInit {
       if (column.code === PREVIEW_ID_FIELD || column.code === PREVIEW_PARENT_FIELD) {
         return;
       }
+      if (!this.worked(answer[column.code], sent[column.code])) {
+        return;
+      }
       if (column.code in this.values) {
         this.values[column.code] = toFieldValue(answer[column.code], column, this.language.current());
       } else {
@@ -394,6 +427,27 @@ export class PreviewFormDialog implements OnInit {
       }
     });
     this.fieldChanged();
+  }
+
+  /**
+   * Whether the function gave back another value than the one it was handed. An empty value is
+   * empty however it is written (nothing at all, null, empty text), and a number is weighed as a
+   * number, so 5 and 5.00 are the same value.
+   */
+  private worked(fromFunction: any, sent: any): boolean {
+    const empty = (value: any) => value === null || value === undefined || value === "";
+    if (empty(fromFunction) && empty(sent)) {
+      return false;
+    }
+    if (empty(fromFunction) || empty(sent)) {
+      return true;
+    }
+    const first = Number(fromFunction);
+    const second = Number(sent);
+    if (!Number.isNaN(first) && !Number.isNaN(second)) {
+      return first !== second;
+    }
+    return String(fromFunction) !== String(sent);
   }
 
   /** A field pointing at a codebook offers the record it holds, shown in the same dialog, locked. */
@@ -450,9 +504,14 @@ export class PreviewFormDialog implements OnInit {
     return this.isRequired(column) && !this.isLocked(column) && this.isEmpty(column);
   }
 
+  /**
+   * A change function at work does not hold the button back. The value typed in is handed to its
+   * function by the very blur that leads to the save, so a button disabled at that moment would
+   * swallow the first click without a word; the save waits for the answer instead.
+   */
   canSave(): boolean {
     // a field a condition has taken off the form is not filled in, so it is not asked for either
-    return !this.loading() && !this.saving() && !this.changing() && this.fields().length > 0
+    return !this.loading() && !this.saving() && this.fields().length > 0
       && !this.shownFields().some(
         (column) => this.missing(column) || this.wrongNumber(column) || this.tooManyDecimals(column)
       );
@@ -461,6 +520,36 @@ export class PreviewFormDialog implements OnInit {
   /** Subtables are offered next to Save, so a new record can be filled in and opened at once. */
   subTables(): SubTable[] {
     return this.data.readOnly ? [] : this.data.subTables ?? [];
+  }
+
+  /**
+   * Procedures of the table are offered next to Save as well: the record is stored first, so the
+   * procedure works on what stands on the form, and a new record exists by the time it runs.
+   */
+  procedures(): TableProcedure[] {
+    return this.data.readOnly || !this.data.procedureUrl ? [] : this.data.procedures ?? [];
+  }
+
+  /**
+   * Saves, runs the procedure over the stored record and reads the form again with its result. It
+   * is asked for first, as in the list: the procedure changes the record and cannot be taken back.
+   */
+  saveAndRun(procedure: TableProcedure): void {
+    if (!this.canSave()) {
+      return;
+    }
+    const data: ConfirmDialogData = {
+      title: procedure.name,
+      message: this.translate.get("ui.preview.procedureConfirm").replace("{0}", procedure.name),
+      confirmText: this.translate.get("ui.procedureRun"),
+    };
+    this.dialog.open(ConfirmDialog, { width: "460px", data })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (confirmed) {
+          this.save(undefined, true, procedure);
+        }
+      });
   }
 
   /** Something in the form was changed and not saved yet. */
@@ -535,8 +624,14 @@ export class PreviewFormDialog implements OnInit {
     return record;
   }
 
-  save(goTo?: SubTable, stay = false): void {
+  save(goTo?: SubTable, stay = false, run?: TableProcedure): void {
     if (!this.canSave()) {
+      return;
+    }
+    // a function is still working the values out, so this is not yet the record to store: the save
+    // is kept and goes through with what the answer brings
+    if (this.pending > 0) {
+      this.waitingSave = { goTo, stay, run };
       return;
     }
 
@@ -560,11 +655,56 @@ export class PreviewFormDialog implements OnInit {
 
         this.lastSaved = stored;
         this.lastFileChanged = this.lastFileChanged || fileChanged;
-        this.saving.set(false);
         this.data.id = stored[PREVIEW_ID_FIELD] ?? this.data.id;
+
+        // the record is stored, so the procedure runs over it and the form waits for what it leaves
+        if (run) {
+          this.runProcedure(run);
+          return;
+        }
+
+        this.saving.set(false);
         this.loadForm();
       })
       .catch(() => this.saving.set(false));
+  }
+
+  /**
+   * A procedure of the database over the record that was just stored. Whatever it leaves behind is
+   * read back into the form, and the list behind the dialog gets it when the dialog closes.
+   */
+  private runProcedure(procedure: TableProcedure): void {
+    const url = this.data.procedureUrl;
+    const id = this.data.id;
+    if (!url || !id) {
+      this.saving.set(false);
+      this.loadForm();
+      return;
+    }
+    this.sendRequest
+      .post(url(procedure.id, id), null)
+      .then((row: any) => {
+        if (row) {
+          this.lastSaved = row;
+        }
+        this.notify.success(this.translate.get("ui.procedureDone").replace("{0}", procedure.name));
+      })
+      .finally(() => {
+        this.saving.set(false);
+        this.loadForm();
+      });
+  }
+
+  /**
+   * The save that was asked for while a function was working. What the answer brought can leave a
+   * required field empty, and then there is nothing to store: that field stands marked on the form.
+   */
+  private saveWhenAsked(): void {
+    const asked = this.waitingSave;
+    this.waitingSave = null;
+    if (asked) {
+      this.save(asked.goTo, asked.stay, asked.run);
+    }
   }
 
   /** Closing after a save that kept the dialog open still refreshes the list behind it. */

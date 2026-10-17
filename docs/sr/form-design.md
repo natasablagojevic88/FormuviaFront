@@ -177,7 +177,9 @@ Kad se funkcija pita zavisi od načina unosa, da kucanje ne bi pokretalo poziv p
 
 Još dve stvari zadržavaju pozive. Dok se čeka odgovor, ništa se ne pita: polje promenjeno u međuvremenu pita se tek kad taj odgovor stigne, pa držanje strelica na polju sa brojem završi jednim dodatnim pozivom, a ne jednim po kliku. I ništa se ne pita dvaput za isti zapis, pa napuštanje polja u koje niste ništa ukucali, ili ponovni izbor iste vrednosti, ne košta ništa.
 
-Dok baza računa, forma to kaže u dnu, a *Sačuvaj* čeka odgovor.
+Dok baza računa, forma to kaže u dnu. *Sačuvaj* ostaje aktivan: pritisnite ga i zapis se snima čim odgovor stigne, sa vrednostima koje je funkcija izračunala.
+
+Preuzima se samo ono što je funkcija stvarno promenila. Funkcija obično vraća ceo zapis, a polje koje vrati onakvim kakvim ga je dobila ostaje tačno kako stoji - pa vrednost koju ukucate u drugo polje dok baza računa odgovor ne prepisuje.
 
 ## Uslovi
 

@@ -131,6 +131,13 @@
               <i class="fa-solid fa-floppy-disk menu-icon"></i>
               <span>{{ 'ui.preview.saveAndStay' | t }}</span>
             </button>
+            <!-- a procedure works on what stands on the form, so the record is stored first -->
+            @for (procedure of procedures(); track procedure.id) {
+              <button type="button" mat-menu-item (click)="saveAndRun(procedure)" [disabled]="!canSave()">
+                <i class="fa-solid menu-icon" [class]="procedure.icon || 'fa-solid fa-gears'"></i>
+                <span>{{ 'ui.preview.saveAndRun' | t }}: {{ procedure.name }}</span>
+              </button>
+            }
             <!-- a new record is saved first; an existing one is already stored, so it is only opened -->
             @for (subTable of subTables(); track subTable.modelId) {
               <button type="button" mat-menu-item (click)="isNew ? save(subTable) : open(subTable)">

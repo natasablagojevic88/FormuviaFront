@@ -9,7 +9,7 @@ import { SendRequest } from "../services/send-request";
 import { ApiRoute } from "../shared/ApiRoute";
 import { ConfirmDialog, ConfirmDialogData } from "../shared/confirm-dialog/confirm-dialog";
 import { DataTable, ID_FIELD, TrailCrumb } from "../shared/data-table/data-table";
-import { DatabaseColumn, DatabaseTable, SubTable } from "../shared/database-table";
+import { DatabaseColumn, DatabaseTable, SubTable, TableProcedure } from "../shared/database-table";
 import { PreviewFormDialog, PreviewFormDialogData, PreviewFormResult } from "./preview-form-dialog/preview-form-dialog";
 import { DEFAULT_FORM_WIDTH } from "./preview-form";
 
@@ -28,6 +28,8 @@ export class ModelPreviewPage {
   readonly tableUrl = signal("");
   /** Subtables of this table; the entry dialog offers to save and open one of them. */
   private readonly subTables = signal<SubTable[]>([]);
+  /** Procedures of this table; the entry dialog offers to save and run one of them. */
+  private readonly procedures = signal<TableProcedure[]>([]);
 
   /** What the user may do here; the server sends it with the table. */
   readonly canAdd = signal(true);
@@ -89,6 +91,10 @@ export class ModelPreviewPage {
 
   /** History of a row: model tables have a path of their own instead of a DTO class name. */
   readonly historyUrl = (id: string) => ApiRoute.modelPreviewHistory(this.modelId(), id);
+
+  /** Runs one of the procedures of this table over a row; the row menu offers them by name. */
+  readonly procedureUrl = (procedureId: string, id: string) =>
+    ApiRoute.modelPreviewExecuteProcedure(procedureId, id);
 
   /** In a subtable every new row belongs to the row of the parent table the page was opened from. */
   readonly newRowValues = computed(() => (this.parent() ? { parent: this.parent() } : null));
@@ -152,6 +158,7 @@ export class ModelPreviewPage {
     this.title.set(table.name ?? "");
     this.subtitle.set(table.description ?? "");
     this.subTables.set(table.subTables ?? []);
+    this.procedures.set(table.procedures ?? []);
     this.canAdd.set(table.hasAdd !== false);
     this.canUpdate.set(table.hasUpdate !== false);
   }
@@ -162,6 +169,8 @@ export class ModelPreviewPage {
       title: this.title(),
       parent: this.parent(),
       subTables: this.subTables(),
+      procedures: this.procedures(),
+      procedureUrl: this.procedureUrl,
     });
   }
 
@@ -172,6 +181,8 @@ export class ModelPreviewPage {
       id: row.id,
       parent: this.parent(),
       subTables: this.subTables(),
+      procedures: this.procedures(),
+      procedureUrl: this.procedureUrl,
       // without the right to change, the record is only shown
       readOnly: !this.canUpdate(),
     });

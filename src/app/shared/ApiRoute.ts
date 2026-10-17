@@ -27,6 +27,13 @@
         return `/api/model/list-of-values/${modelId}`;
     }
 
+    /** Procedure of the database behind a table: insert when the id is empty, otherwise update. */
+    static readonly modelProcedure='/api/model/procedure';
+
+    static modelProcedureId(id: string): string {
+        return `/api/model/procedure/${id}`;
+    }
+
     static readonly modelColumn='/api/model-column';
 
     static modelColumnList(modelId: string): string {
@@ -133,6 +140,16 @@
      */
     static modelPreviewChange(modelId: string, columnName: string): string {
         return `/api/preview/change/${modelId}/${columnName}`;
+    }
+
+    /** Runs a procedure of the table over one record; the answer is that record as it stands after it. */
+    static modelPreviewExecuteProcedure(procedureId: string, id: string): string {
+        return `/api/preview/execute-procedure/${procedureId}/${id}`;
+    }
+
+    /** Routines of the database by kind (FUNCTION, PROCEDURE), whatever data type they return. */
+    static databaseRoutines(functionType: string): string {
+        return `/api/function/${functionType}`;
     }
 
     /** Routines of the database, by kind (FUNCTION, PROCEDURE) and by the data type they return. */

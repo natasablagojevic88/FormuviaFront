@@ -50,6 +50,8 @@ A table from the Model is opened with four separate rights: viewing, adding, cha
 
 The **Save** button carries a small tab on its right. It always holds **Save and stay** — the record is stored and the form stays open, filled in again with what the server stored, so a long form can be saved as you go and a new record simply turns into an existing one. When the table has subtables, the tab holds one entry per subtable as well. On a **new** record it reads *Save and open: …* — the record is stored and the subtable opens with it as the parent, so the header and its lines are entered in one move. On an **existing** record it reads *Open: …*, because the record is already stored and you may only want to look at it and step into its lines; if you changed something on the form first, you are told those changes will not be saved.
 
+If the table has procedures, the tab holds those as well, as *Save and run: …*. It asks first, as in the list, because a procedure changes the record and that cannot be taken back. The record is stored first, so the procedure works on what stands on the form and a new record exists by the time it runs; when it is done the form is filled in again with what the procedure left behind, and stays open. Procedures are in the tab only while the record may be changed — a record you are only looking at has no Save at all. The same procedures stand in the ⋯ menu of the list, for a record you do not need to open.
+
 The labels on that form come from the server, in the language you chose, so the form and the table always use the same words for the same thing.
 
 A value picked from a list is cleared with the **×** at the right end of the field — that works in the form, in the table and in the filters alike.
@@ -83,6 +85,8 @@ The ⋯ button next to *Edit* holds everything else:
 **Subtables** — if the table has subtables, each one is listed here. Opening one shows only the rows belonging to the record you came from, and the header says which record that is: *Customers: Acme d.o.o.*, with a **Back** button beside it. The chain can go as deep as the model does.
 
 **Back** puts the list exactly as you left it — the same page, the same filters and sorting, and the row you went into still marked — so you never have to find your place again. Opening that table from the menu again, or reloading the page, starts it fresh.
+
+**Procedures** — if the model put procedures on this table, each one stands here under the name and the icon it was given: *Recalculate*, *Close*. Choosing one asks first, because a procedure changes the record in the database. While it runs, the ⋯ button of that row spins; when it is done, the row is drawn again with what the procedure left behind, and the rest of the list stays as it was. A procedure is offered only to someone who may change the record, since that is what it does. The same procedures stand in the tab next to *Save* in the entry dialog, as *Save and run: …*, for a record you have open anyway. Which procedures a table has is set in [Model](/model#procedures).
 
 **Delete** — asks for confirmation first, because it cannot be undone.
 
