@@ -60,3 +60,38 @@ export interface ModelProcedure {
 
 /** Only a procedure can stand behind this, so the list is asked for that kind of routine. */
 export const PROCEDURE_TYPE = "PROCEDURE";
+
+/**
+ * A trigger of the database on the table: the database itself runs a function of its own
+ * before or after a row is written. It is not run from the application, so the model only
+ * says what stands on the table; the database decides when.
+ */
+export interface ModelTrigger {
+  id?: string;
+  /** Name of the trigger in the database; it cannot change afterwards (the server refuses it). */
+  name: string;
+  modelId: string;
+  triggerWhen: TriggerWhen;
+  action: TriggerAction;
+  /** Condition of the trigger (the WHEN clause), written over NEW and OLD; empty means always. */
+  condition?: string;
+  /** Name of the function in the database; it has to return trigger. */
+  functionName: string;
+}
+
+/** When the database runs it: before or after the row is written. */
+export type TriggerWhen = "BEFORE" | "AFTER";
+
+/** What writes it off (ModelTriggerAction on the server; ALL is insert, update and delete). */
+export type TriggerAction = "INSERT" | "UPDATE" | "INSERT_OR_UPDATE" | "DELETE" | "ALL";
+
+export const TRIGGER_WHEN: TriggerWhen[] = ["BEFORE", "AFTER"];
+
+export const TRIGGER_ACTIONS: TriggerAction[] = ["INSERT", "UPDATE", "INSERT_OR_UPDATE", "DELETE", "ALL"];
+
+/** Only a function returning trigger can stand behind it, so the list is asked for that type. */
+export const TRIGGER_FUNCTION_TYPE = "FUNCTION";
+export const TRIGGER_DATA_TYPE = "trigger";
+
+/** The name becomes the name of the trigger in the database, so it is an identifier like the table code. */
+export const TRIGGER_NAME_PATTERN = /^[a-z][a-z0-9_]{0,62}$/;

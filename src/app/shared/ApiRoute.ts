@@ -34,6 +34,13 @@
         return `/api/model/procedure/${id}`;
     }
 
+    /** Trigger of the database on a table: insert when the id is empty, otherwise update. */
+    static readonly modelTrigger='/api/model/trigger';
+
+    static modelTriggerId(id: string): string {
+        return `/api/model/trigger/${id}`;
+    }
+
     static readonly modelColumn='/api/model-column';
 
     static modelColumnList(modelId: string): string {

@@ -179,6 +179,106 @@
             }
           }
         </div>
+
+        <!-- triggers of the database on this table; the database runs them by itself, the list wears the same clothes as the procedures -->
+        <div class="fd-field fd-field-wide section">
+          <span class="section-title">{{ 'ui.model.triggersTitle' | t }}</span>
+          <span class="fd-help">{{ 'ui.model.triggersHelp' | t }}</span>
+        </div>
+
+        <div class="fd-field fd-field-wide procedures">
+          @if (isNew) {
+            <p class="procedures-empty">{{ 'ui.model.triggersNew' | t }}</p>
+          } @else {
+            @if (triggers().length) {
+              <ul class="procedure-list">
+                @for (trigger of triggers(); track trigger.id) {
+                  <li class="procedure" [class.procedure-open]="triggerDraft()?.id === trigger.id">
+                    <button type="button" class="procedure-main" (click)="editTrigger(trigger)">
+                      <i class="fa-solid fa-bolt procedure-glyph"></i>
+                      <span class="procedure-name">{{ trigger.name }}</span>
+                      <span class="trigger-meta">{{ whenLabel(trigger.triggerWhen) }} · {{ actionLabel(trigger.action) }}</span>
+                      <span class="procedure-code">{{ trigger.functionName }}</span>
+                    </button>
+                    <button type="button" class="procedure-remove" (click)="removeTrigger(trigger)"
+                      [disabled]="savingTrigger()" [attr.aria-label]="'ui.delete' | t">
+                      <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="procedures-empty">{{ 'ui.model.triggerEmpty' | t }}</p>
+            }
+
+            @if (triggerDraft(); as trigger) {
+              <div class="procedure-form">
+                <div class="fd-field">
+                  <label class="fd-label fd-required" for="triggerName">{{ 'ui.model.triggerName' | t }}</label>
+                  <!-- the name is the name of the trigger in the database: it cannot change afterwards -->
+                  <input id="triggerName" name="triggerName" class="fd-input code" [(ngModel)]="trigger.name"
+                    [ngModelOptions]="{ standalone: true }" autocomplete="off" spellcheck="false"
+                    [readonly]="!!trigger.id" [class.fd-input-error]="triggerNameInvalid()" />
+                  @if (triggerNameInvalid()) {
+                    <span class="fd-field-error">{{ 'ui.model.triggerNameInvalid' | t }}</span>
+                  } @else if (trigger.id) {
+                    <span class="fd-help">{{ 'ui.model.triggerNameLocked' | t }}</span>
+                  } @else {
+                    <span class="fd-help">{{ 'ui.model.triggerNameHint' | t }}</span>
+                  }
+                </div>
+
+                <div class="fd-field">
+                  <span class="fd-label fd-required">{{ 'ui.model.triggerWhenLabel' | t }}</span>
+                  <app-search-select [options]="whenOptions()" [clearable]="false" [(ngModel)]="trigger.triggerWhen"
+                    [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-clock"
+                    [ariaLabel]="'ui.model.triggerWhenLabel' | t" />
+                </div>
+
+                <div class="fd-field">
+                  <span class="fd-label fd-required">{{ 'ui.model.triggerActionLabel' | t }}</span>
+                  <app-search-select [options]="actionOptions()" [clearable]="false" [(ngModel)]="trigger.action"
+                    [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-pen-to-square"
+                    [ariaLabel]="'ui.model.triggerActionLabel' | t" />
+                </div>
+
+                <div class="fd-field">
+                  <span class="fd-label fd-required">{{ 'ui.model.triggerFunction' | t }}</span>
+                  <app-search-select [options]="triggerFunctions()" [clearable]="false" [(ngModel)]="trigger.functionName"
+                    [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-bolt"
+                    [placeholder]="'ui.model.triggerFunctionChoose' | t"
+                    [ariaLabel]="'ui.model.triggerFunction' | t" />
+                  <span class="fd-help">{{ (triggerFunctions().length ? 'ui.model.triggerFunctionHelp' : 'ui.model.triggerFunctionNone') | t }}</span>
+                </div>
+
+                <div class="fd-field trigger-condition">
+                  <label class="fd-label" for="triggerCondition">{{ 'ui.model.triggerCondition' | t }}</label>
+                  <textarea id="triggerCondition" name="triggerCondition" class="fd-input area code" rows="2"
+                    [(ngModel)]="trigger.condition" [ngModelOptions]="{ standalone: true }"
+                    autocomplete="off" spellcheck="false"></textarea>
+                  <span class="fd-help">{{ 'ui.model.triggerConditionHelp' | t }}</span>
+                </div>
+
+                <div class="procedure-actions">
+                  <button type="button" class="fd-button fd-button-secondary" (click)="cancelTrigger()">
+                    {{ 'ui.cancel' | t }}
+                  </button>
+                  <button type="button" class="fd-button fd-button-primary" (click)="saveTrigger()"
+                    [disabled]="!canSaveTrigger()">
+                    <i class="fa-solid" [class.fa-check]="!savingTrigger()" [class.fa-spinner]="savingTrigger()"
+                      [class.fa-spin]="savingTrigger()"></i>
+                    {{ 'ui.save' | t }}
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <button type="button" class="procedure-add" (click)="startTrigger()" [disabled]="savingTrigger()">
+                <i class="fa-solid fa-plus"></i>
+                {{ 'ui.model.triggerAdd' | t }}
+              </button>
+            }
+          }
+        </div>
       }
     </div>
   </div>

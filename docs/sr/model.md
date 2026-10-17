@@ -81,6 +81,22 @@ Klik na proceduru u spisku je otvara za izmenu, a korpa je skida sa tabele. Skid
 
 Ko sme da je pokrene prati tabelu: ista uloga koja sme da **menja** zapis sme i da pokrene proceduru nad njim, jer to procedura i radi. Nudi se na dva mesta: u ⋯ meniju liste i u ježičku pored dugmeta *Sačuvaj* u dijalogu za unos. Kako se pokreće piše u [Rad sa tabelama](/sr/tables#sta-jos-red-moze).
 
+### Trigeri
+
+Ispod procedura stoje **Trigeri**: funkcije baze koje baza sama pokreće kad se upisuje red ove tabele. Ništa u Formuvia-i ih ne okida — za njih nema ni dugmeta ni stavke u meniju. Triger je za ono što mora da se odigra svaki put, bez obzira na to ko upisuje red i odakle: upis zbira u zaglavlje, pečat na zapisu, odbijanje vrednosti koju forma sama ne može da proveri.
+
+Ovaj deo se pojavljuje kad je tabela sačuvana. **Dodaj triger** traži naziv, trenutak, radnju i funkciju, a uslovom može i da se suzi:
+
+- **Naziv** — naziv koji triger dobija u bazi: mala slova, cifre i donja crta, počinje slovom. Posle se ne menja; da bi se preimenovao, obriše se i doda ponovo.
+- **Kada** — *Pre upisa* ili *Posle upisa*. Pre upisa funkcija još drži red u rukama i može da ga promeni ili odbije; posle upisa red je već zapisan i funkcija radi oko njega. Između toga nema ničega, a kad dva trigera stoje na istom trenutku, baza odlučuje kojim redom se pokreću — pa na taj red ne treba računati.
+- **Na** — šta ga okida: unos, izmena, oboje, brisanje ili bilo šta od toga troje.
+- **Funkcija baze** — bira se među funkcijama koje baza ima i koje **vraćaju `trigger`**. Takva funkcija ne prima parametre i radi nad `NEW` i `OLD`. Naziv koji baza ne poznaje Formuvia odbija.
+- **Uslov** — nije obavezan, piše se nad `NEW` i `OLD` bez `WHEN`, na primer `NEW.iznos <> OLD.iznos`. Ako se ostavi prazan, triger radi nad svakim redom.
+
+Klik na triger u spisku ga otvara za izmenu, a korpa ga skida sa tabele. Skidanje trigera **briše ga i iz baze** — to je razlika od procedure, gde se briše samo stavka u Formuvia-i. Sama funkcija u bazi ostaje u oba slučaja.
+
+Ono što triger upiše odmah je u zapisu: dijalog za unos se posle snimanja ponovo popunjava, pa vrednost koju je baza upisala stoji u formi i u listi, a da je niko nije tražio.
+
 ## Izmena
 
 ⋯ → *Izmeni* otvara istu formu. Naziv, opis, ikona, uloge i veličina dijaloga za unos mogu se menjati kad god.

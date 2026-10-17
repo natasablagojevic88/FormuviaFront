@@ -190,6 +190,21 @@
   cursor: not-allowed;
 }
 
+/* --- triggers of the database; the list and the form reuse the look of the procedures --- */
+
+.trigger-meta {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--c-surface-3);
+  color: var(--c-text-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.trigger-condition {
+  grid-column: 1 / -1;
+}
+
 @media (max-width: 600px) {
   .procedure-form {
     grid-template-columns: 1fr;

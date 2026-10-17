@@ -81,6 +81,22 @@ Click a procedure in the list to change it, or the basket to take it off the tab
 
 Who may run it follows the table: the same role that may **change** a record may run a procedure over it, because that is what a procedure does. It is offered in two places: the ⋯ menu of the list, and the tab next to *Save* in the entry dialog. How it is run is in [Working with tables](/tables#what-else-a-row-can-do).
 
+### Triggers
+
+Under the procedures stands **Triggers**: functions of the database that the database itself runs whenever a row of this table is written. Nothing in Formuvia sets them off — there is no button and no menu entry for them. A trigger is for what has to happen every single time, no matter who writes the row or from where: writing a sum into a header, stamping a record, refusing a value the form cannot check on its own.
+
+This part appears once the table is saved. **Add a trigger** asks for a name, the moment, the event and the function, and lets you narrow it with a condition:
+
+- **Name** — the name the trigger gets in the database: lowercase letters, digits and underscore, starting with a letter. It cannot be changed afterwards; to rename it, delete it and add it again.
+- **When** — *Before the write* or *After the write*. Before, the function still has the row in its hands and can change or refuse it; after, the row is already written and the function works around it. There is nothing in between, and when two triggers stand on the same moment the database decides in which order they run — so do not build on that order.
+- **On** — what sets it off: an insert, an update, both, a delete, or any of the three.
+- **Function of the database** — chosen from the functions the database holds that **return `trigger`**. Such a function takes no parameters and works over `NEW` and `OLD`. A name the database does not know is refused.
+- **Condition** — optional, written over `NEW` and `OLD` without `WHEN`, for example `NEW.amount <> OLD.amount`. Left empty, the trigger runs over every row.
+
+Click a trigger in the list to change it, or the basket to take it off the table. Taking a trigger off **drops it from the database as well** — that is the difference from a procedure, where only the entry in Formuvia goes. The function itself stays in the database either way.
+
+What a trigger writes is in the record straight away: the entry dialog is filled in again after saving, so a value the database put there stands in the form and in the list without anyone asking for it.
+
 ## Editing
 
 ⋯ → *Edit* opens the same form. The name, the description, the icon, the roles and the size of the entry dialog can all be changed at any time.

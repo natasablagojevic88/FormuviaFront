@@ -13,9 +13,17 @@ import {
   DIALOG_LIMITS,
   ModelNode,
   ModelProcedure,
+  ModelTrigger,
   ModelType,
   PROCEDURE_TYPE,
   TABLE_CODE_PATTERN,
+  TRIGGER_ACTIONS,
+  TRIGGER_DATA_TYPE,
+  TRIGGER_FUNCTION_TYPE,
+  TRIGGER_NAME_PATTERN,
+  TRIGGER_WHEN,
+  TriggerAction,
+  TriggerWhen,
 } from "../model";
 
 export interface ModelDialogData {
@@ -98,11 +106,15 @@ export class ModelDialog implements OnInit {
       this.minRows.set(Math.max(1, ...(columns ?? []).map((column) => column.rowIndex)));
     }).finally(() => this.loadingColumns.set(false));
 
-    // the table carries its procedures, and the database says which ones there are to choose from
-    this.sendRequest.get(ApiRoute.modelId(id))
-      .then((model: { procedures?: ModelProcedure[] }) => this.procedures.set(model?.procedures ?? []));
+    // the table carries its procedures and its triggers, and the database says what there is to choose from
+    this.sendRequest.get(ApiRoute.modelId(id)).then((model: { procedures?: ModelProcedure[]; triggers?: ModelTrigger[] }) => {
+      this.procedures.set(model?.procedures ?? []);
+      this.triggers.set(model?.triggers ?? []);
+    });
     this.sendRequest.get(ApiRoute.databaseRoutines(PROCEDURE_TYPE)).then((names: string[]) =>
       this.routines.set((names ?? []).map((name) => ({ value: name, label: name }))));
+    this.sendRequest.get(ApiRoute.databaseFunctions(TRIGGER_FUNCTION_TYPE, TRIGGER_DATA_TYPE)).then((names: string[]) =>
+      this.triggerFunctions.set((names ?? []).map((name) => ({ value: name, label: name }))));
   }
 
   // --- procedures of the database over one record of this table ---
@@ -173,6 +185,103 @@ export class ModelDialog implements OnInit {
             this.notify.success(this.translate.get("ui.deleted"));
           })
           .finally(() => this.savingProcedure.set(false));
+      });
+  }
+
+  // --- triggers of the database on this table; the database runs them by itself ---
+
+  readonly triggers = signal<ModelTrigger[]>([]);
+  /** Functions of the database that return trigger; one of them stands behind the trigger. */
+  readonly triggerFunctions = signal<SelectOption[]>([]);
+  readonly triggerDraft = signal<ModelTrigger | null>(null);
+  readonly savingTrigger = signal(false);
+
+  readonly whenOptions = computed<SelectOption[]>(() =>
+    TRIGGER_WHEN.map((when) => ({ value: when, label: this.whenLabel(when) })));
+
+  readonly actionOptions = computed<SelectOption[]>(() =>
+    TRIGGER_ACTIONS.map((action) => ({ value: action, label: this.actionLabel(action) })));
+
+  whenLabel(when: TriggerWhen): string {
+    return this.translate.get("ui.model.triggerWhen." + when);
+  }
+
+  actionLabel(action: TriggerAction): string {
+    return this.translate.get("ui.model.triggerAction." + action);
+  }
+
+  startTrigger(): void {
+    this.triggerDraft.set({
+      name: "",
+      modelId: this.data.node!.id!,
+      triggerWhen: "BEFORE",
+      action: "INSERT_OR_UPDATE",
+      condition: "",
+      functionName: "",
+    });
+  }
+
+  editTrigger(trigger: ModelTrigger): void {
+    this.triggerDraft.set({ ...trigger });
+  }
+
+  cancelTrigger(): void {
+    this.triggerDraft.set(null);
+  }
+
+  /** A new trigger is created in the database under this name, so the name is an identifier. */
+  triggerNameInvalid(): boolean {
+    const name = this.triggerDraft()?.name ?? "";
+    return !!name && !TRIGGER_NAME_PATTERN.test(name);
+  }
+
+  canSaveTrigger(): boolean {
+    const draft = this.triggerDraft();
+    return !!draft?.name && !this.triggerNameInvalid() && !!draft.functionName && !this.savingTrigger();
+  }
+
+  saveTrigger(): void {
+    const draft = this.triggerDraft();
+    if (!draft || !this.canSaveTrigger()) {
+      return;
+    }
+    this.savingTrigger.set(true);
+    this.sendRequest.post(ApiRoute.modelTrigger, { ...draft, condition: draft.condition?.trim() || undefined })
+      .then((saved: ModelTrigger) => {
+        const list = this.triggers();
+        const place = list.findIndex((other) => other.id === saved.id);
+        this.triggers.set(place < 0
+          ? [...list, saved].sort((first, second) => first.name.localeCompare(second.name))
+          : list.map((other, index) => (index === place ? saved : other)));
+        this.triggerDraft.set(null);
+        this.notify.success(this.translate.get("ui.saved"));
+      })
+      .finally(() => this.savingTrigger.set(false));
+  }
+
+  removeTrigger(trigger: ModelTrigger): void {
+    const data: ConfirmDialogData = {
+      title: this.translate.get("ui.model.triggerDeleteTitle"),
+      message: this.translate.get("ui.model.triggerDeleteConfirm").replace("{0}", trigger.name),
+      confirmText: this.translate.get("ui.delete"),
+      danger: true,
+    };
+    this.dialog.open(ConfirmDialog, { width: "520px", data })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+        this.savingTrigger.set(true);
+        this.sendRequest.delete(ApiRoute.modelTriggerId(trigger.id!))
+          .then(() => {
+            this.triggers.set(this.triggers().filter((other) => other.id !== trigger.id));
+            if (this.triggerDraft()?.id === trigger.id) {
+              this.triggerDraft.set(null);
+            }
+            this.notify.success(this.translate.get("ui.deleted"));
+          })
+          .finally(() => this.savingTrigger.set(false));
       });
   }
 
