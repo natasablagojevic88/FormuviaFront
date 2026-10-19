@@ -1,0 +1,77 @@
+<app-page-header [title]="title() || ('ui.reportRun.title' | t)" [subtitle]="description()"
+  [breadcrumb]="breadcrumb()"></app-page-header>
+
+<div class="run-layout">
+  <!-- left: what the report asks for before it runs -->
+  <section class="card params">
+    <header class="card-head">
+      <h3 class="card-title">{{ 'ui.reportRun.parameters' | t }}</h3>
+    </header>
+
+    <div class="card-body">
+      @if (loading()) {
+        <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+      } @else if (!parameters().length) {
+        <p class="empty">{{ 'ui.reportRun.noParameters' | t }}</p>
+      } @else {
+        @for (parameter of parameters(); track parameter.code) {
+          <div class="fd-field">
+            @if (hasOptions(parameter)) {
+              <span class="fd-label">{{ parameter.name }}</span>
+              <app-search-select [options]="optionsOf(parameter)" [(ngModel)]="values[parameter.code]"
+                [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-list"
+                [placeholder]="'ui.reportRun.choose' | t" [ariaLabel]="parameter.name" />
+            } @else if (parameter.type === 'BOOLEAN') {
+              <span class="fd-label">{{ parameter.name }}</span>
+              <app-search-select [options]="booleanOptions()" [(ngModel)]="values[parameter.code]"
+                [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-circle-half-stroke"
+                [placeholder]="'ui.reportRun.choose' | t" [ariaLabel]="parameter.name" />
+            } @else if (parameter.type === 'LOCALDATE' || parameter.type === 'LOCALDATETIME') {
+              <span class="fd-label">{{ parameter.name }}</span>
+              <app-date-field [withTime]="parameter.type === 'LOCALDATETIME'"
+                [(ngModel)]="values[parameter.code]" [ngModelOptions]="{ standalone: true }"
+                [ariaLabel]="parameter.name" />
+            } @else {
+              <label class="fd-label" [for]="'rp-' + parameter.code">{{ parameter.name }}</label>
+              <input [id]="'rp-' + parameter.code" class="fd-input"
+                [type]="parameter.type === 'LOCALTIME' ? 'time' : isNumber(parameter.type) && !isDecimal(parameter.type) ? 'number' : 'text'"
+                [attr.inputmode]="isDecimal(parameter.type) ? 'decimal' : null"
+                [(ngModel)]="values[parameter.code]" [ngModelOptions]="{ standalone: true }"
+                autocomplete="off" />
+            }
+          </div>
+        }
+      }
+    </div>
+
+    <footer class="card-foot">
+      <button type="button" class="run-button" (click)="run()" [disabled]="running() || loading() || isJasper()">
+        <i class="fa-solid" [class.fa-play]="!running()" [class.fa-spinner]="running()" [class.fa-spin]="running()"></i>
+        {{ (isExecute() ? 'ui.reportRun.execute' : 'ui.reportRun.show') | t }}
+      </button>
+    </footer>
+  </section>
+
+  <!-- right: what came back -->
+  <section class="result">
+    @if (isJasper()) {
+      <div class="card message">
+        <i class="fa-solid fa-file-pdf"></i>
+        <p>{{ 'ui.reportRun.jasperNotYet' | t }}</p>
+      </div>
+    } @else if (isExecute()) {
+      <div class="card message">
+        <i class="fa-solid" [class.fa-circle-check]="shown()" [class.fa-gears]="!shown()"></i>
+        <p>{{ (shown() ? 'ui.reportRun.executed' : 'ui.reportRun.executeHint') | t }}</p>
+      </div>
+    } @else if (shown()) {
+      <app-query-table [columns]="columns()" [rows]="rows()" [loading]="running()" [exporting]="exporting()"
+        (exportExcel)="exportExcel()" />
+    } @else {
+      <div class="card message">
+        <i class="fa-solid fa-table-list"></i>
+        <p>{{ 'ui.reportRun.showHint' | t }}</p>
+      </div>
+    }
+  </section>
+</div>

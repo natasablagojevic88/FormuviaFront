@@ -20,6 +20,16 @@ const routes: Routes = [
     loadChildren: () => import('./model-preview/model-preview-module').then(m => m.ModelPreviewModule)
   },
   {
+    // the path is the same as in the menu from the server (MenuDTO.url of one report)
+    path: 'report/preview',
+    loadChildren: () => import('./report-preview/report-preview-module').then(m => m.ReportPreviewModule)
+  },
+  {
+    // the path is the same as in the menu from the server (MenuDTO.url of the reports)
+    path: 'report-group',
+    loadChildren: () => import('./report/report-groups-module').then(m => m.ReportGroupsModule)
+  },
+  {
     path: 'roles',
     loadChildren: () => import('./administration/roles-module').then(m => m.RolesModule)
   },

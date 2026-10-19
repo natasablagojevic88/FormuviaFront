@@ -1,0 +1,68 @@
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+app-page-header {
+  flex-shrink: 0;
+}
+
+app-data-table {
+  flex: 1;
+}
+
+.add-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 16px;
+  /* it sits on the blue bar, so it is always white with blue text */
+  background: var(--c-on-dark);
+  color: #1f5eff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(3, 8, 23, 0.15);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+/* beside Add; it leads back to the list of groups */
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--c-on-dark);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.add-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(3, 8, 23, 0.2);
+}
+
+@media (max-width: 900px) {
+  .add-button,
+  .back-button {
+    justify-content: center;
+    width: 100%;
+  }
+}

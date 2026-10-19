@@ -1,0 +1,85 @@
+:host {
+  display: block;
+}
+
+/* the default value and the switch take the whole width, each on a line of its own */
+.fd-field-wide {
+  grid-column: 1 / -1;
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  min-height: 160px;
+  color: var(--c-primary);
+  font-size: 28px;
+}
+
+/* the code and the two queries are read as they stand, so they are shown in a monospace font */
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* short queries, each on a line of its own, and they can be pulled taller by hand */
+.sql {
+  height: auto;
+  min-height: 60px;
+  padding: 10px 16px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.switch-track {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--c-border);
+  transition: background 0.15s;
+}
+
+.switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--c-surface);
+  box-shadow: 0 2px 6px rgba(3, 8, 23, 0.2);
+  transition: transform 0.15s;
+}
+
+.switch input:checked + .switch-track {
+  background: var(--c-primary);
+}
+
+.switch input:checked + .switch-track .switch-thumb {
+  transform: translateX(20px);
+}
+
+.switch input:focus-visible + .switch-track {
+  box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.25);
+}
+
+.switch-text {
+  color: var(--c-text);
+  font-size: 14px;
+  font-weight: 600;
+}

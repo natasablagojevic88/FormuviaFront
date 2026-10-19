@@ -1,0 +1,35 @@
+:host {
+  display: block;
+}
+
+/* the description and the query take the whole width, each on a line of its own */
+.fd-field-wide {
+  grid-column: 1 / -1;
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  min-height: 160px;
+  color: var(--c-primary);
+  font-size: 28px;
+}
+
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* the query stands under the rest, with room to read it, and can be pulled taller by hand */
+.sql {
+  height: auto;
+  min-height: 220px;
+  padding: 12px 16px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+@media (max-width: 600px) {
+  .sql {
+    min-height: 160px;
+  }
+}

@@ -48,6 +48,17 @@ interface TableState {
  */
 const TABLE_STATE = new Map<string, TableState>();
 
+/**
+ * An action the page itself puts in the row menu, for what only that page knows about (the reports
+ * of a report group). The table only shows it and says which row it was chosen on.
+ */
+export interface RowAction {
+  key: string;
+  label: string;
+  /** Font Awesome class; without it the item gets an arrow. */
+  icon?: string;
+}
+
 /** One step in the parent -> child trail; route is the address it came from. */
 export interface TrailCrumb {
   title: string;
@@ -171,6 +182,10 @@ export class DataTable implements AfterViewInit, OnDestroy {
   readonly procedureUrl = input<((procedureId: string, id: string) => string) | null>(null);
   /** Path to the report of the table made over one row; without it the row menu offers no report. */
   readonly jasperUrl = input<((modelJasperId: string, id: string) => string) | null>(null);
+  /** Items the page adds to the row menu; what they do is up to the page, through (action). */
+  readonly rowActions = input<RowAction[]>([]);
+  /** An item from rowActions was chosen on a row. */
+  readonly action = output<{ action: RowAction; row: any }>();
   readonly edit = output<any>();
   readonly remove = output<any>();
   readonly loaded = output<DatabaseTable<any>>();
@@ -736,6 +751,7 @@ export class DataTable implements AfterViewInit, OnDestroy {
       this.subTables().length > 0 ||
       this.rowProcedures().length > 0 ||
       this.rowJaspers().length > 0 ||
+      this.rowActions().length > 0 ||
       this.showDelete()
   );
 

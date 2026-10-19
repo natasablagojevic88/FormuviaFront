@@ -1,0 +1,157 @@
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+app-page-header {
+  flex-shrink: 0;
+}
+
+/* the parameters on the left, what came back on the right */
+.run-layout {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+  gap: 20px;
+  min-height: 0;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--c-surface);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+}
+
+.params {
+  min-height: 0;
+}
+
+.card-head {
+  flex-shrink: 0;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--c-border-soft);
+  background: var(--c-surface-2);
+}
+
+.card-title {
+  margin: 0;
+  color: var(--c-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  overflow: auto;
+  padding: 20px;
+}
+
+.card-foot {
+  flex-shrink: 0;
+  padding: 16px 20px;
+  border-top: 1px solid var(--c-border-soft);
+  background: var(--c-surface-2);
+}
+
+.run-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--c-primary);
+  color: var(--c-text-on-primary);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.run-button:hover:not(:disabled) {
+  background: var(--c-primary-strong);
+}
+
+.run-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  min-height: 120px;
+  color: var(--c-primary);
+  font-size: 28px;
+}
+
+.empty {
+  margin: 0;
+  color: var(--c-text-muted);
+  font-size: 14px;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+app-query-table {
+  flex: 1;
+  min-height: 0;
+}
+
+/* before the first run, and for a report that only works over the data */
+.message {
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.message i {
+  color: var(--c-text-faint);
+  font-size: 34px;
+}
+
+.message p {
+  margin: 0;
+  max-width: 420px;
+  color: var(--c-text-muted);
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  /* one under another: first what is asked for, then what came back */
+  .run-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .card {
+    border-radius: 18px;
+  }
+
+  .card-body {
+    max-height: none;
+  }
+}

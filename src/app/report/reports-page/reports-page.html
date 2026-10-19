@@ -1,0 +1,17 @@
+<app-page-header
+  [title]="(groupName() ? groupName() + ' — ' : '') + (title() || ('ui.reports.title' | t))"
+  [subtitle]="'ui.reports.subtitle' | t"
+  [breadcrumb]="('ui.reportGroups.title' | t) + (groupName() ? ' / ' + groupName() : '')">
+  <button type="button" class="back-button" (click)="back()">
+    <i class="fa-solid fa-arrow-left"></i>
+    {{ 'ui.back' | t }}
+  </button>
+  <button type="button" class="add-button" (click)="add()">
+    <i class="fa-solid fa-plus"></i>
+    {{ 'ui.add' | t }}
+  </button>
+</app-page-header>
+
+<app-data-table [url]="tableUrl" [newRowValues]="newRowValues" [rowActions]="rowActions"
+  (loaded)="onLoaded($event)" (edit)="edit($event)" (remove)="remove($event)"
+  (action)="openParameters($event.row)"></app-data-table>

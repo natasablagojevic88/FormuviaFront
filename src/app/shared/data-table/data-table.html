@@ -112,6 +112,13 @@
                     <span>{{ 'ui.history.title' | t }}</span>
                   </button>
                 }
+                <!-- what the page itself offers over this row (the reports of a group) -->
+                @for (rowAction of rowActions(); track rowAction.key) {
+                  <button type="button" mat-menu-item (click)="action.emit({ action: rowAction, row })">
+                    <i class="fa-solid menu-icon" [class]="rowAction.icon || 'fa-solid fa-arrow-right'"></i>
+                    <span>{{ rowAction.label }}</span>
+                  </button>
+                }
                 <!-- procedures of the database over this record; they change it, so they are asked for first -->
                 @for (procedure of rowProcedures(); track procedure.id) {
                   <button type="button" mat-menu-item (click)="runProcedure(procedure, row)">

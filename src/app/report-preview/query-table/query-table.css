@@ -1,0 +1,287 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.table-card {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--c-surface);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+}
+
+.toolbar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--c-surface-2);
+}
+
+.row-count {
+  flex: 1;
+  min-width: 0;
+  color: var(--c-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.export-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.export-button i {
+  color: var(--c-success);
+}
+
+.export-button:hover:not(:disabled) {
+  border-color: var(--c-border-strong);
+  background: var(--c-surface-3);
+}
+
+.export-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.progress {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  height: 4px;
+  --mat-progress-bar-active-indicator-color: var(--c-primary);
+  --mat-progress-bar-track-color: var(--c-primary-softer);
+}
+
+.table-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0 16px;
+  height: 48px;
+  border-bottom: 1px solid var(--c-border-soft);
+  background: var(--c-surface-2);
+  color: var(--c-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+td {
+  padding: 0 16px;
+  height: 52px;
+  border-bottom: 1px solid var(--c-border-soft);
+  color: var(--c-text);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+th.cell-number,
+td.cell-number {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+tbody tr:hover {
+  background: var(--c-surface-3);
+}
+
+.empty {
+  margin: 0;
+  padding: 28px 20px;
+  color: var(--c-text-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.totals {
+  flex-shrink: 0;
+  overflow: hidden;
+  border-top: 1px solid var(--c-border-soft);
+  background: var(--c-surface-2);
+}
+
+.totals-cells {
+  display: flex;
+  width: max-content;
+  min-width: 100%;
+}
+
+.totals-list {
+  display: none;
+}
+
+.total-cell {
+  flex: none;
+  padding: 9px 16px;
+  color: var(--c-text);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.total-cell.cell-number {
+  text-align: right;
+}
+
+.totals-title {
+  color: var(--c-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.total-name {
+  color: var(--c-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.total-value {
+  color: var(--c-text);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  .table-card {
+    border-radius: 18px;
+  }
+
+  .toolbar {
+    padding: 12px;
+  }
+
+  /* on a phone Excel stays an icon only */
+  .export-button {
+    flex: none;
+    width: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .export-label {
+    display: none;
+  }
+
+  /* A row becomes a card: the name of the column on the left, the value on the right. */
+  .table-scroll {
+    padding: 4px 12px 12px;
+    background: var(--c-surface-2);
+  }
+
+  .table,
+  .table tbody {
+    display: block;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    margin-bottom: 12px;
+    border: 1px solid var(--c-border-soft);
+    border-radius: 16px;
+    background: var(--c-surface);
+    box-shadow: 0 4px 14px rgba(3, 8, 23, 0.05);
+  }
+
+  .table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 10px 14px;
+    border-bottom: 0;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    color: var(--c-text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .table td.cell-number {
+    text-align: right;
+  }
+
+  /* There is no column to stand under, so the sums are listed one under another, each with its name. */
+  .totals-cells {
+    display: none;
+  }
+
+  .totals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 14px;
+  }
+
+  .total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+  }
+}

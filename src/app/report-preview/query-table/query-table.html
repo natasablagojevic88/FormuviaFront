@@ -1,0 +1,68 @@
+<div class="table-card">
+  <!-- how many rows came back on the left, Excel on the far right -->
+  <div class="toolbar">
+    <span class="row-count">{{ 'ui.reportRun.rowCount' | t }}: {{ rows().length }}</span>
+    <button type="button" class="export-button" (click)="exportExcel.emit()" [disabled]="exporting() || loading()"
+      [title]="'ui.exportExcel' | t" [attr.aria-label]="'ui.exportExcel' | t">
+      <i class="fa-solid" [class.fa-file-excel]="!exporting()" [class.fa-spinner]="exporting()"
+        [class.fa-spin]="exporting()"></i>
+      <span class="export-label">{{ 'ui.exportExcel' | t }}</span>
+    </button>
+  </div>
+
+  <div class="progress">
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+  </div>
+
+  <div class="table-scroll" (scroll)="onTableScroll($event)">
+    <table class="table">
+      <thead>
+        <tr>
+          @for (column of columns(); track column.code) {
+            <th [class.cell-number]="isNumber(column.columnType)">{{ column.name }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows(); track $index) {
+          <tr>
+            @for (column of columns(); track column.code) {
+              <td [attr.data-label]="column.name" [class.cell-number]="isNumber(column.columnType)">
+                {{ format(row, column) }}
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (!rows().length && !loading()) {
+      <p class="empty">{{ 'ui.noData' | t }}</p>
+    }
+  </div>
+
+  @if (hasTotals()) {
+    <!-- The sums stand in a low strip under the table, each under its own column, and the strip
+         follows the table when it is scrolled sideways. -->
+    <div class="totals">
+      <div class="totals-cells" [style.transform]="'translateX(' + -scrollLeft() + 'px)'">
+        @for (column of columns(); track column.code; let index = $index) {
+          <span class="total-cell" [style.width.px]="totalWidth(index)"
+            [class.cell-number]="isNumber(column.columnType)"
+            >@if (column.code === totalLabelCode()) {<span class="totals-title">{{ 'ui.total' | t }}</span>}
+            @else {{{ totalOf(column) }}}</span>
+        }
+      </div>
+      <div class="totals-list">
+        <span class="totals-title">{{ 'ui.total' | t }}</span>
+        @for (column of totalColumns(); track column.code) {
+          <span class="total">
+            <span class="total-name">{{ column.name }}</span>
+            <span class="total-value">{{ totalOf(column) }}</span>
+          </span>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -176,6 +176,63 @@
         return `/api/function/${functionType}/${dataType}`;
     }
 
+    /** Groups the reports are sorted into; the role of the group says who may read them. */
+    static readonly reportGroup='/api/report-group';
+    static readonly reportGroupTable='/api/report-group/table';
+
+    static reportGroupId(id: string): string {
+        return `/api/report-group/${id}`;
+    }
+
+    /** Reports of one group; the group is in the path, so a report of another group never comes back. */
+    static reportTable(reportGroupId: string): string {
+        return `/api/report/table/${reportGroupId}`;
+    }
+
+    /** Report of a group: insert when the id is empty, otherwise update. */
+    static readonly report='/api/report';
+
+    static reportId(id: string): string {
+        return `/api/report/${id}`;
+    }
+
+    /** Parameters of one report; the report is in the path, so a parameter of another report never comes back. */
+    static reportParameterTable(reportId: string): string {
+        return `/api/report/parameter/table/${reportId}`;
+    }
+
+    /** Parameter of a report: insert when the id is empty, otherwise update. */
+    static readonly reportParameter='/api/report/parameter';
+
+    static reportParameterId(id: string): string {
+        return `/api/report/parameter/${id}`;
+    }
+
+    /** Order to offer for a new parameter: one more than the largest one already entered. */
+    static reportParameterOrderNumber(reportId: string): string {
+        return `/api/report/parameter/next-order-number/${reportId}`;
+    }
+
+    /** What a report asks for before it runs: its name, its kind and its parameters with their defaults and lists. */
+    static reportPreview(reportId: string): string {
+        return `/api/report/preview/${reportId}`;
+    }
+
+    /** Rows a report of the SELECT kind gives back for the values entered into its parameters; no paging. */
+    static reportPreviewTable(reportId: string): string {
+        return `/api/report/preview/${reportId}/table`;
+    }
+
+    /** The same rows as an Excel file. */
+    static reportPreviewExcel(reportId: string): string {
+        return `/api/report/preview/${reportId}/excel`;
+    }
+
+    /** Runs a report that works over the data (CALL, UPDATE, INSERT, DELETE); it gives nothing back. */
+    static reportPreviewExecute(reportId: string): string {
+        return `/api/report/preview/${reportId}/execute`;
+    }
+
     static modelId(id: string): string {
         return `/api/model/${id}`;
     }
