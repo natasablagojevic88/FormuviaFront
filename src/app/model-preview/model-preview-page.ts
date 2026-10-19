@@ -9,7 +9,7 @@ import { SendRequest } from "../services/send-request";
 import { ApiRoute } from "../shared/ApiRoute";
 import { ConfirmDialog, ConfirmDialogData } from "../shared/confirm-dialog/confirm-dialog";
 import { DataTable, ID_FIELD, TrailCrumb } from "../shared/data-table/data-table";
-import { DatabaseColumn, DatabaseTable, SubTable, TableProcedure } from "../shared/database-table";
+import { DatabaseColumn, DatabaseTable, SubTable, TableJasper, TableProcedure } from "../shared/database-table";
 import { PreviewFormDialog, PreviewFormDialogData, PreviewFormResult } from "./preview-form-dialog/preview-form-dialog";
 import { DEFAULT_FORM_WIDTH } from "./preview-form";
 
@@ -30,6 +30,8 @@ export class ModelPreviewPage {
   private readonly subTables = signal<SubTable[]>([]);
   /** Procedures of this table; the entry dialog offers to save and run one of them. */
   private readonly procedures = signal<TableProcedure[]>([]);
+  /** Reports of this table; the entry dialog offers them next to Save. */
+  private readonly jaspers = signal<TableJasper[]>([]);
 
   /** What the user may do here; the server sends it with the table. */
   readonly canAdd = signal(true);
@@ -96,6 +98,9 @@ export class ModelPreviewPage {
   readonly procedureUrl = (procedureId: string, id: string) =>
     ApiRoute.modelPreviewExecuteProcedure(procedureId, id);
 
+  /** Report of this table made over one row; the answer is the PDF, shown in the viewer. */
+  readonly jasperUrl = (modelJasperId: string, id: string) => ApiRoute.modelJasperPrint(modelJasperId, id);
+
   /** In a subtable every new row belongs to the row of the parent table the page was opened from. */
   readonly newRowValues = computed(() => (this.parent() ? { parent: this.parent() } : null));
 
@@ -159,6 +164,7 @@ export class ModelPreviewPage {
     this.subtitle.set(table.description ?? "");
     this.subTables.set(table.subTables ?? []);
     this.procedures.set(table.procedures ?? []);
+    this.jaspers.set(table.jaspers ?? []);
     this.canAdd.set(table.hasAdd !== false);
     this.canUpdate.set(table.hasUpdate !== false);
   }
@@ -171,6 +177,8 @@ export class ModelPreviewPage {
       subTables: this.subTables(),
       procedures: this.procedures(),
       procedureUrl: this.procedureUrl,
+      jaspers: this.jaspers(),
+      jasperUrl: this.jasperUrl,
     });
   }
 
@@ -183,6 +191,8 @@ export class ModelPreviewPage {
       subTables: this.subTables(),
       procedures: this.procedures(),
       procedureUrl: this.procedureUrl,
+      jaspers: this.jaspers(),
+      jasperUrl: this.jasperUrl,
       // without the right to change, the record is only shown
       readOnly: !this.canUpdate(),
     });

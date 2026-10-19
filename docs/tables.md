@@ -52,6 +52,8 @@ The **Save** button carries a small tab on its right. It always holds **Save and
 
 If the table has procedures, the tab holds those as well, as *Save and run: …*. It asks first, as in the list, because a procedure changes the record and that cannot be taken back. The record is stored first, so the procedure works on what stands on the form and a new record exists by the time it runs; when it is done the form is filled in again with what the procedure left behind, and stays open. Procedures are in the tab only while the record may be changed — a record you are only looking at has no Save at all. The same procedures stand in the ⋯ menu of the list, for a record you do not need to open.
 
+The reports of the table are there too, as *Save and print: …*. Nothing is asked first, because a report changes nothing: the record is stored, the report is made over it as it was just saved, and the PDF opens in the reader over the dialog, which stays open behind it.
+
 The labels on that form come from the server, in the language you chose, so the form and the table always use the same words for the same thing.
 
 A value picked from a list is cleared with the **×** at the right end of the field — that works in the form, in the table and in the filters alike.
@@ -87,6 +89,8 @@ The ⋯ button next to *Edit* holds everything else:
 **Back** puts the list exactly as you left it — the same page, the same filters and sorting, and the row you went into still marked — so you never have to find your place again. Opening that table from the menu again, or reloading the page, starts it fresh.
 
 **Procedures** — if the model put procedures on this table, each one stands here under the name and the icon it was given: *Recalculate*, *Close*. Choosing one asks first, because a procedure changes the record in the database. While it runs, the ⋯ button of that row spins; when it is done, the row is drawn again with what the procedure left behind, and the rest of the list stays as it was. A procedure is offered only to someone who may change the record, since that is what it does. The same procedures stand in the tab next to *Save* in the entry dialog, as *Save and run: …*, for a record you have open anyway. Which procedures a table has is set in [Model](/model#procedures).
+
+**Reports** — if the model put reports on this table, each one stands here under the name it was given, beside the icon of a PDF. Choosing one makes that report over this record, straight away and without asking, because nothing is changed: the database works out the figures itself and the finished PDF opens in the reader inside the application, from where it can be printed or saved. While it is being made, the ⋯ button of that row spins. The same reports stand in the tab next to *Save* in the entry dialog, as *Save and print: …*, for a record you have open anyway. Which reports a table has is set in [Model](/model#reports).
 
 **Delete** — asks for confirmation first, because it cannot be undone.
 

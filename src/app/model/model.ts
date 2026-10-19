@@ -95,3 +95,34 @@ export const TRIGGER_DATA_TYPE = "trigger";
 
 /** The name becomes the name of the trigger in the database, so it is an identifier like the table code. */
 export const TRIGGER_NAME_PATTERN = /^[a-z][a-z0-9_]{0,62}$/;
+
+/**
+ * Names the application itself puts on every table: the audit trigger and the one that reports a
+ * change. A trigger under one of those names would replace it, so the name is refused here.
+ */
+export const RESERVED_TRIGGER_NAMES = ["create_audit", "table_listen"];
+
+/** Report of JasperReports tied to one table (ModelJasperDTO). */
+export interface ModelJasper {
+  id?: string;
+  modelId: string;
+  /** Name of the report, as the user sees it in the list of reports of the table. */
+  name: string;
+  /** Stored file of the report; the server sends it, the client only shows the name. */
+  fileId?: string;
+  fileFileName?: string;
+  /** The file sent for this report; the server takes it over when the report is saved. */
+  fileUpload?: JasperFile;
+}
+
+/** File of a report: the identifier the upload returned, with the name of the chosen file. */
+export interface JasperFile {
+  id?: string | null;
+  fileName?: string | null;
+}
+
+/** The report is a compiled file; Jaspersoft Studio writes it under this extension. */
+export const JASPER_FILE_EXTENSION = ".jasper";
+
+/** As much as model_jasper.name holds on the server. */
+export const JASPER_NAME_LENGTH = 255;

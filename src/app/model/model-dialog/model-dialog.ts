@@ -11,11 +11,15 @@ import { SelectOption } from "../../shared/search-select/search-select";
 import {
   DIALOG_DEFAULTS,
   DIALOG_LIMITS,
+  JASPER_FILE_EXTENSION,
+  JASPER_NAME_LENGTH,
+  ModelJasper,
   ModelNode,
   ModelProcedure,
   ModelTrigger,
   ModelType,
   PROCEDURE_TYPE,
+  RESERVED_TRIGGER_NAMES,
   TABLE_CODE_PATTERN,
   TRIGGER_ACTIONS,
   TRIGGER_DATA_TYPE,
@@ -106,11 +110,13 @@ export class ModelDialog implements OnInit {
       this.minRows.set(Math.max(1, ...(columns ?? []).map((column) => column.rowIndex)));
     }).finally(() => this.loadingColumns.set(false));
 
-    // the table carries its procedures and its triggers, and the database says what there is to choose from
-    this.sendRequest.get(ApiRoute.modelId(id)).then((model: { procedures?: ModelProcedure[]; triggers?: ModelTrigger[] }) => {
-      this.procedures.set(model?.procedures ?? []);
-      this.triggers.set(model?.triggers ?? []);
-    });
+    // the table carries its procedures, its triggers and its reports, and the database says what there is to choose from
+    this.sendRequest.get(ApiRoute.modelId(id)).then(
+      (model: { procedures?: ModelProcedure[]; triggers?: ModelTrigger[]; jaspers?: ModelJasper[] }) => {
+        this.procedures.set(model?.procedures ?? []);
+        this.triggers.set(model?.triggers ?? []);
+        this.jaspers.set(model?.jaspers ?? []);
+      });
     this.sendRequest.get(ApiRoute.databaseRoutines(PROCEDURE_TYPE)).then((names: string[]) =>
       this.routines.set((names ?? []).map((name) => ({ value: name, label: name }))));
     this.sendRequest.get(ApiRoute.databaseFunctions(TRIGGER_FUNCTION_TYPE, TRIGGER_DATA_TYPE)).then((names: string[]) =>
@@ -235,9 +241,15 @@ export class ModelDialog implements OnInit {
     return !!name && !TRIGGER_NAME_PATTERN.test(name);
   }
 
+  /** The application keeps those two names for itself on every table; taking one would replace it. */
+  triggerNameReserved(): boolean {
+    return RESERVED_TRIGGER_NAMES.includes(this.triggerDraft()?.name ?? "");
+  }
+
   canSaveTrigger(): boolean {
     const draft = this.triggerDraft();
-    return !!draft?.name && !this.triggerNameInvalid() && !!draft.functionName && !this.savingTrigger();
+    return !!draft?.name && !this.triggerNameInvalid() && !this.triggerNameReserved()
+      && !!draft.functionName && !this.savingTrigger();
   }
 
   saveTrigger(): void {
@@ -282,6 +294,122 @@ export class ModelDialog implements OnInit {
             this.notify.success(this.translate.get("ui.deleted"));
           })
           .finally(() => this.savingTrigger.set(false));
+      });
+  }
+
+  // --- reports of JasperReports over one record of this table ---
+
+  readonly jaspers = signal<ModelJasper[]>([]);
+  readonly jasperDraft = signal<ModelJasper | null>(null);
+  readonly savingJasper = signal(false);
+  /** The file goes to the server the moment it is chosen, and the report keeps what it returned. */
+  readonly sendingJasperFile = signal(false);
+  /** A file of another kind: said here, because the server would only refuse it afterwards. */
+  readonly jasperFileWrong = signal(false);
+
+  readonly jasperNameLength = JASPER_NAME_LENGTH;
+
+  startJasper(): void {
+    this.jasperFileWrong.set(false);
+    this.jasperDraft.set({ name: "", modelId: this.data.node!.id!, fileUpload: { id: null, fileName: null } });
+  }
+
+  editJasper(jasper: ModelJasper): void {
+    this.jasperFileWrong.set(false);
+    // the file already stored carries only its name; a new one is chosen only if the user wants to replace it
+    this.jasperDraft.set({ ...jasper, fileUpload: { id: null, fileName: jasper.fileFileName ?? null } });
+  }
+
+  cancelJasper(): void {
+    this.jasperDraft.set(null);
+    this.jasperFileWrong.set(false);
+  }
+
+  /** Name of the file in the form: the one just chosen, otherwise the one the report already holds. */
+  jasperFileName(jasper: ModelJasper): string {
+    return jasper.fileUpload?.fileName ?? jasper.fileFileName ?? "";
+  }
+
+  chooseJasperFile(input: HTMLInputElement): void {
+    const file = input.files?.[0];
+    // the same file can be chosen again, so the input is emptied
+    input.value = "";
+    const draft = this.jasperDraft();
+    if (!file || !draft || this.sendingJasperFile()) {
+      return;
+    }
+    if (!file.name.toLowerCase().endsWith(JASPER_FILE_EXTENSION)) {
+      this.jasperFileWrong.set(true);
+      return;
+    }
+
+    this.jasperFileWrong.set(false);
+    this.sendingJasperFile.set(true);
+    this.sendRequest.upload(ApiRoute.fileUpload, file)
+      .then((stored: { fileUploadFile?: string }) => {
+        // the upload only stores the content; the report takes it over when it is saved
+        this.jasperDraft.set({ ...draft, fileUpload: { id: stored?.fileUploadFile ?? null, fileName: file.name } });
+      })
+      .finally(() => this.sendingJasperFile.set(false));
+  }
+
+  canSaveJasper(): boolean {
+    const draft = this.jasperDraft();
+    if (!draft?.name.trim() || this.savingJasper() || this.sendingJasperFile()) {
+      return false;
+    }
+    // a new report cannot go without a file; an old one keeps the one it has
+    return !!draft.id || !!draft.fileUpload?.id;
+  }
+
+  saveJasper(): void {
+    const draft = this.jasperDraft();
+    if (!draft || !this.canSaveJasper()) {
+      return;
+    }
+    this.savingJasper.set(true);
+    const body: ModelJasper = {
+      id: draft.id,
+      modelId: draft.modelId,
+      name: draft.name.trim(),
+      fileUpload: draft.fileUpload,
+    };
+    this.sendRequest.post(ApiRoute.modelJasper, body)
+      .then((saved: ModelJasper) => {
+        const list = this.jaspers();
+        const place = list.findIndex((other) => other.id === saved.id);
+        this.jaspers.set(place < 0
+          ? [...list, saved].sort((first, second) => first.name.localeCompare(second.name))
+          : list.map((other, index) => (index === place ? saved : other)));
+        this.jasperDraft.set(null);
+        this.notify.success(this.translate.get("ui.saved"));
+      })
+      .finally(() => this.savingJasper.set(false));
+  }
+
+  removeJasper(jasper: ModelJasper): void {
+    const data: ConfirmDialogData = {
+      title: this.translate.get("ui.model.jasperDeleteTitle"),
+      message: this.translate.get("ui.model.jasperDeleteConfirm").replace("{0}", jasper.name),
+      confirmText: this.translate.get("ui.delete"),
+      danger: true,
+    };
+    this.dialog.open(ConfirmDialog, { width: "520px", data })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+        this.savingJasper.set(true);
+        this.sendRequest.delete(ApiRoute.modelJasperId(jasper.id!))
+          .then(() => {
+            this.jaspers.set(this.jaspers().filter((other) => other.id !== jasper.id));
+            if (this.jasperDraft()?.id === jasper.id) {
+              this.jasperDraft.set(null);
+            }
+            this.notify.success(this.translate.get("ui.deleted"));
+          })
+          .finally(() => this.savingJasper.set(false));
       });
   }
 

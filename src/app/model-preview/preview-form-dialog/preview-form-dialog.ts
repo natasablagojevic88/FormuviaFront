@@ -4,7 +4,8 @@ import { Language } from "../../services/language";
 import { SendRequest } from "../../services/send-request";
 import { ApiRoute } from "../../shared/ApiRoute";
 import { SelectOption } from "../../shared/search-select/search-select";
-import { ComboOption, FileValue, fileId, SubTable, TableProcedure } from "../../shared/database-table";
+import { ComboOption, FileValue, fileId, SubTable, TableJasper, TableProcedure } from "../../shared/database-table";
+import { PdfDialog, PdfDialogData } from "../../shared/pdf-dialog/pdf-dialog";
 import { conditionsHold, ConditionSourceLookup, hasConditions } from "../../shared/column-conditions";
 import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
 import { Translate } from "../../services/translate";
@@ -45,6 +46,10 @@ export interface PreviewFormDialogData {
   procedures?: TableProcedure[];
   /** Path that runs a procedure over the record; without it no procedure is offered. */
   procedureUrl?: (procedureId: string, id: string) => string;
+  /** Reports of this table; saving can make one of them over the record at once. */
+  jaspers?: TableJasper[];
+  /** Path to the report made over the record; without it no report is offered. */
+  jasperUrl?: (modelJasperId: string, id: string) => string;
 }
 
 /** What the dialog closes with: the stored record, and the subtable to open next when one was chosen. */
@@ -317,7 +322,7 @@ export class PreviewFormDialog implements OnInit {
   /** The record that was last sent for a field, so the same question is not asked twice. */
   private lastSent = new Map<string, string>();
   /** A save asked for while a function was still working; it goes through once the answer is in. */
-  private waitingSave: { goTo?: SubTable; stay: boolean; run?: TableProcedure } | null = null;
+  private waitingSave: { goTo?: SubTable; stay: boolean; run?: TableProcedure; print?: TableJasper } | null = null;
   /** The form is counted, so an answer belonging to the form before it was read again is dropped. */
   private round = 0;
 
@@ -531,6 +536,19 @@ export class PreviewFormDialog implements OnInit {
   }
 
   /**
+   * Reports of the table stand next to Save too: the record is stored first, so the report is made
+   * over what the form holds, and a new record exists by the time it is made.
+   */
+  jaspers(): TableJasper[] {
+    return this.data.readOnly || !this.data.jasperUrl ? [] : this.data.jaspers ?? [];
+  }
+
+  /** Saves and makes the report over the stored record; nothing is changed, so it is not asked. */
+  saveAndPrint(jasper: TableJasper): void {
+    this.save(undefined, true, undefined, jasper);
+  }
+
+  /**
    * Saves, runs the procedure over the stored record and reads the form again with its result. It
    * is asked for first, as in the list: the procedure changes the record and cannot be taken back.
    */
@@ -624,14 +642,14 @@ export class PreviewFormDialog implements OnInit {
     return record;
   }
 
-  save(goTo?: SubTable, stay = false, run?: TableProcedure): void {
+  save(goTo?: SubTable, stay = false, run?: TableProcedure, print?: TableJasper): void {
     if (!this.canSave()) {
       return;
     }
     // a function is still working the values out, so this is not yet the record to store: the save
     // is kept and goes through with what the answer brings
     if (this.pending > 0) {
-      this.waitingSave = { goTo, stay, run };
+      this.waitingSave = { goTo, stay, run, print };
       return;
     }
 
@@ -660,6 +678,12 @@ export class PreviewFormDialog implements OnInit {
         // the record is stored, so the procedure runs over it and the form waits for what it leaves
         if (run) {
           this.runProcedure(run);
+          return;
+        }
+
+        // the record is stored, so the report is made over what was just saved
+        if (print) {
+          this.printJasper(print);
           return;
         }
 
@@ -696,6 +720,30 @@ export class PreviewFormDialog implements OnInit {
   }
 
   /**
+   * A report of the table over the record that was just stored. It changes nothing, so the form is
+   * only read again and the finished PDF opens in the reader over the dialog.
+   */
+  private printJasper(jasper: TableJasper): void {
+    const url = this.data.jasperUrl;
+    const id = this.data.id;
+    if (!url || !id) {
+      this.saving.set(false);
+      this.loadForm();
+      return;
+    }
+    this.sendRequest
+      .blob(url(jasper.id, id))
+      .then((content: Blob) => {
+        const data: PdfDialogData = { title: jasper.name, content };
+        this.dialog.open(PdfDialog, { width: "min(1100px, 95vw)", data });
+      })
+      .finally(() => {
+        this.saving.set(false);
+        this.loadForm();
+      });
+  }
+
+  /**
    * The save that was asked for while a function was working. What the answer brought can leave a
    * required field empty, and then there is nothing to store: that field stands marked on the form.
    */
@@ -703,7 +751,7 @@ export class PreviewFormDialog implements OnInit {
     const asked = this.waitingSave;
     this.waitingSave = null;
     if (asked) {
-      this.save(asked.goTo, asked.stay, asked.run);
+      this.save(asked.goTo, asked.stay, asked.run, asked.print);
     }
   }
 

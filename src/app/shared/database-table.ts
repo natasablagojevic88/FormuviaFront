@@ -121,6 +121,8 @@ export interface DatabaseTable<T> {
   children?: TableChild[];
   /** Procedures of the database the model put on this table; the row menu runs one over a row. */
   procedures?: TableProcedure[];
+  /** Reports the model put on this table; the row menu makes one over a row. */
+  jaspers?: TableJasper[];
 }
 
 /** A procedure of a model table, as the row menu offers it; the name is already translated. */
@@ -129,6 +131,12 @@ export interface TableProcedure {
   name: string;
   /** Font Awesome classes chosen on the model; without it the menu shows the gears. */
   icon?: string;
+}
+
+/** A report of a model table, as the row menu offers it; the name is the one given on the model. */
+export interface TableJasper {
+  id: string;
+  name: string;
 }
 
 /** A subtable of a model table; the row it is opened from becomes its parent. */

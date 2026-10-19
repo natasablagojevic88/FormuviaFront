@@ -138,6 +138,13 @@
                 <span>{{ 'ui.preview.saveAndRun' | t }}: {{ procedure.name }}</span>
               </button>
             }
+            <!-- the report is made over the record as it was just stored, so it shows what is on the form -->
+            @for (jasper of jaspers(); track jasper.id) {
+              <button type="button" mat-menu-item (click)="saveAndPrint(jasper)" [disabled]="!canSave()">
+                <i class="fa-solid fa-file-pdf menu-icon"></i>
+                <span>{{ 'ui.preview.saveAndPrint' | t }}: {{ jasper.name }}</span>
+              </button>
+            }
             <!-- a new record is saved first; an existing one is already stored, so it is only opened -->
             @for (subTable of subTables(); track subTable.modelId) {
               <button type="button" mat-menu-item (click)="isNew ? save(subTable) : open(subTable)">

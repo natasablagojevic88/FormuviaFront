@@ -87,7 +87,7 @@ Under the procedures stands **Triggers**: functions of the database that the dat
 
 This part appears once the table is saved. **Add a trigger** asks for a name, the moment, the event and the function, and lets you narrow it with a condition:
 
-- **Name** — the name the trigger gets in the database: lowercase letters, digits and underscore, starting with a letter. It cannot be changed afterwards; to rename it, delete it and add it again.
+- **Name** — the name the trigger gets in the database: lowercase letters, digits and underscore, starting with a letter. It cannot be changed afterwards; to rename it, delete it and add it again. Two names are taken: `create_audit` and `table_listen` stand on every table for the history and for reporting a change, so Formuvia refuses them.
 - **When** — *Before the write* or *After the write*. Before, the function still has the row in its hands and can change or refuse it; after, the row is already written and the function works around it. There is nothing in between, and when two triggers stand on the same moment the database decides in which order they run — so do not build on that order.
 - **On** — what sets it off: an insert, an update, both, a delete, or any of the three.
 - **Function of the database** — chosen from the functions the database holds that **return `trigger`**. Such a function takes no parameters and works over `NEW` and `OLD`. A name the database does not know is refused.
@@ -96,6 +96,27 @@ This part appears once the table is saved. **Add a trigger** asks for a name, th
 Click a trigger in the list to change it, or the basket to take it off the table. Taking a trigger off **drops it from the database as well** — that is the difference from a procedure, where only the entry in Formuvia goes. The function itself stays in the database either way.
 
 What a trigger writes is in the record straight away: the entry dialog is filled in again after saving, so a value the database put there stands in the form and in the list without anyone asking for it.
+
+### Reports
+
+The last part is **Reports**: reports of JasperReports tied to this table, each one made over a single record of it.
+
+::: info What is in effect today
+A report is kept here with its name and its file, the file is checked when it is sent, and the ⋯ menu of a row in the list offers the report by name. Making the PDF itself is still being finished on the server, so choosing a report ends in an error for now.
+:::
+
+This part appears once the table is saved. **Add a report** asks for two things:
+
+- **Name of the report** — what the user reads over the record. It is unique within the table.
+- **File of the report** — a report compiled by Jaspersoft Studio, the one with the `.jasper` extension; the source `.jrxml` is not taken. The file is read the moment it is sent, and it is accepted only if it is really a compiled report and if it takes a parameter **`id` of type `UUID`** — that parameter is the record the report is made over. Anything else is refused, with the reason.
+
+Click a report in the list to change it. Changing only the name keeps the file as it is; choosing a new file replaces it. The basket takes the report off the table and the file of the report goes with it.
+
+The report is then offered in the ⋯ menu of every row of that table, under its name: choosing it makes the report over that record and opens the finished PDF in the reader inside the application. It is offered to anyone who may read the table, since making a report changes nothing. The tab next to *Save* in the entry dialog offers the same ones as *Save and print*: the record is stored and the report is made over it at once. See [What else a row can do](/tables#what-else-a-row-can-do).
+
+::: tip
+Leave the font out of the report and it gets the one the server offers, which has š, đ, č, ć and ž in it. A report that names a font of its own needs that same font on the server; if it is not there, making the report fails and says which font is missing.
+:::
 
 ## Editing
 

@@ -221,6 +221,8 @@
                     [readonly]="!!trigger.id" [class.fd-input-error]="triggerNameInvalid()" />
                   @if (triggerNameInvalid()) {
                     <span class="fd-field-error">{{ 'ui.model.triggerNameInvalid' | t }}</span>
+                  } @else if (triggerNameReserved()) {
+                    <span class="fd-field-error">{{ 'ui.model.triggerNameReserved' | t }}</span>
                   } @else if (trigger.id) {
                     <span class="fd-help">{{ 'ui.model.triggerNameLocked' | t }}</span>
                   } @else {
@@ -275,6 +277,87 @@
               <button type="button" class="procedure-add" (click)="startTrigger()" [disabled]="savingTrigger()">
                 <i class="fa-solid fa-plus"></i>
                 {{ 'ui.model.triggerAdd' | t }}
+              </button>
+            }
+          }
+        </div>
+
+        <!-- reports over one record of this table; the list wears the same clothes as the procedures -->
+        <div class="fd-field fd-field-wide section">
+          <span class="section-title">{{ 'ui.model.jaspersTitle' | t }}</span>
+          <span class="fd-help">{{ 'ui.model.jaspersHelp' | t }}</span>
+        </div>
+
+        <div class="fd-field fd-field-wide procedures">
+          @if (isNew) {
+            <p class="procedures-empty">{{ 'ui.model.jaspersNew' | t }}</p>
+          } @else {
+            @if (jaspers().length) {
+              <ul class="procedure-list">
+                @for (jasper of jaspers(); track jasper.id) {
+                  <li class="procedure" [class.procedure-open]="jasperDraft()?.id === jasper.id">
+                    <button type="button" class="procedure-main" (click)="editJasper(jasper)">
+                      <i class="fa-solid fa-file-pdf procedure-glyph"></i>
+                      <span class="procedure-name">{{ jasper.name }}</span>
+                      <span class="procedure-code">{{ jasper.fileFileName }}</span>
+                    </button>
+                    <button type="button" class="procedure-remove" (click)="removeJasper(jasper)"
+                      [disabled]="savingJasper()" [attr.aria-label]="'ui.delete' | t">
+                      <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="procedures-empty">{{ 'ui.model.jasperEmpty' | t }}</p>
+            }
+
+            @if (jasperDraft(); as jasper) {
+              <div class="procedure-form">
+                <div class="fd-field">
+                  <label class="fd-label fd-required" for="jasperName">{{ 'ui.model.jasperName' | t }}</label>
+                  <input id="jasperName" name="jasperName" class="fd-input" [(ngModel)]="jasper.name"
+                    [ngModelOptions]="{ standalone: true }" autocomplete="off" [attr.maxlength]="jasperNameLength"
+                    (keydown.enter)="$event.preventDefault(); saveJasper()" />
+                </div>
+
+                <div class="fd-field">
+                  <span class="fd-label" [class.fd-required]="!jasper.id">{{ 'ui.model.jasperFile' | t }}</span>
+                  <div class="jasper-file">
+                    <label class="fd-button fd-button-secondary jasper-choose">
+                      <i class="fa-solid" [class.fa-upload]="!sendingJasperFile()"
+                        [class.fa-spinner]="sendingJasperFile()" [class.fa-spin]="sendingJasperFile()"></i>
+                      {{ 'ui.model.jasperChoose' | t }}
+                      <input type="file" accept=".jasper" class="jasper-input"
+                        [disabled]="sendingJasperFile()" (change)="chooseJasperFile($any($event.target))" />
+                    </label>
+                    @if (jasperFileName(jasper)) {
+                      <span class="jasper-name" [title]="jasperFileName(jasper)">{{ jasperFileName(jasper) }}</span>
+                    }
+                  </div>
+                  @if (jasperFileWrong()) {
+                    <span class="fd-field-error">{{ 'ui.model.jasperFileWrong' | t }}</span>
+                  } @else {
+                    <span class="fd-help">{{ (jasper.id ? 'ui.model.jasperFileKept' : 'ui.model.jasperFileHelp') | t }}</span>
+                  }
+                </div>
+
+                <div class="procedure-actions">
+                  <button type="button" class="fd-button fd-button-secondary" (click)="cancelJasper()">
+                    {{ 'ui.cancel' | t }}
+                  </button>
+                  <button type="button" class="fd-button fd-button-primary" (click)="saveJasper()"
+                    [disabled]="!canSaveJasper()">
+                    <i class="fa-solid" [class.fa-check]="!savingJasper()" [class.fa-spinner]="savingJasper()"
+                      [class.fa-spin]="savingJasper()"></i>
+                    {{ 'ui.save' | t }}
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <button type="button" class="procedure-add" (click)="startJasper()" [disabled]="savingJasper()">
+                <i class="fa-solid fa-plus"></i>
+                {{ 'ui.model.jasperAdd' | t }}
               </button>
             }
           }

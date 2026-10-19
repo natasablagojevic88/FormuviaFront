@@ -11,7 +11,7 @@ import { Translate } from "../../services/translate";
 import { Language } from "../../services/language";
 import { Notify } from "../../services/notify";
 import { AdvancedSearchDialog, AdvancedSearchDialogData } from "../advanced-search-dialog/advanced-search-dialog";
-import { ComboOption, DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, FileValue, fileId, fileName, isPdf, QueryDatabaseOrder, SubTable, TableChild, TableProcedure } from "../database-table";
+import { ComboOption, DatabaseColumn, DatabaseFilter, DatabaseParameter, DatabaseTable, FileValue, fileId, fileName, isPdf, QueryDatabaseOrder, SubTable, TableChild, TableJasper, TableProcedure } from "../database-table";
 import { ConfirmDialog, ConfirmDialogData } from "../confirm-dialog/confirm-dialog";
 import { PdfDialog, PdfDialogData } from "../pdf-dialog/pdf-dialog";
 import { FileVersionsDialog, FileVersionsDialogData } from "../file-versions-dialog/file-versions-dialog";
@@ -169,6 +169,8 @@ export class DataTable implements AfterViewInit, OnDestroy {
   readonly historyUrl = input<((id: string) => string) | null>(null);
   /** Path that runs a procedure of the table over one row; without it the row menu does not offer any. */
   readonly procedureUrl = input<((procedureId: string, id: string) => string) | null>(null);
+  /** Path to the report of the table made over one row; without it the row menu offers no report. */
+  readonly jasperUrl = input<((modelJasperId: string, id: string) => string) | null>(null);
   readonly edit = output<any>();
   readonly remove = output<any>();
   readonly loaded = output<DatabaseTable<any>>();
@@ -227,6 +229,10 @@ export class DataTable implements AfterViewInit, OnDestroy {
   readonly procedures = signal<TableProcedure[]>([]);
   /** The row a procedure is running over; until it answers the menu offers nothing more. */
   readonly runningProcedure = signal<string | null>(null);
+  /** Reports the model put on this table, as the row menu offers them. */
+  readonly jaspers = signal<TableJasper[]>([]);
+  /** The row a report is being made over; the row menu waits for it like it waits for a procedure. */
+  readonly printingJasper = signal<string | null>(null);
   /** Records of the codebooks above the columns, once per model. */
   readonly parentCodebook = signal<Record<string, ComboOption[]>>({});
 
@@ -548,6 +554,7 @@ export class DataTable implements AfterViewInit, OnDestroy {
     this.lastTable = null;
     this.subTables.set([]);
     this.procedures.set([]);
+    this.jaspers.set([]);
     this.parentCodebook.set({});
     this.hasAdd.set(true);
     this.hasUpdate.set(true);
@@ -566,6 +573,7 @@ export class DataTable implements AfterViewInit, OnDestroy {
     this.children.set(table.children ?? []);
     this.subTables.set(table.subTables ?? []);
     this.procedures.set(table.procedures ?? []);
+    this.jaspers.set(table.jaspers ?? []);
     this.parentCodebook.set(table.parentCodebook ?? {});
     this.hasAdd.set(table.hasAdd !== false);
     this.hasUpdate.set(table.hasUpdate !== false);
@@ -716,6 +724,9 @@ export class DataTable implements AfterViewInit, OnDestroy {
   readonly rowProcedures = computed<TableProcedure[]>(() =>
     this.procedureUrl() && this.hasUpdate() ? this.procedures() : []);
 
+  /** Reports offered on a row. Making one only reads the record, so the right to look is enough. */
+  readonly rowJaspers = computed<TableJasper[]>(() => (this.jasperUrl() ? this.jaspers() : []));
+
   /** The ⋯ menu is shown only when there is something in it: history, a subtable or deleting. */
   readonly hasRowMenu = computed(
     () =>
@@ -724,6 +735,7 @@ export class DataTable implements AfterViewInit, OnDestroy {
       this.children().length > 0 ||
       this.subTables().length > 0 ||
       this.rowProcedures().length > 0 ||
+      this.rowJaspers().length > 0 ||
       this.showDelete()
   );
 
@@ -756,6 +768,26 @@ export class DataTable implements AfterViewInit, OnDestroy {
           })
           .finally(() => this.runningProcedure.set(null));
       });
+  }
+
+  /**
+   * Makes a report of the table over one row: the server fills the report with that record and sends
+   * back the PDF, which opens in the viewer. Nothing is changed, so it is not asked for first.
+   */
+  printJasper(jasper: TableJasper, row: any): void {
+    const id = row?.[ID_FIELD];
+    const url = this.jasperUrl();
+    if (!id || !url || this.printingJasper()) {
+      return;
+    }
+    this.printingJasper.set(id);
+    this.sendRequest
+      .blob(url(jasper.id, id))
+      .then((content: Blob) => {
+        const data: PdfDialogData = { title: jasper.name, content };
+        this.dialog.open(PdfDialog, { width: "min(1100px, 95vw)", data });
+      })
+      .finally(() => this.printingJasper.set(null));
   }
 
   /**

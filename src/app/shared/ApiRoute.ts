@@ -41,6 +41,13 @@
         return `/api/model/trigger/${id}`;
     }
 
+    /** Report of a table: insert when the id is empty, otherwise update. */
+    static readonly modelJasper='/api/model/jasper';
+
+    static modelJasperId(id: string): string {
+        return `/api/model/jasper/${id}`;
+    }
+
     static readonly modelColumn='/api/model-column';
 
     static modelColumnList(modelId: string): string {
@@ -152,6 +159,11 @@
     /** Runs a procedure of the table over one record; the answer is that record as it stands after it. */
     static modelPreviewExecuteProcedure(procedureId: string, id: string): string {
         return `/api/preview/execute-procedure/${procedureId}/${id}`;
+    }
+
+    /** Report of a table made over one record; the answer is the PDF. */
+    static modelJasperPrint(modelJasperId: string, id: string): string {
+        return `/api/preview/jasper/${modelJasperId}/${id}`;
     }
 
     /** Routines of the database by kind (FUNCTION, PROCEDURE), whatever data type they return. */

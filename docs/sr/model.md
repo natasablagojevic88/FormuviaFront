@@ -87,7 +87,7 @@ Ispod procedura stoje **Trigeri**: funkcije baze koje baza sama pokreće kad se 
 
 Ovaj deo se pojavljuje kad je tabela sačuvana. **Dodaj triger** traži naziv, trenutak, radnju i funkciju, a uslovom može i da se suzi:
 
-- **Naziv** — naziv koji triger dobija u bazi: mala slova, cifre i donja crta, počinje slovom. Posle se ne menja; da bi se preimenovao, obriše se i doda ponovo.
+- **Naziv** — naziv koji triger dobija u bazi: mala slova, cifre i donja crta, počinje slovom. Posle se ne menja; da bi se preimenovao, obriše se i doda ponovo. Dva naziva su zauzeta: `create_audit` i `table_listen` stoje na svakoj tabeli zbog istorije i javljanja izmene, pa ih Formuvia odbija.
 - **Kada** — *Pre upisa* ili *Posle upisa*. Pre upisa funkcija još drži red u rukama i može da ga promeni ili odbije; posle upisa red je već zapisan i funkcija radi oko njega. Između toga nema ničega, a kad dva trigera stoje na istom trenutku, baza odlučuje kojim redom se pokreću — pa na taj red ne treba računati.
 - **Na** — šta ga okida: unos, izmena, oboje, brisanje ili bilo šta od toga troje.
 - **Funkcija baze** — bira se među funkcijama koje baza ima i koje **vraćaju `trigger`**. Takva funkcija ne prima parametre i radi nad `NEW` i `OLD`. Naziv koji baza ne poznaje Formuvia odbija.
@@ -96,6 +96,27 @@ Ovaj deo se pojavljuje kad je tabela sačuvana. **Dodaj triger** traži naziv, t
 Klik na triger u spisku ga otvara za izmenu, a korpa ga skida sa tabele. Skidanje trigera **briše ga i iz baze** — to je razlika od procedure, gde se briše samo stavka u Formuvia-i. Sama funkcija u bazi ostaje u oba slučaja.
 
 Ono što triger upiše odmah je u zapisu: dijalog za unos se posle snimanja ponovo popunjava, pa vrednost koju je baza upisala stoji u formi i u listi, a da je niko nije tražio.
+
+### Izveštaji
+
+Poslednji deo su **Izveštaji**: JasperReports izveštaji vezani za ovu tabelu, svaki se pravi nad jednim njenim redom.
+
+::: info Šta danas ima dejstvo
+Izveštaj se ovde čuva sa svojim nazivom i fajlom, fajl se proverava pri slanju, a ⋯ meni reda u listi nudi izveštaj po nazivu. Samo pravljenje PDF-a se na serveru još dovršava, pa izbor izveštaja za sada završi greškom.
+:::
+
+Ovaj deo se pojavljuje kad tabela bude sačuvana. **Dodaj izveštaj** traži dve stvari:
+
+- **Naziv izveštaja** — ono što korisnik čita nad zapisom. Jedinstven je u okviru tabele.
+- **Fajl izveštaja** — izveštaj preveden u Jaspersoft Studiju, onaj sa ekstenzijom `.jasper`; izvorni `.jrxml` se ne prima. Fajl se čita u trenutku slanja i prihvata se samo ako je zaista preveden izveštaj i ako ima parametar **`id` tipa `UUID`** — taj parametar je zapis nad kojim se izveštaj pravi. Sve drugo se odbija, sa objašnjenjem.
+
+Klik na izveštaj u spisku ga otvara za izmenu. Izmena samo naziva zadržava postojeći fajl, a izbor novog fajla ga zamenjuje. Korpa skida izveštaj sa tabele i sa njim ide i fajl izveštaja.
+
+Izveštaj se zatim nudi u ⋯ meniju svakog reda te tabele, pod svojim nazivom: kad ga izaberete, pravi se nad tim zapisom, a gotov PDF se otvori u čitaču unutar aplikacije. Nudi se svakome ko sme da čita tabelu, jer pravljenje izveštaja ništa ne menja. Ježičak pored dugmeta *Sačuvaj* u dijalogu za unos nudi iste te, kao *Sačuvaj i štampaj*: zapis se snimi i izveštaj se odmah napravi nad njim. Vidi [Šta još red može](/sr/tables#sta-jos-red-moze).
+
+::: tip
+Ako u izveštaju ne navedete font, dobiće onaj koji server nudi, a u njemu ima š, đ, č, ć i ž. Izveštaj koji navede svoj font traži taj isti font i na serveru; ako ga tamo nema, pravljenje izveštaja pukne i kaže koji font fali.
+:::
 
 ## Izmena
 

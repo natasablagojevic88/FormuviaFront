@@ -205,9 +205,58 @@
   grid-column: 1 / -1;
 }
 
+/* --- reports: the file is chosen next to the name it got --- */
+
+.jasper-file {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.jasper-choose {
+  position: relative;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+/* the field itself is hidden: the label above is the button */
+.jasper-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* beside the button while there is room for it, otherwise on a line of its own under it */
+.jasper-name {
+  flex: 1 1 140px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--c-text-muted);
+  font-size: 13px;
+}
+
 @media (max-width: 600px) {
   .procedure-form {
     grid-template-columns: 1fr;
+  }
+
+  .jasper-file {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .jasper-choose {
+    width: 100%;
+  }
+
+  .jasper-name {
+    text-align: center;
   }
 
   .procedure-actions {

@@ -52,6 +52,8 @@ Dugme **Sačuvaj** ima mali jezičak sa desne strane. U njemu je uvek **Sačuvaj
 
 Ako tabela ima procedure, i one stoje u ježičku, kao *Sačuvaj i pokreni: …*. Prvo pita, kao i u listi, jer procedura menja zapis i to se ne može poništiti. Zapis se prvo snimi, pa procedura radi nad onim što stoji na formi, a nov zapis do tada već postoji; kad završi, forma se ponovo popuni onim što je procedura ostavila i ostaje otvorena. Procedure su u ježičku samo dok zapis sme da se menja — zapis koji samo gledate nema ni dugme Sačuvaj. Iste te procedure stoje i u ⋯ meniju liste, za zapis koji ne morate da otvarate.
 
+Tu su i izveštaji tabele, kao *Sačuvaj i štampaj: …*. Ništa se ne pita unapred, jer izveštaj ništa ne menja: zapis se snimi, izveštaj se napravi nad onim što je upravo sačuvano, a PDF se otvori u čitaču preko dijaloga, koji ostaje otvoren iza njega.
+
 Nazivi polja na toj formi dolaze sa servera, na jeziku koji ste izabrali, pa forma i tabela uvek koriste iste reči za istu stvar.
 
 Vrednost izabrana iz liste poništava se **×** na desnom kraju polja — isto radi i na formi, i u tabeli, i u filterima.
@@ -87,6 +89,8 @@ Dugme ⋯ pored *Izmeni* nosi sve ostalo:
 **Nazad** vraća listu tačno onakvu kakvu ste ostavili — ista strana, isti filteri i sortiranje, i red u koji ste ušli i dalje označen — pa ne morate ponovo da tražite gde ste stali. Kad tu tabelu ponovo otvorite iz menija, ili osvežite stranu, kreće ispočetka.
 
 **Procedure** — ako je model postavio procedure na ovu tabelu, svaka stoji ovde pod nazivom i ikonom koje je dobila: *Preračunaj*, *Zatvori*. Kad izaberete jednu, Formuvia prvo pita, jer procedura menja zapis u bazi. Dok radi, ⋯ dugme tog reda se vrti; kad završi, red se ponovo iscrta sa onim što je procedura ostavila, a ostatak liste ostaje kakav je bio. Procedura se nudi samo onome ko sme da menja zapis, jer to i radi. Iste procedure stoje i u ježičku pored dugmeta *Sačuvaj* u dijalogu za unos, kao *Sačuvaj i pokreni: …*, za zapis koji ste ionako otvorili. Koje procedure tabela ima podešava se u [Modelu](/sr/model#procedure).
+
+**Izveštaji** — ako je model postavio izveštaje na ovu tabelu, svaki stoji ovde pod nazivom koji je dobio, uz ikonu PDF-a. Kad izaberete jedan, izveštaj se pravi nad tim zapisom odmah i bez pitanja, jer se ništa ne menja: baza sama izračuna šta treba, a gotov PDF se otvori u čitaču unutar aplikacije, odakle može da se odštampa ili sačuva. Dok se pravi, ⋯ dugme tog reda se vrti. Isti izveštaji stoje i u ježičku pored dugmeta *Sačuvaj* u dijalogu za unos, kao *Sačuvaj i štampaj: …*, za zapis koji ste ionako otvorili. Koje izveštaje tabela ima podešava se u [Modelu](/sr/model#izvestaji).
 
 **Obriši** — prvo traži potvrdu, jer se ne može poništiti.
 

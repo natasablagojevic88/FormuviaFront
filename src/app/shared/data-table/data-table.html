@@ -98,10 +98,11 @@
               </button>
               @if (hasRowMenu()) {
                 <button type="button" class="more-button" [matMenuTriggerFor]="rowMenu"
-                  [disabled]="rowEditMode() || !!runningProcedure()"
+                  [disabled]="rowEditMode() || !!runningProcedure() || !!printingJasper()"
                   (click)="selectRow(row)" [title]="'ui.moreActions' | t" [attr.aria-label]="'ui.moreActions' | t">
-                  <i class="fa-solid" [class.fa-ellipsis]="runningProcedure() !== row.id"
-                    [class.fa-spinner]="runningProcedure() === row.id" [class.fa-spin]="runningProcedure() === row.id"></i>
+                  <i class="fa-solid" [class.fa-ellipsis]="runningProcedure() !== row.id && printingJasper() !== row.id"
+                    [class.fa-spinner]="runningProcedure() === row.id || printingJasper() === row.id"
+                    [class.fa-spin]="runningProcedure() === row.id || printingJasper() === row.id"></i>
                 </button>
               }
               <mat-menu #rowMenu="matMenu" class="row-menu">
@@ -116,6 +117,13 @@
                   <button type="button" mat-menu-item (click)="runProcedure(procedure, row)">
                     <i class="fa-solid menu-icon" [class]="procedure.icon || 'fa-solid fa-gears'"></i>
                     <span>{{ procedure.name }}</span>
+                  </button>
+                }
+                <!-- reports of the table over this record; they only read it, so they are made straight away -->
+                @for (jasper of rowJaspers(); track jasper.id) {
+                  <button type="button" mat-menu-item (click)="printJasper(jasper, row)">
+                    <i class="fa-solid fa-file-pdf menu-icon"></i>
+                    <span>{{ jasper.name }}</span>
                   </button>
                 }
                 @for (subTable of subTables(); track subTable.modelId) {
