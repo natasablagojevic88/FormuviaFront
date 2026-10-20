@@ -41,6 +41,8 @@ export class QueryTable implements AfterViewInit, OnDestroy {
   readonly rows = input<Record<string, any>[]>([]);
   readonly loading = input(false);
   readonly exporting = input(false);
+  /** false: the parameters do not hold up, so there is nothing to make the file out of. */
+  readonly canExport = input(true);
   readonly exportExcel = output<void>();
 
   readonly isNumber = isNumberType;

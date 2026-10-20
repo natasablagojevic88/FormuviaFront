@@ -19,6 +19,12 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
+/* the kind of a saved report is only shown, as the code of a table in the Model is */
+.fd-input[readonly] {
+  background: var(--c-surface-2);
+  color: var(--c-text-muted);
+}
+
 /* the query stands under the rest, with room to read it, and can be pulled taller by hand */
 .sql {
   height: auto;
@@ -28,8 +34,55 @@
   resize: vertical;
 }
 
+/* the chosen file stands beside the button while there is room for it */
+.jasper-file {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.jasper-choose {
+  position: relative;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+/* the field itself is hidden: the label above is the button */
+.jasper-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.jasper-name {
+  flex: 1 1 140px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--c-text-muted);
+  font-size: 13px;
+}
+
 @media (max-width: 600px) {
   .sql {
     min-height: 160px;
+  }
+
+  .jasper-file {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .jasper-choose {
+    width: 100%;
+  }
+
+  .jasper-name {
+    text-align: center;
   }
 }

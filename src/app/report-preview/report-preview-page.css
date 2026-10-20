@@ -59,7 +59,10 @@ app-page-header {
 }
 
 .card-foot {
+  display: flex;
   flex-shrink: 0;
+  flex-direction: column;
+  gap: 10px;
   padding: 16px 20px;
   border-top: 1px solid var(--c-border-soft);
   background: var(--c-surface-2);

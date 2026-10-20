@@ -26,6 +26,12 @@
             icon="fa-solid fa-user-shield" [placeholder]="label('roleId')" [ariaLabel]="label('roleId')" />
           <span class="fd-help">{{ 'ui.reportGroups.roleHint' | t }}</span>
         </div>
+
+        <div class="fd-field">
+          <span class="fd-label">{{ label('icon') }}</span>
+          <app-icon-select name="icon" [(ngModel)]="group.icon" [ariaLabel]="label('icon')" />
+          <span class="fd-help">{{ 'ui.reportGroups.iconHint' | t }}</span>
+        </div>
       </div>
     }
   </div>

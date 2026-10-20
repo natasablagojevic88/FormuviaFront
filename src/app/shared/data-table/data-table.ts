@@ -199,6 +199,12 @@ export class DataTable implements AfterViewInit, OnDestroy {
   readonly inputType = inputTypeFor;
   readonly inputMode = inputModeFor;
   readonly isNumber = isNumberType;
+  /**
+   * A column that holds Font Awesome classes (the icon of a group, of a table): the glyph itself is
+   * shown instead of the classes, and it is chosen from the picker instead of being typed.
+   */
+  readonly isIcon = (column: DatabaseColumn) =>
+    column.fieldName === "icon" && column.columnType === "STRING" && !isEnum(column);
   /** Dates and dates with a time stand centred, like yes/no. */
   readonly isCentered = (columnType?: string) =>
     columnType === "BOOLEAN" || columnType === "LOCALDATE" || columnType === "LOCALDATETIME" ||
@@ -293,6 +299,29 @@ export class DataTable implements AfterViewInit, OnDestroy {
   /** Columns offered in edit mode: every editable column from allColumns, including those hidden in the table. */
   readonly editColumns = computed(() =>
     this.allColumns().filter((column) => openByOption(column) && isEditableType(column)));
+  /** Values a new row carries without being asked: from the page, and the parent row of a subtable. */
+  readonly newRowGiven = computed<Record<string, any>>(() => {
+    const parent = this.parentFilter();
+    const given = { ...(this.newRowValues() ?? {}) };
+    if (parent) {
+      given[parent.field] = parent.value;
+    }
+    return given;
+  });
+  /**
+   * A new row is offered only when it could really be saved: a required column the table does not
+   * offer for editing, and that the page does not fill in by itself, would be sent empty and refused.
+   */
+  readonly canAddRow = computed(() => {
+    if (!this.hasAdd()) {
+      return false;
+    }
+    const given = this.newRowGiven();
+    const offered = this.editColumns();
+    return this.allColumns().every((column) => column.required !== true
+      || offered.some((item) => item.fieldName === column.fieldName)
+      || given[column.fieldName] !== undefined);
+  });
   /** Cell definitions are built for the union: table columns + columns seen only in edit mode. */
   readonly cellColumns = computed(() => {
     const columns = this.columns();
@@ -989,12 +1018,12 @@ export class DataTable implements AfterViewInit, OnDestroy {
 
   /** New row: an empty row at the top of the table, in edit mode. */
   startNew(): void {
-    if (!this.hasAdd()) {
+    if (!this.canAddRow()) {
       return;
     }
     const draft: Record<string, any> = {};
     this.editColumns().forEach((column) => (draft[column.fieldName] = column.columnType === "BOOLEAN" ? true : null));
-    Object.assign(draft, this.newRowValues() ?? {});
+    Object.assign(draft, this.newRowGiven());
     this.draftRow.set(draft);
     this.startRowEdit(draft, null);
     this.focusEditor(false);

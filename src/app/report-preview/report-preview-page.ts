@@ -16,6 +16,8 @@ export interface ReportInfoParameter {
   code: string;
   name: string;
   type: ColumnType;
+  /** false: the report cannot be run until the value is given. */
+  nullable?: boolean;
   /** Value the query of the default gave back; empty when the parameter has no default. */
   defaultValue?: any;
   /** Rows of the query of the list of values: the value that gets used and the text that is shown. */
@@ -153,6 +155,26 @@ export class ReportPreviewPage {
     return (parameter.listOfValues ?? []).length > 0;
   }
 
+  /** A parameter that may not be left out; the server asks for it, so the report is not run without it. */
+  isRequired(parameter: ReportInfoParameter): boolean {
+    return parameter.nullable !== true;
+  }
+
+  readonly hasRequired = computed(() => this.parameters().some((parameter) => this.isRequired(parameter)));
+
+  /** Every parameter that may not be left out has to be filled in before the report is run. */
+  canRun(): boolean {
+    if (this.running() || this.loading() || this.isJasper()) {
+      return false;
+    }
+    return this.parameters().every((parameter) => !this.isRequired(parameter) || this.isFilled(parameter));
+  }
+
+  private isFilled(parameter: ReportInfoParameter): boolean {
+    const value = this.values[parameter.code];
+    return value !== null && value !== undefined && String(value).trim() !== "";
+  }
+
   /** Yes/no as a list, so a parameter can also be left without an answer. */
   readonly booleanOptions = computed<SelectOption[]>(() => [
     { value: "true", label: this.translate.get("ui.yes") },
@@ -160,7 +182,7 @@ export class ReportPreviewPage {
   ]);
 
   run(): void {
-    if (this.running() || this.loading() || this.isJasper()) {
+    if (!this.canRun()) {
       return;
     }
     this.running.set(true);
@@ -186,7 +208,8 @@ export class ReportPreviewPage {
 
   /** Excel is made on the server, out of the same parameters, so the rows are read there again. */
   exportExcel(): void {
-    if (this.exporting()) {
+    // the rows are read on the server again, so the parameters have to hold up there as well
+    if (this.exporting() || !this.canRun()) {
       return;
     }
     this.exporting.set(true);

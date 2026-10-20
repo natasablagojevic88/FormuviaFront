@@ -26,7 +26,7 @@
         <i class="fa-solid fa-table-cells-large"></i>
         <span class="mode-label">{{ 'ui.editMode' | t }}</span>
       </button>
-      @if (editMode()) {
+      @if (editMode() && canAddRow()) {
         <button type="button" class="advanced-button new-row-button" (click)="startNew()" [disabled]="rowEditMode()"
           [title]="'ui.newRow' | t" [attr.aria-label]="'ui.newRow' | t">
           <i class="fa-solid fa-plus"></i>
@@ -160,7 +160,7 @@
       <ng-container [matColumnDef]="filterPrefix + actionsColumn">
         <th mat-header-cell *matHeaderCellDef class="filter-cell actions-cell">
           <div class="row-actions">
-            @if (editMode() && hasAdd()) {
+            @if (editMode() && canAddRow()) {
               <button type="button" class="new-row-cell-button" (click)="startNew()" [disabled]="rowEditMode()"
                 [title]="'ui.newRow' | t" [attr.aria-label]="'ui.newRow' | t">
                 <i class="fa-solid fa-plus"></i>
@@ -207,6 +207,10 @@
                   [(ngModel)]="rowValues[column.fieldName]" (ngModelChange)="rowChanged()"
                   [disabled]="rowLocked(column)" [ngModelOptions]="{ standalone: true }"
                   (keydown.enter)="saveRow()" (keydown.escape)="cancelRowEdit()" [ariaLabel]="column.description" />
+              } @else if (isIcon(column)) {
+                <app-icon-select class="cell-icon" [(ngModel)]="rowValues[column.fieldName]"
+                  (ngModelChange)="rowChanged()" [disabled]="rowLocked(column)"
+                  [ngModelOptions]="{ standalone: true }" [ariaLabel]="column.description" />
               } @else {
                 <input class="cell-editor" [type]="editorType(column)" [attr.inputmode]="inputMode(column)"
                   [(ngModel)]="rowValues[column.fieldName]" (ngModelChange)="rowChanged()"
@@ -233,6 +237,11 @@
                 <app-date-field class="cell-date" [compact]="true" [withTime]="column.columnType === 'LOCALDATETIME'"
                   [(ngModel)]="editValue" [ngModelOptions]="{ standalone: true }" (picked)="commitEdit()"
                   (keydown.enter)="commitEdit()" (keydown.escape)="cancelEdit()" [ariaLabel]="column.description" />
+              } @else if (isIcon(column)) {
+                <!-- the icon is chosen from the picker, so the cell is saved the moment it comes back -->
+                <app-icon-select class="cell-icon" [ngModel]="editValue"
+                  (ngModelChange)="editValue = $event; commitEdit()" [ngModelOptions]="{ standalone: true }"
+                  [ariaLabel]="column.description" />
               } @else {
                 <input class="cell-editor" [type]="editorType(column)" [attr.inputmode]="inputMode(column)" [(ngModel)]="editValue"
                   (keydown.enter)="commitEdit()" (keydown.escape)="cancelEdit()" (blur)="commitEdit()"
@@ -272,6 +281,10 @@
                   }
                 </span>
               }
+            } @else if (isIcon(column)) {
+              @if (row[column.fieldName]) {
+                <i class="icon-glyph" [class]="row[column.fieldName]"></i>
+              }
             } @else if (isEnum(column) && column.columnType !== 'UUID' && row[column.fieldName]) {
               <span class="badge badge-enum">{{ format(row, column) }}</span>
             } @else if (canShowRecord(row, column)) {
@@ -303,6 +316,8 @@
                 [ngModel]="filterValue(column.fieldName)"
                 (ngModelChange)="onFilter(column.fieldName, $event)" [ngModelOptions]="{ standalone: true }"
                 [ariaLabel]="column.description" />
+            } @else if (isIcon(column)) {
+              <!-- searching by the classes of an icon says nothing, so the column has no filter -->
             } @else if (column.columnType !== 'UUID') {
               <input class="filter-input" [type]="inputType(column)"
                 [attr.inputmode]="inputMode(column)" [value]="filterValue(column.fieldName)"

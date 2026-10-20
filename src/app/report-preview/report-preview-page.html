@@ -17,22 +17,23 @@
         @for (parameter of parameters(); track parameter.code) {
           <div class="fd-field">
             @if (hasOptions(parameter)) {
-              <span class="fd-label">{{ parameter.name }}</span>
+              <span class="fd-label" [class.fd-required]="isRequired(parameter)">{{ parameter.name }}</span>
               <app-search-select [options]="optionsOf(parameter)" [(ngModel)]="values[parameter.code]"
                 [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-list"
                 [placeholder]="'ui.reportRun.choose' | t" [ariaLabel]="parameter.name" />
             } @else if (parameter.type === 'BOOLEAN') {
-              <span class="fd-label">{{ parameter.name }}</span>
+              <span class="fd-label" [class.fd-required]="isRequired(parameter)">{{ parameter.name }}</span>
               <app-search-select [options]="booleanOptions()" [(ngModel)]="values[parameter.code]"
                 [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-circle-half-stroke"
                 [placeholder]="'ui.reportRun.choose' | t" [ariaLabel]="parameter.name" />
             } @else if (parameter.type === 'LOCALDATE' || parameter.type === 'LOCALDATETIME') {
-              <span class="fd-label">{{ parameter.name }}</span>
+              <span class="fd-label" [class.fd-required]="isRequired(parameter)">{{ parameter.name }}</span>
               <app-date-field [withTime]="parameter.type === 'LOCALDATETIME'"
                 [(ngModel)]="values[parameter.code]" [ngModelOptions]="{ standalone: true }"
                 [ariaLabel]="parameter.name" />
             } @else {
-              <label class="fd-label" [for]="'rp-' + parameter.code">{{ parameter.name }}</label>
+              <label class="fd-label" [class.fd-required]="isRequired(parameter)"
+                [for]="'rp-' + parameter.code">{{ parameter.name }}</label>
               <input [id]="'rp-' + parameter.code" class="fd-input"
                 [type]="parameter.type === 'LOCALTIME' ? 'time' : isNumber(parameter.type) && !isDecimal(parameter.type) ? 'number' : 'text'"
                 [attr.inputmode]="isDecimal(parameter.type) ? 'decimal' : null"
@@ -45,7 +46,10 @@
     </div>
 
     <footer class="card-foot">
-      <button type="button" class="run-button" (click)="run()" [disabled]="running() || loading() || isJasper()">
+      @if (hasRequired()) {
+        <span class="fd-hint">{{ 'ui.requiredFieldsMarked' | t }}</span>
+      }
+      <button type="button" class="run-button" (click)="run()" [disabled]="!canRun()">
         <i class="fa-solid" [class.fa-play]="!running()" [class.fa-spinner]="running()" [class.fa-spin]="running()"></i>
         {{ (isExecute() ? 'ui.reportRun.execute' : 'ui.reportRun.show') | t }}
       </button>
@@ -66,7 +70,7 @@
       </div>
     } @else if (shown()) {
       <app-query-table [columns]="columns()" [rows]="rows()" [loading]="running()" [exporting]="exporting()"
-        (exportExcel)="exportExcel()" />
+        [canExport]="canRun()" (exportExcel)="exportExcel()" />
     } @else {
       <div class="card message">
         <i class="fa-solid fa-table-list"></i>

@@ -21,11 +21,17 @@
         </div>
 
         <div class="fd-field">
-          <span class="fd-label fd-required">{{ label('type') }}</span>
-          <app-search-select [options]="typeOptions()" [ngModel]="report.type" (ngModelChange)="typeChanged($event)"
-            [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-shapes" [placeholder]="label('type')"
-            [ariaLabel]="label('type')" />
-          <span class="fd-help">{{ 'ui.reports.typeHint' | t }}</span>
+          <span class="fd-label" [class.fd-required]="isNew">{{ label('type') }}</span>
+          @if (isNew) {
+            <app-search-select [options]="typeOptions()" [ngModel]="report.type" (ngModelChange)="typeChanged($event)"
+              [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-shapes" [placeholder]="label('type')"
+              [ariaLabel]="label('type')" />
+            <span class="fd-help">{{ 'ui.reports.typeHint' | t }}</span>
+          } @else {
+            <!-- the kind is chosen once: the report keeps either a query or a file, and they are not swapped -->
+            <input class="fd-input" [value]="typeName()" [attr.aria-label]="label('type')" readonly />
+            <span class="fd-help">{{ 'ui.reports.typeLocked' | t }}</span>
+          }
         </div>
 
         <div class="fd-field fd-field-wide">
@@ -41,9 +47,28 @@
               autocomplete="off" spellcheck="false"></textarea>
             <span class="fd-help">{{ queryHint() }}</span>
           </div>
-        } @else if (type() === 'JASPER') {
+        } @else if (isJasper()) {
           <div class="fd-field fd-field-wide">
-            <span class="fd-help">{{ 'ui.reports.jasperHint' | t }}</span>
+            <span class="fd-label" [class.fd-required]="!hasStoredFile">{{ 'ui.reports.jasperFile' | t }}</span>
+            <div class="jasper-file">
+              <label class="fd-button fd-button-secondary jasper-choose">
+                <i class="fa-solid" [class.fa-upload]="!sendingFile()"
+                  [class.fa-spinner]="sendingFile()" [class.fa-spin]="sendingFile()"></i>
+                {{ 'ui.reports.jasperChoose' | t }}
+                <input type="file" accept=".jasper" class="jasper-input"
+                  [disabled]="sendingFile()" (change)="chooseFile($any($event.target))" />
+              </label>
+              @if (fileNameShown()) {
+                <span class="jasper-name" [title]="fileNameShown()">{{ fileNameShown() }}</span>
+              } @else if (hasStoredFile) {
+                <span class="jasper-name">{{ 'ui.reports.jasperFileStored' | t }}</span>
+              }
+            </div>
+            @if (fileWrong()) {
+              <span class="fd-field-error">{{ 'ui.reports.jasperFileWrong' | t }}</span>
+            } @else {
+              <span class="fd-help">{{ (hasStoredFile ? 'ui.reports.jasperFileKept' : 'ui.reports.jasperFileHelp') | t }}</span>
+            }
           </div>
         }
       </div>

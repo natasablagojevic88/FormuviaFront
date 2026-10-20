@@ -20,6 +20,8 @@ interface ReportGroup {
   name: string;
   roleId?: string;
   roleCode?: string;
+  /** Font Awesome classes, e.g. "fa-solid fa-file-invoice"; the menu shows it beside the group. */
+  icon?: string;
 }
 
 @Component({

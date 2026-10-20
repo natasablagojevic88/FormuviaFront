@@ -441,6 +441,16 @@ tr.mat-mdc-row.row-highlight .with-info .info,
   }
 }
 
+/* A column of Font Awesome classes: the glyph in the cell, the picker while it is edited. */
+.icon-glyph {
+  color: var(--c-text-muted);
+  font-size: 16px;
+}
+
+.cell-icon {
+  min-width: 160px;
+}
+
 /* A chained codebook takes several selects, so the row being edited grows downwards. */
 .cell-chain {
   display: block;

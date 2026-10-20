@@ -5,31 +5,32 @@
 Izveštaj uvek pripada **grupi**. Grupa stoji zbog dve stvari: drži izveštaje urednim i kaže kome su dostupni — grupa nosi jednu ulogu, a izveštaje iz nje dobija samo korisnik koji tu ulogu ima.
 
 ::: info Šta danas ima dejstvo
-Grupe, izveštaji i parametri se čuvaju, prikazuju, menjaju i brišu, a izveštaj prve dve vrste može i da se pokrene iz menija. Na serveru se dovršavaju dve stvari: fajl Jasper izveštaja, pa se takav izveštaj još ne predaje kao PDF, i vrednosti parametara, koje se čitaju onako kako stignu — parametar tipa datum, vreme ili veza na šifarnik se zato za sada odbija uz poruku o tipovima, dok tekst, brojevi i da/ne prolaze.
+Grupe, izveštaji i parametri se čuvaju, prikazuju, menjaju i brišu, `.jasper` fajl Jasper izveštaja se šalje i čuva uz izveštaj, a izveštaj prve dve vrste može i da se pokrene iz menija, sa vrednostima svih tipova. Na serveru se dovršava pokretanje Jasper izveštaja, pa se takav izveštaj još ne predaje kao PDF.
 :::
 
 ## Grupe
 
-Spisak prikazuje naziv grupe i ulogu koja uz nju ide. To je isti spisak kao svuda u Formuvia-i: pretraga, sortiranje, strane, izvoz u Excel i ⋯ na redu sa *Izveštajima*, *Istorijom* i *Obriši*. Naziv grupe može i da se menja pravo u spisku — *Režim izmene* u toolbar-u ili dvoklik na ćeliju.
+Spisak prikazuje naziv grupe, ulogu koja uz nju ide i njenu ikonu. To je isti spisak kao svuda u Formuvia-i: pretraga, sortiranje, strane, izvoz u Excel i ⋯ na redu sa *Izveštajima*, *Istorijom* i *Obriši*. Naziv grupe može i da se menja pravo u spisku — *Režim izmene* u toolbar-u ili dvoklik na ćeliju; ćelija sa ikonom otvara isti izbor kao forma.
 
 ### Dodavanje grupe
 
-*Dodaj* traži dve stvari:
+*Dodaj* traži:
 
 - **Naziv** — ono što ljudi čitaju nad izveštajima grupe. Dve grupe ne mogu nositi isti naziv; Formuvia to kaže kad je naziv zauzet.
 - **Uloga** — uloga koja sme da čita izveštaje grupe. Uloge se vode u [Korisnicima i ulogama](/sr/administration).
+- **Ikona** — nije obavezna, bira se iz spiska sa pretragom: sličica koja stoji uz grupu u meniju, tamo gde se njeni izveštaji i nude.
 
-Oba su obavezna. Izborom uloge je pravilo pristupa završeno: ko ima tu ulogu dobija izveštaje grupe, ko je nema ne vidi ih nikada.
+Naziv i uloga su obavezni. Izborom uloge je pravilo pristupa završeno: ko ima tu ulogu dobija izveštaje grupe, ko je nema ne vidi ih nikada.
 
 ### Izmena i brisanje grupe
 
-⋯ → *Izmeni* otvara istu formu; i naziv i uloga mogu da se menjaju kad god, a promena uloge od tog trenutka menja i to kome su izveštaji dostupni. ⋯ → *Obriši* skida grupu zajedno sa izveštajima u njoj.
+⋯ → *Izmeni* otvara istu formu; naziv, uloga i ikona mogu da se menjaju kad god, a promena uloge od tog trenutka menja i to kome su izveštaji dostupni. ⋯ → *Obriši* skida grupu zajedno sa izveštajima u njoj.
 
 ## Izveštaji grupe
 
 ⋯ → **Izveštaji** na grupi otvara izveštaje te grupe. *Nazad* u zaglavlju vodi ponovo na spisak grupa.
 
-Spisak prikazuje vrstu, naziv i opis svakog izveštaja grupe. *Dodaj* i *Izmeni* otvaraju njegovu formu, a ⋯ na redu nosi *Parametre*, *Istoriju* i *Obriši*. Vrsta, naziv, opis i sam upit mogu i da se menjaju pravo u spisku, isto kao u grupama; za duži upit je forma udobnija.
+Spisak prikazuje vrstu, naziv i opis svakog izveštaja grupe. *Dodaj* i *Izmeni* otvaraju njegovu formu, a ⋯ na redu nosi *Parametre*, *Istoriju* i *Obriši*. Naziv, opis i sam upit mogu i da se menjaju pravo u spisku, isto kao u grupama; za duži upit je forma udobnija.
 
 ### Šta izveštaj može da bude
 
@@ -44,11 +45,12 @@ Spisak prikazuje vrstu, naziv i opis svakog izveštaja grupe. *Dodaj* i *Izmeni*
 ### Dodavanje izveštaja
 
 - **Naziv** — ono što ljudi čitaju u spisku grupe. Dva izveštaja iste grupe ne mogu nositi isti naziv.
-- **Vrsta** — jedna od tri gore.
+- **Vrsta** — jedna od tri gore, i bira se ovde, pri dodavanju izveštaja. Sačuvan izveštaj svoju vrstu samo prikazuje: nosi ili upit ili fajl, a jedno se posle ne menja za drugo.
 - **Opis** — nije obavezan, red o tome čemu izveštaj služi.
 - **Upit** — traže ga samo prve dve vrste. Čita se u trenutku snimanja: mora biti jedna naredba, one vrste koju vrsta dozvoljava, i posle tačke i zapeta ne sme da stoji ništa. Upit koji se ne može pročitati, upit pogrešne vrste i druga naredba podmetnuta posle prve — svaki se odbija, sa objašnjenjem.
+- **Fajl izveštaja** — traži ga samo Jasper izveštaj, i za nov izveštaj je obavezan: izveštaj preveden u Jaspersoft Studiju, sa ekstenzijom `.jasper`. Fajl druge ekstenzije se odmah prijavi kao pogrešan; onaj koji se primi odlazi na server u trenutku izbora, a čita se pri snimanju izveštaja, pa se fajl koji nije preveden izveštaj tada odbija.
 
-Jasper izveštaj nema upit; njegov `.jasper` fajl se ovde još ne šalje.
+Jasper izveštaj nema upit, a prve dve vrste ne čuvaju fajl. Izmena Jasper izveštaja bez izbora fajla zadržava postojeći — forma to i kaže — a nov fajl dolazi na mesto starog.
 
 ## Parametri izveštaja
 
@@ -62,7 +64,7 @@ select * from racun where datum >= :datum_od and komitent = :komitent
 
 Spisak prikazuje redosled, tip podatka, šifru, naziv i da li je vrednost obavezna. *Dodaj* i *Izmeni* otvaraju formu, ⋯ na redu nosi *Istoriju* i *Obriši*, a sve se može menjati i pravo u spisku.
 
-- **Šifra** — ono pod čim parametar stoji u upitu, bez dvotačke. Dozvoljena su mala slova, cifre i donja crta, a šifra počinje slovom — isto pravilo kao za šifru kolone u Modelu. Šifra mora stvarno da stoji u upitu: parametar koji se u upitu ne pojavljuje se ne prima, jer izveštaj onda ne bi mogao da se pokrene. Dva parametra istog izveštaja ne mogu nositi istu šifru.
+- **Šifra** — ono pod čim parametar stoji u upitu, bez dvotačke. Za upitni izveštaj su dozvoljena mala slova, cifre i donja crta, a šifra počinje slovom — isto pravilo kao za šifru kolone u Modelu; i šifra mora stvarno da stoji u upitu, jer parametar koji se u upitu ne pojavljuje nikad ne bi bio popunjen. Za Jasper izveštaj je šifra naziv parametra iz `.jasper` fajla, napisan tačno kako tamo stoji, pa i velikim slovima; parametar koji preveden izveštaj ne nosi se odbija. Dva parametra istog izveštaja ne mogu nositi istu šifru.
 - **Naziv** — ono što čita onaj ko pokreće izveštaj, nad poljem za unos.
 - **Tip podatka** — koja se vrednost traži: tekst, broj, datum, da/ne, veza na šifarnik. Fajl ne može da se traži.
 - **Redosled** — kojim redom se parametri traže. Nudi se prvi slobodan broj, a dva parametra istog izveštaja ne mogu imati isti.
@@ -72,13 +74,22 @@ Spisak prikazuje redosled, tip podatka, šifru, naziv i da li je vrednost obavez
 
 Oba upita se čitaju pri snimanju, po istom pravilu kao kod kolone u Modelu: moraju biti `SELECT`, bez `*`, sa tačno jednom odnosno tačno dve kolone.
 
-Jasper izveštaj svoje parametre nosi u samom `.jasper` fajlu, pa se za njega i ne proverava da li šifra stoji u upitu — upita nema.
+Parametar koji korisnik sme da ostavi prazan mora u upitu da stoji sa izrečenim tipom, jer prazna vrednost sama po sebi bazi ne kaže šta je:
+
+```sql
+select * from racun
+where (cast(:datum_od as date) is null or datum >= :datum_od)
+```
+
+Tako napisan izveštaj radi i sa datumom i bez njega. Bez `cast`-a baza odbija upit u trenutku kad polje ostane prazno.
+
+Jasper izveštaj nema upit, pa se njegov parametar traži u samom `.jasper` fajlu: parametar koji preveden izveštaj ne nosi se odbija, a parametri koje JasperReports postavlja sam se ne računaju. Podrazumevana vrednost i lista vrednosti za njega rade isto kao za upitni izveštaj.
 
 ## Pokretanje izveštaja
 
-Svaki izveštaj stoji u meniju, pod nazivom svoje grupe: ko ima ulogu grupe vidi njene izveštaje, ko je nema ne vidi ih. Strana izveštaja ima dve strane: levo ono što izveštaj traži, desno ono što je vratio.
+Svaki izveštaj stoji u meniju, pod nazivom i ikonom svoje grupe: ko ima ulogu grupe vidi njene izveštaje, ko je nema ne vidi ih. Strana izveštaja ima dve strane: levo ono što izveštaj traži, desno ono što je vratio.
 
-Levo stoje parametri, onim redom kojim su uneti. Parametar sa podrazumevanom vrednošću je već popunjen njom, parametar sa listom vrednosti se bira iz te liste, datum se bira iz kalendara, a da/ne se bira kao da ili ne. Parametar koji ostane prazan se šalje kao ništa.
+Levo stoje parametri, onim redom kojim su uneti. Parametar sa podrazumevanom vrednošću je već popunjen njom, parametar sa listom vrednosti se bira iz te liste, datum se bira iz kalendara, a da/ne se bira kao da ili ne. Parametar koji ne sme da ostane prazan nosi crvenu zvezdicu i dok svi takvi nisu popunjeni dugme je ugašeno; parametar označen kao *Nije obavezno* može da ostane prazan i tada se šalje kao ništa.
 
 *Prikaži* onda pokreće izveštaj, a šta dugme piše zavisi od vrste izveštaja:
 
