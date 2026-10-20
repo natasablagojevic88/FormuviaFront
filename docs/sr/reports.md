@@ -4,10 +4,6 @@
 
 Izveštaj uvek pripada **grupi**. Grupa stoji zbog dve stvari: drži izveštaje urednim i kaže kome su dostupni — grupa nosi jednu ulogu, a izveštaje iz nje dobija samo korisnik koji tu ulogu ima.
 
-::: info Šta danas ima dejstvo
-Grupe, izveštaji i parametri se čuvaju, prikazuju, menjaju i brišu, `.jasper` fajl Jasper izveštaja se šalje i čuva uz izveštaj, a izveštaj prve dve vrste može i da se pokrene iz menija, sa vrednostima svih tipova. Na serveru se dovršava pokretanje Jasper izveštaja, pa se takav izveštaj još ne predaje kao PDF.
-:::
-
 ## Grupe
 
 Spisak prikazuje naziv grupe, ulogu koja uz nju ide i njenu ikonu. To je isti spisak kao svuda u Formuvia-i: pretraga, sortiranje, strane, izvoz u Excel i ⋯ na redu sa *Izveštajima*, *Istorijom* i *Obriši*. Naziv grupe može i da se menja pravo u spisku — *Režim izmene* u toolbar-u ili dvoklik na ćeliju; ćelija sa ikonom otvara isti izbor kao forma.
@@ -46,6 +42,7 @@ Spisak prikazuje vrstu, naziv i opis svakog izveštaja grupe. *Dodaj* i *Izmeni*
 
 - **Naziv** — ono što ljudi čitaju u spisku grupe. Dva izveštaja iste grupe ne mogu nositi isti naziv.
 - **Vrsta** — jedna od tri gore, i bira se ovde, pri dodavanju izveštaja. Sačuvan izveštaj svoju vrstu samo prikazuje: nosi ili upit ili fajl, a jedno se posle ne menja za drugo.
+- **Ikona** — sličica koja stoji uz izveštaj u meniju, bira se iz istog spiska sa pretragom kao i ikona grupe. Može da ostane prazna.
 - **Opis** — nije obavezan, red o tome čemu izveštaj služi.
 - **Upit** — traže ga samo prve dve vrste. Čita se u trenutku snimanja: mora biti jedna naredba, one vrste koju vrsta dozvoljava, i posle tačke i zapeta ne sme da stoji ništa. Upit koji se ne može pročitati, upit pogrešne vrste i druga naredba podmetnuta posle prve — svaki se odbija, sa objašnjenjem.
 - **Fajl izveštaja** — traži ga samo Jasper izveštaj, i za nov izveštaj je obavezan: izveštaj preveden u Jaspersoft Studiju, sa ekstenzijom `.jasper`. Fajl druge ekstenzije se odmah prijavi kao pogrešan; onaj koji se primi odlazi na server u trenutku izbora, a čita se pri snimanju izveštaja, pa se fajl koji nije preveden izveštaj tada odbija.
@@ -66,7 +63,7 @@ Spisak prikazuje redosled, tip podatka, šifru, naziv i da li je vrednost obavez
 
 - **Šifra** — ono pod čim parametar stoji u upitu, bez dvotačke. Za upitni izveštaj su dozvoljena mala slova, cifre i donja crta, a šifra počinje slovom — isto pravilo kao za šifru kolone u Modelu; i šifra mora stvarno da stoji u upitu, jer parametar koji se u upitu ne pojavljuje nikad ne bi bio popunjen. Za Jasper izveštaj je šifra naziv parametra iz `.jasper` fajla, napisan tačno kako tamo stoji, pa i velikim slovima; parametar koji preveden izveštaj ne nosi se odbija. Dva parametra istog izveštaja ne mogu nositi istu šifru.
 - **Naziv** — ono što čita onaj ko pokreće izveštaj, nad poljem za unos.
-- **Tip podatka** — koja se vrednost traži: tekst, broj, datum, da/ne, veza na šifarnik. Fajl ne može da se traži.
+- **Tip podatka** — koja se vrednost traži: tekst, broj, datum, da/ne. Fajl ne može da se traži, a ne može ni veza na zapis: takva vrednost se ne predaje kao identifikator. Parametar koji bira zapis iz šifarnika se zato traži kao tekst — njegova lista vrednosti i daje identifikator kakav je — a u upitu se kaže šta je: `komitent = cast(:komitent as uuid)`.
 - **Redosled** — kojim redom se parametri traže. Nudi se prvi slobodan broj, a dva parametra istog izveštaja ne mogu imati isti.
 - **Nije obavezno** — izveštaj može da se pokrene i bez te vrednosti.
 - **Podrazumevana vrednost (SQL)** — `SELECT` upit sa tačno jednom kolonom; njegova vrednost se nudi u polju kad se izveštaj zatraži, na primer `select now()`. Može ostati prazno.
@@ -83,11 +80,11 @@ where (cast(:datum_od as date) is null or datum >= :datum_od)
 
 Tako napisan izveštaj radi i sa datumom i bez njega. Bez `cast`-a baza odbija upit u trenutku kad polje ostane prazno.
 
-Jasper izveštaj nema upit, pa se njegov parametar traži u samom `.jasper` fajlu: parametar koji preveden izveštaj ne nosi se odbija, a parametri koje JasperReports postavlja sam se ne računaju. Podrazumevana vrednost i lista vrednosti za njega rade isto kao za upitni izveštaj.
+Jasper izveštaj nema upit, pa se njegov parametar traži u samom `.jasper` fajlu: parametar koji preveden izveštaj ne nosi se odbija, a parametri koje JasperReports postavlja sam se ne računaju. Podrazumevana vrednost i lista vrednosti za njega rade isto kao za upitni izveštaj. U fajlu se parametar koji nosi identifikator postavlja kao `Object` i u upitu izveštaja se kaže šta je, isto kao i svuda drugde: `cast($P{komitent} as uuid)`.
 
 ## Pokretanje izveštaja
 
-Svaki izveštaj stoji u meniju, pod nazivom i ikonom svoje grupe: ko ima ulogu grupe vidi njene izveštaje, ko je nema ne vidi ih. Strana izveštaja ima dve strane: levo ono što izveštaj traži, desno ono što je vratio.
+Svaki izveštaj stoji u meniju, pod nazivom i ikonom svoje grupe, sa svojom ikonom pored sebe ako je izabrana: ko ima ulogu grupe vidi njene izveštaje, ko je nema ne vidi ih. Strana izveštaja ima dve strane: levo ono što izveštaj traži, desno ono što je vratio.
 
 Levo stoje parametri, onim redom kojim su uneti. Parametar sa podrazumevanom vrednošću je već popunjen njom, parametar sa listom vrednosti se bira iz te liste, datum se bira iz kalendara, a da/ne se bira kao da ili ne. Parametar koji ne sme da ostane prazan nosi crvenu zvezdicu i dok svi takvi nisu popunjeni dugme je ugašeno; parametar označen kao *Nije obavezno* može da ostane prazan i tada se šalje kao ništa.
 
@@ -95,9 +92,9 @@ Levo stoje parametri, onim redom kojim su uneti. Parametar sa podrazumevanom vre
 
 - **SELECT upit** — redovi koje upit vrati se prikažu desno. Dolaze svi odjednom: nema strana, a redosled je onaj koji daje sam upit. Pod kolonom decimalnih brojeva stoji njen zbir, po svim redovima koji su došli. *Izvoz u Excel* daje iste redove kao `.xlsx` fajl; fajl se pravi na serveru, od istih vrednosti parametara.
 - **UPDATE upit ili procedura** — dugme piše *Pokreni*, i izveštaj odradi posao nad podacima. Nema šta da se prikaže, pa desna strana samo kaže da je izveštaj pokrenut.
-- **Jasper izveštaj** — još se ne pokreće odavde; desna strana to i kaže.
+- **Jasper izveštaj** — server popuni prevedeni `.jasper` fajl unetim vrednostima i od njega napravi PDF; dokument se prikaže desno, u istom čitaču kao svuda u Formuvia-i, sa svojim listanjem, uvećanjem, štampom i snimanjem. Ponovno *Prikaži* pravi izveštaj nad novim vrednostima, a dokument koji dođe dolazi na mesto onog desno.
 
-Na telefonu dve strane idu jedna pod drugu: prvo ono što izveštaj traži, pa ono što je vratio, a svaki red odgovora je kartica sa nazivom kolone uz svaku vrednost.
+Na telefonu dve strane idu jedna pod drugu: prvo ono što izveštaj traži, pa ono što je vratio, a svaki red odgovora je kartica sa nazivom kolone uz svaku vrednost. PDF stoji ispod parametara na isti način, visok koliko ekran dozvoljava.
 
 ## Izveštaj nad jednim zapisom je druga stvar
 

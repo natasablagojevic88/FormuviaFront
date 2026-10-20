@@ -94,6 +94,11 @@
     }
 
     /** Form for a new record in a subtable: an empty form with the link to the parent row. */
+    /** The record of a codebook, reached from a table that points at it; that table says who may read it. */
+    static modelPreviewFormFromTable(currentModelId: string, modelId: string, id: string): string {
+        return `/api/preview/table/form/${currentModelId}/${modelId}/${id}`;
+    }
+
     static modelPreviewFormWithParent(modelId: string, parent: string): string {
         return `/api/preview/form/${modelId}/parent/${parent}`;
     }
@@ -231,6 +236,11 @@
     /** Runs a report that works over the data (CALL, UPDATE, INSERT, DELETE); it gives nothing back. */
     static reportPreviewExecute(reportId: string): string {
         return `/api/report/preview/${reportId}/execute`;
+    }
+
+    /** Runs a report of the Jasper kind and gives the document back as a PDF. */
+    static reportPreviewJasper(reportId: string): string {
+        return `/api/report/preview/${reportId}/jasper`;
     }
 
     static modelId(id: string): string {

@@ -59,10 +59,17 @@
   <!-- right: what came back -->
   <section class="result">
     @if (isJasper()) {
-      <div class="card message">
-        <i class="fa-solid fa-file-pdf"></i>
-        <p>{{ 'ui.reportRun.jasperNotYet' | t }}</p>
-      </div>
+      <!-- a frame of its own for every run: the same one would keep the document shown until now -->
+      @for (view of pdfViews(); track view.run) {
+        <div class="card pdf">
+          <iframe class="pdf-frame" [src]="view.source" [title]="'ui.reportRun.pdf' | t"></iframe>
+        </div>
+      } @empty {
+        <div class="card message">
+          <i class="fa-solid fa-file-pdf"></i>
+          <p>{{ 'ui.reportRun.jasperHint' | t }}</p>
+        </div>
+      }
     } @else if (isExecute()) {
       <div class="card message">
         <i class="fa-solid" [class.fa-circle-check]="shown()" [class.fa-gears]="!shown()"></i>

@@ -60,7 +60,7 @@ Vrednost izabrana iz liste poništava se **×** na desnom kraju polja — isto r
 
 Polje tipa *Fajl* je dugme koje otvara izbor fajla. Fajl ide na server odmah kad ga izaberete, njegov naziv tada stoji pored dugmeta, a **×** ga vadi iz polja — za fajl koji zapis već ima pita se prvo, a tek izabran se uklanja odmah. Fajl koji je snimljen sa zapisom ima pored naziva dugme **preuzmi**, i na formi i na redu u listi, pa se fajl uzima bez otvaranja zapisa. PDF ima i **oko**, koje ga otvara u čitaču unutar aplikacije.
 
-Polje koje pokazuje na šifarnik ima pored sebe malo **ⓘ**, i na formi i na redu u listi. Njime se otvara zapis iza izabrane vrednosti — ista forma, sa svim poljima zaključanim i bez snimanja — pa možete da proverite šta stoji iza šifre bez napuštanja onoga što radite.
+Polje koje pokazuje na šifarnik ima pored sebe malo **ⓘ**, i na formi i na redu u listi. Njime se otvara zapis iza izabrane vrednosti — ista forma, sa svim poljima zaključanim i bez snimanja — pa možete da proverite šta stoji iza šifre bez napuštanja onoga što radite. Dovoljno je pravo na tabelu u kojoj ste: zapis se čita kroz nju, pa sam šifarnik ne traži posebno pravo.
 
 ### Pravo u tabeli
 

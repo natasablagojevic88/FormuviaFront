@@ -50,10 +50,10 @@ export class ReportParameterDialog implements OnInit {
   readonly loading = signal(false);
   readonly saving = signal(false);
 
-  /** A parameter is never a file; the server refuses that kind. */
+  /** A parameter is never a file and never a link to a record; the server refuses both kinds. */
   readonly typeOptions = computed<SelectOption[]>(() =>
     (this.column("columnType")?.listOfValues ?? [])
-      .filter((value) => value.value !== "FILE")
+      .filter((value) => value.value !== "FILE" && value.value !== "UUID")
       .map((value) => ({ value: value.value, label: value.option })));
 
   constructor(

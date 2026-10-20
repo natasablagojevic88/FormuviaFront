@@ -34,6 +34,12 @@
           }
         </div>
 
+        <div class="fd-field">
+          <span class="fd-label">{{ label('icon') }}</span>
+          <app-icon-select name="icon" [(ngModel)]="report.icon" [ariaLabel]="label('icon')" />
+          <span class="fd-help">{{ 'ui.reports.iconHint' | t }}</span>
+        </div>
+
         <div class="fd-field fd-field-wide">
           <label class="fd-label" for="description">{{ label('description') }}</label>
           <input id="description" name="description" class="fd-input" [(ngModel)]="report.description"

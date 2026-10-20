@@ -205,6 +205,8 @@ export class ModelPreviewPage {
       maxWidth: "95vw",
       data: {
         modelId: event.column.modelId!,
+        // the record is read through this table, which is where the right to see it comes from
+        fromModelId: this.modelId(),
         title: event.column.description,
         id: event.id,
         readOnly: true,

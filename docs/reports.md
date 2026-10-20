@@ -4,10 +4,6 @@
 
 A report always belongs to a **group**. The group is there for two reasons: it keeps the reports tidy, and it says who may read what is in it — a group carries one role, and only a user with that role gets the reports of that group.
 
-::: info What works today
-Groups, reports and parameters are saved, listed, edited and deleted, the `.jasper` file of a Jasper report is sent and kept with the report, and a report of the first two kinds can be run from the menu, with values of every kind. What is still being finished on the server is the running of a Jasper report, so such a report cannot be handed over as a PDF yet.
-:::
-
 ## Groups
 
 The list shows the name of the group, the role that goes with it and its icon. It is the same list as everywhere in Formuvia: search, sorting, pages, Excel export, and ⋯ on the row with *Reports*, *History* and *Delete*. The name of a group can also be changed straight in the list — *Edit mode* in the toolbar, or a double click on the cell; the icon cell opens the same picker as the form.
@@ -46,6 +42,7 @@ The **type** decides what the report does, and the form follows it:
 
 - **Name** — what people read in the list of the group. Two reports of the same group cannot carry the same name.
 - **Type** — one of the three above, and it is chosen here, as the report is added. A saved report only shows its type: it keeps either a query or a file, and the one is not swapped for the other afterwards.
+- **Icon** — the picture that stands beside the report in the menu, picked from the same searchable list as the icon of a group. It can be left empty.
 - **Description** — optional, a line about what the report is for.
 - **Query** — asked for only by the first two types. It is read as it is saved: it has to be a single statement, of the kind the type allows, and nothing may stand after the semicolon. A query that cannot be read at all, one of the wrong kind, or a second statement smuggled in after the first — each is refused with an explanation.
 - **File of the report** — asked for only by a Jasper report, and required for a new one: the report compiled in Jaspersoft Studio, with the `.jasper` extension. A file of another extension is said to be wrong on the spot; the one that is taken goes to the server the moment it is chosen and is read as the report is saved, so a file that is not a compiled report is refused then.
@@ -66,7 +63,7 @@ The list shows the order, the data type, the code, the name and whether the valu
 
 - **Code** — what the parameter stands under in the query, without the colon. For a query report only small letters, digits and underscore are allowed, and it must begin with a letter — the same rule as for the code of a column in the Model; and the code has to really stand in the query, because a parameter that does not appear in it could never be filled in. For a Jasper report the code is the name of a parameter of the `.jasper` file instead, written exactly as it stands there, capital letters included; a parameter the compiled report does not declare is refused. Two parameters of one report cannot carry the same code.
 - **Name** — what the person running the report reads above the field.
-- **Data type** — what kind of value is asked for: text, number, date, yes/no, a link to a codebook. A file cannot be asked for.
+- **Data type** — what kind of value is asked for: text, number, date, yes/no. A file cannot be asked for, and neither can a link to a record: such a value is not handed over as an identifier. A parameter that picks a record out of a codebook is therefore asked for as text — its list of values gives the identifier as it is — and in the query it is said what it is: `customer = cast(:customer as uuid)`.
 - **Order** — the order in which the parameters are asked for. The first free number is offered, and two parameters of one report cannot share it.
 - **Optional** — the report can be run without that value.
 - **Default value (SQL)** — a `SELECT` query with exactly one column; its value is offered in the field when the report is asked for, for example `select now()`. It can be left empty.
@@ -83,11 +80,11 @@ where (cast(:date_from as date) is null or date >= :date_from)
 
 Written that way the report runs both with a date and without one. Without the `cast` the database refuses the query the moment the field is left empty.
 
-A Jasper report has no query, so its parameter is looked for in the `.jasper` file itself: a parameter the compiled report does not declare is refused, and the parameters JasperReports sets by itself do not count. The default value and the list of values work the same way for it as for a query report.
+A Jasper report has no query, so its parameter is looked for in the `.jasper` file itself: a parameter the compiled report does not declare is refused, and the parameters JasperReports sets by itself do not count. The default value and the list of values work the same way for it as for a query report. In the file, a parameter that carries an identifier is declared as `Object` and said out loud in the query of the report, the same way as everywhere else: `cast($P{customer} as uuid)`.
 
 ## Running a report
 
-Every report is in the menu, under the name and the icon of its group: whoever has the role of the group sees its reports there, and nobody else does. The page of a report has two sides: what the report asks for on the left, what came back on the right.
+Every report is in the menu, under the name and the icon of its group, with its own icon beside it when one was chosen: whoever has the role of the group sees its reports there, and nobody else does. The page of a report has two sides: what the report asks for on the left, what came back on the right.
 
 On the left stand the parameters, in the order they were given. A parameter with a default is already filled in with it, a parameter with a list of values is chosen from that list, a date is picked from the calendar, and yes/no is chosen as yes or no. A parameter that may not be left out carries a red star, and until every one of them is filled in the button stays off; one marked *Optional* can be left empty and is then sent as nothing.
 
@@ -95,9 +92,9 @@ On the left stand the parameters, in the order they were given. A parameter with
 
 - **SELECT query** — the rows the query returns appear on the right. They all come at once: there are no pages, and the order is the one the query itself gives. Under a column of decimal numbers stands its sum, over all the rows that came back. *Export to Excel* gives the same rows as an `.xlsx` file; the file is made on the server, out of the same values of the parameters.
 - **UPDATE query or procedure** — the button says *Run*, and the report does its work over the data. There is nothing to show, so the right side only says that the report has been run.
-- **Jasper report** — it is not run here yet; the right side says so.
+- **Jasper report** — the server fills the compiled `.jasper` file with the values entered and makes a PDF out of it; the document opens on the right in the same reader as everywhere in Formuvia, with paging, zoom, printing and saving of its own. *Show* again makes the report over the new values, and the document that comes back takes the place of the one on the right.
 
-On a phone the two sides go one under another: first what the report asks for, then what came back, and every row of the answer is a card with the name of the column beside each value.
+On a phone the two sides go one under another: first what the report asks for, then what came back, and every row of the answer is a card with the name of the column beside each value. A PDF stands under the parameters the same way, as tall as the screen allows.
 
 ## A report over one record is something else
 

@@ -1,4 +1,5 @@
-import { Component, computed, signal } from "@angular/core";
+import { Component, computed, OnDestroy, signal } from "@angular/core";
+import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Language } from "../services/language";
 import { Notify } from "../services/notify";
@@ -32,6 +33,15 @@ export interface ReportInfo {
   parameters: ReportInfoParameter[];
 }
 
+/**
+ * One run of a Jasper report shown in the viewer: the address of its PDF, and the number of the run.
+ * The number is what the template tracks, so every run gets a frame of its own.
+ */
+interface PdfView {
+  run: number;
+  source: SafeResourceUrl;
+}
+
 /** The answer of a report of the SELECT kind: the columns of the query itself and every row at once. */
 interface ReportResult {
   columns: QueryColumn[];
@@ -41,7 +51,8 @@ interface ReportResult {
 /**
  * Running one report, reached from the menu (the server puts every report of a group the user may
  * read into it). What the report asks for stands on the left, what came back on the right: the rows
- * of a SELECT query, or a word that a report which works over the data has been run.
+ * of a SELECT query, the PDF of a Jasper report, or a word that a report which works over the data
+ * has been run.
  */
 @Component({
   selector: "app-report-preview-page",
@@ -49,7 +60,7 @@ interface ReportResult {
   templateUrl: "./report-preview-page.html",
   styleUrl: "./report-preview-page.css",
 })
-export class ReportPreviewPage {
+export class ReportPreviewPage implements OnDestroy {
   readonly info = signal<ReportInfo | null>(null);
   readonly loading = signal(false);
   readonly running = signal(false);
@@ -60,6 +71,8 @@ export class ReportPreviewPage {
 
   readonly columns = signal<QueryColumn[]>([]);
   readonly rows = signal<Record<string, any>[]>([]);
+  /** The PDF of the last run of a Jasper report; empty until it has been run. */
+  readonly pdfViews = signal<PdfView[]>([]);
   /** true once the report has been run, so the right side shows the answer instead of the invitation. */
   readonly shown = signal(false);
 
@@ -78,6 +91,9 @@ export class ReportPreviewPage {
   );
 
   private reportId = "";
+  /** Address the viewer reads the PDF from; it is given back when another run takes its place. */
+  private objectUrl: string | null = null;
+  private runCount = 0;
 
   constructor(
     route: ActivatedRoute,
@@ -87,6 +103,7 @@ export class ReportPreviewPage {
     private translate: Translate,
     private language: Language,
     private session: Session,
+    private sanitizer: DomSanitizer,
   ) {
     // the menu moves from one report to another without building the page again
     route.paramMap.subscribe((params) => this.load(params.get("reportId") ?? ""));
@@ -98,6 +115,7 @@ export class ReportPreviewPage {
     this.values = {};
     this.columns.set([]);
     this.rows.set([]);
+    this.clearPdf();
     this.shown.set(false);
     if (!reportId) {
       return;
@@ -164,7 +182,7 @@ export class ReportPreviewPage {
 
   /** Every parameter that may not be left out has to be filled in before the report is run. */
   canRun(): boolean {
-    if (this.running() || this.loading() || this.isJasper()) {
+    if (this.running() || this.loading()) {
       return false;
     }
     return this.parameters().every((parameter) => !this.isRequired(parameter) || this.isFilled(parameter));
@@ -186,6 +204,13 @@ export class ReportPreviewPage {
       return;
     }
     this.running.set(true);
+    if (this.isJasper()) {
+      this.sendRequest
+        .blob(ApiRoute.reportPreviewJasper(this.reportId), this.body())
+        .then((content: Blob) => this.showPdf(content))
+        .finally(() => this.running.set(false));
+      return;
+    }
     if (this.isExecute()) {
       this.sendRequest
         .post(ApiRoute.reportPreviewExecute(this.reportId), this.body())
@@ -206,6 +231,37 @@ export class ReportPreviewPage {
       .finally(() => this.running.set(false));
   }
 
+  /**
+   * The PDF that came back takes the place of the one shown until now. Every run gets an address of
+   * its own and a frame of its own, because the same address would leave the old document on screen;
+   * the address of the run before is given back once its frame is gone.
+   */
+  private showPdf(content: Blob): void {
+    const previous = this.objectUrl;
+    this.objectUrl = URL.createObjectURL(content);
+    // pagemode=none: the viewer otherwise opens with the page thumbnails, or as it was left last time
+    const viewer =
+      `assets/pdf/web/viewer.html?file=${encodeURIComponent(this.objectUrl)}#zoom=page-width&pagemode=none`;
+    this.runCount++;
+    this.pdfViews.set([{ run: this.runCount, source: this.sanitizer.bypassSecurityTrustResourceUrl(viewer) }]);
+    this.shown.set(true);
+    if (previous) {
+      URL.revokeObjectURL(previous);
+    }
+  }
+
+  private clearPdf(): void {
+    this.pdfViews.set([]);
+    if (this.objectUrl) {
+      URL.revokeObjectURL(this.objectUrl);
+      this.objectUrl = null;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.clearPdf();
+  }
+
   /** Excel is made on the server, out of the same parameters, so the rows are read there again. */
   exportExcel(): void {
     // the rows are read on the server again, so the parameters have to hold up there as well
@@ -218,7 +274,7 @@ export class ReportPreviewPage {
       .finally(() => this.exporting.set(false));
   }
 
-  /** Values for the server, by code: a number as a number, yes/no as a yes/no, the rest as text. */
+  /** Values for the server, by code; a parameter left empty is sent as nothing. */
   private body(): Record<string, any> {
     const body: Record<string, any> = {};
     for (const parameter of this.parameters()) {
@@ -227,24 +283,19 @@ export class ReportPreviewPage {
     return body;
   }
 
+  // Every value goes as text, whatever kind the parameter asks for: the server reads it into that
+  // kind. A date comes out of the field as ISO already, the way the server wants it.
   private valueFor(parameter: ReportInfoParameter): any {
     const value = this.values[parameter.code];
     if (value === null || value === undefined || String(value).trim() === "") {
       return null;
     }
     const text = String(value).trim();
-    switch (parameter.type) {
-      case "BOOLEAN":
-        return text === "true";
-      case "INTEGER":
-      case "LONG":
-      case "BIGDECIMAL": {
-        const numberValue = Number(isDecimalType(parameter.type) ? parseDecimalText(text) : text);
-        return Number.isFinite(numberValue) ? numberValue : null;
-      }
-      // a date comes out of the field as ISO already, the way the server wants it
-      default:
-        return text;
+    if (!isDecimalType(parameter.type)) {
+      return text;
     }
+    // the separator of the language is taken out, so the number goes the way the server reads it
+    const number = parseDecimalText(text);
+    return number === "" ? null : number;
   }
 }

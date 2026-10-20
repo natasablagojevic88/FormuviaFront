@@ -23,6 +23,8 @@ interface Report {
   type?: ReportType;
   name: string;
   description?: string;
+  /** Font Awesome classes of the picture beside the report in the menu. */
+  icon?: string;
   sqlQuery?: string;
   /** Stored file of the report; the server sends its identifier, and the name when it has one. */
   jasterFileId?: string | null;

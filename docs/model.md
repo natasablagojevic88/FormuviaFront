@@ -108,7 +108,7 @@ A report is kept here with its name and its file, the file is checked when it is
 This part appears once the table is saved. **Add a report** asks for two things:
 
 - **Name of the report** — what the user reads over the record. It is unique within the table.
-- **File of the report** — a report compiled by Jaspersoft Studio, the one with the `.jasper` extension; the source `.jrxml` is not taken. The file is read the moment it is sent, and it is accepted only if it is really a compiled report and if it takes a parameter **`id` of type `UUID`** — that parameter is the record the report is made over. Anything else is refused, with the reason.
+- **File of the report** — a report compiled by Jaspersoft Studio, the one with the `.jasper` extension; the source `.jrxml` is not taken. The file is read the moment it is sent, and it is accepted only if it is really a compiled report and if it takes a parameter **`id` of type `Object`** — that parameter is the record the report is made over. Anything else is refused, with the reason. The identifier is handed over as it is, so the query of the report says what it is: `where id = cast($P{id} as uuid)`.
 
 Click a report in the list to change it. Changing only the name keeps the file as it is; choosing a new file replaces it. The basket takes the report off the table and the file of the report goes with it.
 

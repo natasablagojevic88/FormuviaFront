@@ -36,6 +36,11 @@ export interface PreviewFormDialogData {
   title: string;
   /** Edit: id of the record. Empty means a new record. */
   id?: string | null;
+  /**
+   * A record of a codebook shown from the table it stands in: the table it was reached from. The
+   * server judges the right to read it by that table, so the codebook itself needs no role.
+   */
+  fromModelId?: string;
   /** Subtable: id of the row in the parent table. */
   parent?: string | null;
   /** true: the record is only shown - every field is locked and there is nothing to save. */
@@ -154,7 +159,10 @@ export class PreviewFormDialog implements OnInit {
   }
 
   private formUrl(): string {
-    const { modelId, id, parent } = this.data;
+    const { modelId, id, parent, fromModelId } = this.data;
+    if (id && fromModelId) {
+      return ApiRoute.modelPreviewFormFromTable(fromModelId, modelId, id);
+    }
     if (id) {
       return ApiRoute.modelPreviewFormWithId(modelId, id);
     }
@@ -466,6 +474,8 @@ export class PreviewFormDialog implements OnInit {
       maxWidth: "95vw",
       data: {
         modelId: column.modelId!,
+        // the record is read through this table, which is where the right to see it comes from
+        fromModelId: this.data.modelId,
         title: column.name,
         id: String(this.values[column.code]),
         readOnly: true,

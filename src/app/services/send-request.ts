@@ -96,9 +96,15 @@ export class SendRequest {
     return this.send(this.http.post(environment.apiUrl + api, file, options));
   }
 
-  /** GET that returns the content of a file, to be shown instead of saved. */
-  blob(api: string, requestOptions?: RequestOptions): Promise<Blob> {
-    const request = this.http.get(environment.apiUrl + api, { ...this.options(), responseType: "blob" });
+  /**
+   * A request that returns the content of a file, to be shown instead of saved.
+   * Without a body it is a GET (the file of a record), with one a POST (a report over parameters).
+   */
+  blob(api: string, body?: any, requestOptions?: RequestOptions): Promise<Blob> {
+    const options = { ...this.options(), responseType: "blob" as const };
+    const request = body === undefined
+      ? this.http.get(environment.apiUrl + api, options)
+      : this.http.post(environment.apiUrl + api, body, options);
     return this.send(request, requestOptions);
   }
 

@@ -108,7 +108,7 @@ Izveštaj se ovde čuva sa svojim nazivom i fajlom, fajl se proverava pri slanju
 Ovaj deo se pojavljuje kad tabela bude sačuvana. **Dodaj izveštaj** traži dve stvari:
 
 - **Naziv izveštaja** — ono što korisnik čita nad zapisom. Jedinstven je u okviru tabele.
-- **Fajl izveštaja** — izveštaj preveden u Jaspersoft Studiju, onaj sa ekstenzijom `.jasper`; izvorni `.jrxml` se ne prima. Fajl se čita u trenutku slanja i prihvata se samo ako je zaista preveden izveštaj i ako ima parametar **`id` tipa `UUID`** — taj parametar je zapis nad kojim se izveštaj pravi. Sve drugo se odbija, sa objašnjenjem.
+- **Fajl izveštaja** — izveštaj preveden u Jaspersoft Studiju, onaj sa ekstenzijom `.jasper`; izvorni `.jrxml` se ne prima. Fajl se čita u trenutku slanja i prihvata se samo ako je zaista preveden izveštaj i ako ima parametar **`id` tipa `Object`** — taj parametar je zapis nad kojim se izveštaj pravi. Sve drugo se odbija, sa objašnjenjem. Identifikator se predaje kakav je, pa upit izveštaja kaže šta je: `where id = cast($P{id} as uuid)`.
 
 Klik na izveštaj u spisku ga otvara za izmenu. Izmena samo naziva zadržava postojeći fajl, a izbor novog fajla ga zamenjuje. Korpa skida izveštaj sa tabele i sa njim ide i fajl izveštaja.
 

@@ -60,7 +60,7 @@ A value picked from a list is cleared with the **×** at the right end of the fi
 
 A field of the *File* type is a button that opens the file picker. The file goes to the server as soon as you choose it, its name then stands beside the button, and **×** takes it out of the field — a file the record already holds is asked about first, one just chosen is dropped straight away. A file stored with the record carries a **download** button beside its name, on the form and on the row in the list alike, so the file can be taken without opening the record. A PDF carries an **eye** as well, which opens it in a reader inside the application.
 
-A field that points at a codebook carries a small **ⓘ** beside it, both on the form and on the row in the list. It opens the record behind the chosen value — the same form, with every field locked and nothing to save — so you can check what is behind a code without leaving what you were doing.
+A field that points at a codebook carries a small **ⓘ** beside it, both on the form and on the row in the list. It opens the record behind the chosen value — the same form, with every field locked and nothing to save — so you can check what is behind a code without leaving what you were doing. The right to the table you are in is enough: the record is read through that table, so the codebook itself asks for no permission of its own.
 
 ### Straight in the table
 

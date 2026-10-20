@@ -180,10 +180,14 @@ export function toFieldValue(value: any, column: PreviewColumn, language: string
   return String(value);
 }
 
-/** Value from the field -> value sent to the server; an empty field is null. */
+/**
+ * Value from the field -> value sent to the server; an empty field is null. Every value goes as
+ * text: the server reads it into the kind the column holds, and a number written out keeps every
+ * digit it had.
+ */
 export function fromFieldValue(value: any, column: PreviewColumn): any {
   if (column.columnType === "BOOLEAN") {
-    return value === true || value === "true";
+    return value === true || value === "true" ? "true" : "false";
   }
   // a file goes back whole: the server needs the identifier of the upload as well as the stored file
   if (column.columnType === "FILE") {
@@ -193,15 +197,10 @@ export function fromFieldValue(value: any, column: PreviewColumn): any {
   if (text === "") {
     return null;
   }
-  switch (column.columnType) {
-    case "INTEGER":
-    case "LONG":
-      return Number(text);
-    case "BIGDECIMAL": {
-      const number = parseDecimalText(text);
-      return number === "" ? null : Number(number);
-    }
-    default:
-      return text;
+  if (isDecimalType(column.columnType)) {
+    // the separator of the language is taken out, so the number goes the way the server reads it
+    const number = parseDecimalText(text);
+    return number === "" ? null : number;
   }
+  return text;
 }
