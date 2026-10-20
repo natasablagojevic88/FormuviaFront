@@ -21,7 +21,7 @@
           @if (codeInvalid()) {
             <span class="fd-field-error">{{ 'ui.reportParameters.codeInvalid' | t }}</span>
           } @else {
-            <span class="fd-help">{{ 'ui.reportParameters.codeHint' | t }}</span>
+            <span class="fd-help">{{ codeHint() }}</span>
           }
         </div>
 

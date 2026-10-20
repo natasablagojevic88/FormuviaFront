@@ -1,6 +1,6 @@
 <app-page-header
   [title]="(reportName() ? reportName() + ' — ' : '') + (title() || ('ui.reportParameters.title' | t))"
-  [subtitle]="'ui.reportParameters.subtitle' | t"
+  [subtitle]="subtitle()"
   [breadcrumb]="('ui.reports.title' | t) + (reportName() ? ' / ' + reportName() : '')">
   <button type="button" class="back-button" (click)="back()">
     <i class="fa-solid fa-arrow-left"></i>

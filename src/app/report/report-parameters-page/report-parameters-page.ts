@@ -8,6 +8,7 @@ import { ApiRoute } from "../../shared/ApiRoute";
 import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
 import { DataTable } from "../../shared/data-table/data-table";
 import { DatabaseColumn, DatabaseTable } from "../../shared/database-table";
+import { ReportType } from "../report-dialog/report-dialog";
 import {
   ReportParameter,
   ReportParameterDialog,
@@ -27,6 +28,8 @@ export class ReportParametersPage {
   /** A row added straight in the list belongs to the report the page is showing. */
   readonly newRowValues: Record<string, string>;
   readonly reportName = signal("");
+  /** The kind of the report: a Jasper report looks for its parameter in the file, not in a query. */
+  readonly reportType = signal<ReportType | undefined>(undefined);
   readonly title = signal("");
   private allColumns: DatabaseColumn[] = [];
 
@@ -47,10 +50,19 @@ export class ReportParametersPage {
     this.loadReport();
   }
 
-  /** The report itself, for the title: the table of its parameters does not carry its name. */
+  /** The report itself: the table of its parameters carries neither its name nor its kind. */
   private loadReport(): void {
     this.sendRequest.get(ApiRoute.reportId(this.reportId))
-      .then((report: { name: string }) => this.reportName.set(report?.name ?? ""));
+      .then((report: { name: string; type?: ReportType }) => {
+        this.reportName.set(report?.name ?? "");
+        this.reportType.set(report?.type);
+      });
+  }
+
+  /** What the page says above the list follows the kind of the report. */
+  subtitle(): string {
+    return this.translate.get(
+      this.reportType() === "JASPER" ? "ui.reportParameters.subtitleJasper" : "ui.reportParameters.subtitle");
   }
 
   back(): void {
@@ -63,12 +75,12 @@ export class ReportParametersPage {
   }
 
   add(): void {
-    this.openForm({ reportId: this.reportId, columns: this.allColumns });
+    this.openForm({ reportId: this.reportId, columns: this.allColumns, reportType: this.reportType() });
   }
 
   /** The row holds every field of the parameter, so the form opens without a second call. */
   edit(row: ReportParameter): void {
-    this.openForm({ reportId: this.reportId, columns: this.allColumns, parameter: row });
+    this.openForm({ reportId: this.reportId, columns: this.allColumns, parameter: row, reportType: this.reportType() });
   }
 
   remove(row: { id: string }): void {

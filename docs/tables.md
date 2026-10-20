@@ -76,7 +76,7 @@ A [function that works out values](/form-design#value-worked-out-by-the-database
 
 **Quick edit** in the toolbar is for entering several records one after another without opening a dialog each time.
 
-Switched on, it shows every editable column, not just the ones normally visible. **Edit** then opens the row inside the table itself, and **New row** puts an empty row at the top ready to be filled in. Switch it off and the table behaves as before.
+Switched on, it shows every editable column, not just the ones normally visible. **Edit** then opens the row inside the table itself, and **New row** puts an empty row at the top ready to be filled in. **New row** is offered only where such a row could really be saved: where a required field is not changed in the table at all, a record is added through the form instead. Switch it off and the table behaves as before.
 
 ## What else a row can do
 

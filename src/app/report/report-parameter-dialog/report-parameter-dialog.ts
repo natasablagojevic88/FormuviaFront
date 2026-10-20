@@ -5,6 +5,7 @@ import { Translate } from "../../services/translate";
 import { ApiRoute } from "../../shared/ApiRoute";
 import { DatabaseColumn } from "../../shared/database-table";
 import { SelectOption } from "../../shared/search-select/search-select";
+import { ReportType } from "../report-dialog/report-dialog";
 
 export interface ReportParameter {
   id?: string;
@@ -23,6 +24,8 @@ export interface ReportParameter {
 export interface ReportParameterDialogData {
   /** The report the parameter belongs to; it comes from the page, not from the form. */
   reportId: string;
+  /** The kind of the report; it decides where the server looks for the code of the parameter. */
+  reportType?: ReportType;
   /** allColumns from the table response: translated names of every ReportParameterDTO field. */
   columns: DatabaseColumn[];
   /** The parameter being changed, taken from the row of the list; empty for a new one. */
@@ -77,6 +80,12 @@ export class ReportParameterDialog implements OnInit {
     return !this.data.parameter?.id;
   }
 
+  /** A Jasper report has no query: the code has to be a parameter of the compiled file. */
+  codeHint(): string {
+    return this.translate.get(
+      this.data.reportType === "JASPER" ? "ui.reportParameters.codeHintJasper" : "ui.reportParameters.codeHint");
+  }
+
   ngOnInit(): void {
     if (!this.isNew) {
       return;
@@ -104,6 +113,10 @@ export class ReportParameterDialog implements OnInit {
 
   /** Front validation only: the server checks the same pattern. */
   codeInvalid(): boolean {
+    if (this.data.reportType === "JASPER") {
+      // the code is a name from the compiled file, written as it stands there; the server matches it
+      return false;
+    }
     const code = this.parameter.code?.trim() ?? "";
     return code.length > 0 && !CODE_PATTERN.test(code);
   }

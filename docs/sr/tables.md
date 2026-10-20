@@ -76,7 +76,7 @@ Gde god se lista menja na ovaj način, kolona koja nosi [uslov](/sr/form-design#
 
 **Brza izmena** u traci služi za unos više zapisa jedan za drugim, bez otvaranja dijaloga svaki put.
 
-Kad je uključena, prikazuje sve izmenljive kolone, ne samo one koje se inače vide. **Izmeni** tada otvara red u samoj tabeli, a **Nov red** ubacuje prazan red na vrh, spreman za popunjavanje. Kad je isključite, tabela se ponaša kao i pre.
+Kad je uključena, prikazuje sve izmenljive kolone, ne samo one koje se inače vide. **Izmeni** tada otvara red u samoj tabeli, a **Nov red** ubacuje prazan red na vrh, spreman za popunjavanje. **Nov red** se nudi samo tamo gde bi takav red stvarno mogao da se sačuva: gde se neko obavezno polje u tabeli uopšte ne menja, unos ide kroz formu. Kad je isključite, tabela se ponaša kao i pre.
 
 ## Šta još red može
 
