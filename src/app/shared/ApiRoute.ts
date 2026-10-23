@@ -19,6 +19,19 @@
         return `/api/role/${id}`;
     }
 
+    /** Mail servers the application sends through: insert when the id is empty, otherwise update. */
+    static readonly smtp='/api/smtp';
+    static readonly smtpTable='/api/smtp/table';
+
+    static smtpId(id: string): string {
+        return `/api/smtp/${id}`;
+    }
+
+    /** Sends one mail through that server, to see whether it works. */
+    static smtpTestMail(smtpId: string): string {
+        return `/api/smtp/test-mail/${smtpId}`;
+    }
+
     static readonly model='/api/model';
     static readonly modelTree='/api/model/tree';
 

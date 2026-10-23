@@ -13,7 +13,7 @@ The list shows the name of the group, the role that goes with it and its icon. I
 *Add* asks for:
 
 - **Name** — what people read above the reports of the group. Two groups cannot carry the same name; Formuvia says so when a name is taken.
-- **Role** — the role that may read the reports of the group. Roles are kept in [Users and roles](/administration).
+- **Role** — the role that may read the reports of the group. Roles are kept in [Users and roles](/administration#roles).
 - **Icon** — optional, chosen from a searchable list: the picture that stands beside the group in the menu, where its reports are offered.
 
 The name and the role are required. Picking the role is the whole of the access rule: whoever has that role gets the reports of the group, whoever does not never sees them.

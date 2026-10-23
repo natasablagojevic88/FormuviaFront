@@ -49,7 +49,7 @@ A table has four roles, and they are separate on purpose:
 | **Edit role** | may change existing records |
 | **Delete role** | may delete records |
 
-Someone can be allowed to enter orders without being allowed to delete them. The roles themselves are managed in [Users and roles](/administration).
+Someone can be allowed to enter orders without being allowed to delete them. The roles themselves are managed in [Users and roles](/administration#roles).
 
 ### The entry dialog
 

@@ -34,6 +34,10 @@ const routes: Routes = [
     loadChildren: () => import('./administration/roles-module').then(m => m.RolesModule)
   },
   {
+    path: 'smtp',
+    loadChildren: () => import('./administration/smtp-module').then(m => m.SmtpModule)
+  },
+  {
     path: '',
     loadChildren: () => import('./main-pages/main-pages-module').then(m => m.MainPagesModule)
   }

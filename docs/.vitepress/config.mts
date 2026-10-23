@@ -39,7 +39,7 @@ export default defineConfig({
             items: [
               { text: "Model: menus and tables", link: "/model" },
               { text: "Form design", link: "/form-design" },
-              { text: "Users and roles", link: "/administration" },
+              { text: "Administration", link: "/administration" },
               { text: "Reports", link: "/reports" },
             ],
           },
@@ -77,7 +77,7 @@ export default defineConfig({
             items: [
               { text: "Model: meniji i tabele", link: "/sr/model" },
               { text: "Dizajn forme", link: "/sr/form-design" },
-              { text: "Korisnici i uloge", link: "/sr/administration" },
+              { text: "Administracija", link: "/sr/administration" },
               { text: "Izveštaji", link: "/sr/reports" },
             ],
           },

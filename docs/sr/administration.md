@@ -1,8 +1,8 @@
-# Korisnici i uloge
+# Administracija
 
-Dva ekrana pod *Administracijom* odlučuju ko ulazi u Formuviu i šta sme kad uđe: **Korisnici** i **Uloge**.
+Ekrani pod *Administracijom* odlučuju ko ulazi u Formuviu i šta sme kad uđe — **Korisnici** i **Uloge** — i drže podešavanja same aplikacije, kao što su **serveri za poštu** preko kojih šalje.
 
-Oba su obični ekrani sa tabelom, pa sve iz [Rada sa tabelama](/sr/tables) — filtriranje, sortiranje, istorija, export u Excel — važi i za njih.
+Korisnici i uloge su obični ekrani sa tabelom, pa sve iz [Rada sa tabelama](/sr/tables) — filtriranje, sortiranje, istorija, export u Excel — važi i za njih.
 
 ## Uloge
 
@@ -36,6 +36,31 @@ Na dnu forme korisnika uloge stoje kao čipovi. Dodate jednu iz liste, uklonite 
 Ono što korisnik vidi sledi direktno iz ovoga: meni se gradi iz njegovih uloga, kao i to šta sme unutar svake tabele. Neko ko ima `faktura_pregled` a nema `faktura_brisanje` otvori fakture i u ⋯ meniju nema *Obriši*.
 
 Pošto `admin` implicitno ima sve uloge, administrator vidi sve i nije mu potrebno dodeljivati ništa drugo.
+
+## Serveri za poštu
+
+*Administracija / Serveri za poštu* čuva servere preko kojih aplikacija šalje poštu. To je obična tabelarna strana, pa pretraga, sortiranje, strane, istorija i izvoz u Excel rade kao i svuda.
+
+::: info Šta danas ima dejstvo
+Serveri za poštu se ovde upisuju, menjaju i brišu, uz njih se čuva lozinka, i svaki se može isprobati probnom poštom. Pošta koju aplikacija sama šalje — obaveštenja, izveštaji — se tek pravi.
+:::
+
+*Dodaj* traži:
+
+- **Naziv** — kako se server zove unutar Formuvia-e. Dva servera ne mogu nositi isti naziv.
+- **Pošiljalac** — adresa sa koje pošta odlazi, na primer `info@firma.rs`.
+- **Server** — adresa servera za poštu, na primer `smtp.gmail.com`.
+- **Port** — broj na kom server sluša: najčešće 25 bez zaštite, 587 za STARTTLS i 465 za SSL/TLS.
+- **Zaštita** — kako je veza zaštićena: *Bez zaštite*, *STARTTLS* ili *SSL/TLS*.
+- **Prijava** — uključuje se kad server traži korisnika. Tada se traže i **korisničko ime** i **lozinka**.
+
+Lozinka se samo upisuje: sa servera nikad ne izlazi, pa je polje prazno svaki put kad se forma otvori. Ostavljena prazna pri izmeni, sačuvana lozinka ostaje kakva je; mora se uneti kad server tek počne da se prijavljuje. Isključena *Prijava* briše i korisničko ime i lozinku.
+
+### Proba servera
+
+U ⋯ meniju reda stoji **Probna pošta**. Traži jednu adresu i aplikacija preko tog servera pošalje jednu jedinu poruku. Ako poruka stigne, podešavanja su dobra.
+
+Ako server ne primi poruku, crvena poruka nosi ono što je sam server rekao — najčešće se svede na pogrešan port, pogrešnu vrstu zaštite ili korisničko ime i lozinku koje server nije prihvatio. Svaka proba se upisuje na serveru, i uspela i neuspela, zajedno sa razlogom.
 
 ## Promena sopstvene lozinke
 

@@ -13,7 +13,7 @@ Spisak prikazuje naziv grupe, ulogu koja uz nju ide i njenu ikonu. To je isti sp
 *Dodaj* traži:
 
 - **Naziv** — ono što ljudi čitaju nad izveštajima grupe. Dve grupe ne mogu nositi isti naziv; Formuvia to kaže kad je naziv zauzet.
-- **Uloga** — uloga koja sme da čita izveštaje grupe. Uloge se vode u [Korisnicima i ulogama](/sr/administration).
+- **Uloga** — uloga koja sme da čita izveštaje grupe. Uloge se vode u [Korisnicima i ulogama](/sr/administration#uloge).
 - **Ikona** — nije obavezna, bira se iz spiska sa pretragom: sličica koja stoji uz grupu u meniju, tamo gde se njeni izveštaji i nude.
 
 Naziv i uloga su obavezni. Izborom uloge je pravilo pristupa završeno: ko ima tu ulogu dobija izveštaje grupe, ko je nema ne vidi ih nikada.

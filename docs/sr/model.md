@@ -49,7 +49,7 @@ Tabela ima četiri uloge, i one su namerno odvojene:
 | **Uloga za izmenu** | sme da menja postojeće zapise |
 | **Uloga za brisanje** | sme da briše zapise |
 
-Neko može imati pravo da unosi porudžbine a da ih ne sme brisati. Same uloge se vode u [Korisnicima i ulogama](/sr/administration).
+Neko može imati pravo da unosi porudžbine a da ih ne sme brisati. Same uloge se vode u [Korisnicima i ulogama](/sr/administration#uloge).
 
 ### Dijalog za unos
 

@@ -36,7 +36,7 @@ Oko toga stoji ono što poslovnoj aplikaciji ionako treba: nalozi i uloge, zapis
 ## Kome je ovo uputstvo namenjeno
 
 - **Ako unosite i pretražujete podatke**, pročitajte [Prijavu](/sr/getting-started) i [Rad sa tabelama](/sr/tables). To je sve što vam treba.
-- **Ako gradite aplikaciju**, nastavite sa [Modelom](/sr/model) i [Dizajnom forme](/sr/form-design), ljude podesite u [Korisnicima i ulogama](/sr/administration), a dokumente aplikacije složite u grupe u [Izveštajima](/sr/reports).
+- **Ako gradite aplikaciju**, nastavite sa [Modelom](/sr/model) i [Dizajnom forme](/sr/form-design), ljude podesite u [Administraciji](/sr/administration), a dokumente aplikacije složite u grupe u [Izveštajima](/sr/reports).
 
 ## Dokle je Formuvia stigla
 

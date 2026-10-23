@@ -1,0 +1,89 @@
+<form class="fd" (ngSubmit)="save()">
+  <header class="fd-header">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ (isNew ? 'ui.smtp.addTitle' : 'ui.smtp.editTitle') | t }}</h2>
+      <p class="fd-subtitle">{{ 'ui.smtp.formSubtitle' | t }}</p>
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    @if (loading()) {
+      <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    } @else {
+      <div class="fd-grid">
+        <div class="fd-field">
+          <label class="fd-label fd-required" for="name">{{ label('name') }}</label>
+          <input id="name" name="name" class="fd-input" [(ngModel)]="smtp.name" autocomplete="off" required />
+          <span class="fd-help">{{ 'ui.smtp.nameHint' | t }}</span>
+        </div>
+
+        <div class="fd-field">
+          <label class="fd-label fd-required" for="sender">{{ label('sender') }}</label>
+          <input id="sender" name="sender" type="email" class="fd-input" [(ngModel)]="smtp.sender"
+            autocomplete="off" required />
+          <span class="fd-help">{{ 'ui.smtp.senderHint' | t }}</span>
+        </div>
+
+        <div class="fd-field">
+          <label class="fd-label fd-required" for="host">{{ label('host') }}</label>
+          <input id="host" name="host" class="fd-input" [(ngModel)]="smtp.host" autocomplete="off" required />
+          <span class="fd-help">{{ 'ui.smtp.hostHint' | t }}</span>
+        </div>
+
+        <div class="fd-field">
+          <label class="fd-label fd-required" for="port">{{ label('port') }}</label>
+          <input id="port" name="port" type="number" min="1" max="65535" step="1" class="fd-input"
+            [(ngModel)]="smtp.port" autocomplete="off" required />
+          <span class="fd-help">{{ 'ui.smtp.portHint' | t }}</span>
+        </div>
+
+        <div class="fd-field">
+          <span class="fd-label fd-required">{{ label('smtpSecurity') }}</span>
+          <app-search-select [options]="securityOptions()" [(ngModel)]="smtp.smtpSecurity"
+            [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-lock"
+            [placeholder]="label('smtpSecurity')" [ariaLabel]="label('smtpSecurity')" />
+          <span class="fd-help">{{ 'ui.smtp.securityHint' | t }}</span>
+        </div>
+
+        <div class="fd-field">
+          <span class="fd-label">{{ label('auth') }}</span>
+          <label class="switch">
+            <input type="checkbox" name="auth" [(ngModel)]="smtp.auth" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span class="switch-text">{{ (smtp.auth ? 'ui.yes' : 'ui.no') | t }}</span>
+          </label>
+          <span class="fd-help">{{ 'ui.smtp.authHint' | t }}</span>
+        </div>
+
+        @if (smtp.auth) {
+          <div class="fd-field">
+            <label class="fd-label fd-required" for="username">{{ label('username') }}</label>
+            <input id="username" name="username" class="fd-input" [(ngModel)]="smtp.username"
+              autocomplete="off" required />
+          </div>
+
+          <div class="fd-field">
+            <label class="fd-label" [class.fd-required]="passwordRequired" for="password">{{ label('password') }}</label>
+            <input id="password" name="password" type="password" class="fd-input" [(ngModel)]="smtp.password"
+              autocomplete="new-password" [required]="passwordRequired" />
+            <span class="fd-help">{{ (passwordRequired ? 'ui.smtp.passwordHint' : 'ui.smtp.passwordKept') | t }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint">{{ 'ui.requiredFieldsMarked' | t }}</span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.cancel' | t }}</button>
+      <button type="submit" class="fd-button fd-button-primary" [disabled]="!canSave()">
+        <i class="fa-solid" [class.fa-floppy-disk]="!saving()" [class.fa-spinner]="saving()" [class.fa-spin]="saving()"></i>
+        {{ 'ui.save' | t }}
+      </button>
+    </div>
+  </footer>
+</form>

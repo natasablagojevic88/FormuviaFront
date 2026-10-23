@@ -1,0 +1,12 @@
+<app-page-header
+  [title]="title() || ('ui.smtp.title' | t)"
+  [subtitle]="'ui.smtp.subtitle' | t"
+  [breadcrumb]="'ui.smtp.breadcrumb' | t">
+  <button type="button" class="add-button" (click)="add()">
+    <i class="fa-solid fa-plus"></i>
+    {{ 'ui.add' | t }}
+  </button>
+</app-page-header>
+
+<app-data-table [url]="tableUrl" [rowActions]="rowActions" (loaded)="onLoaded($event)" (edit)="edit($event)"
+  (remove)="remove($event)" (action)="testMail($event.row)"></app-data-table>

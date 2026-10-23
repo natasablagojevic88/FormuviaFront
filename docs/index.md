@@ -36,7 +36,7 @@ Around that sits everything a business application needs anyway: accounts and ro
 ## Who this guide is for
 
 - **If you enter and look up data**, read [Signing in](/getting-started) and [Working with tables](/tables). That is everything you need.
-- **If you build the application**, continue with [Model](/model) and [Form design](/form-design), set people up in [Users and roles](/administration), and sort the documents of the application into groups in [Reports](/reports).
+- **If you build the application**, continue with [Model](/model) and [Form design](/form-design), set people up in [Administration](/administration), and sort the documents of the application into groups in [Reports](/reports).
 
 ## Where Formuvia is today
 
