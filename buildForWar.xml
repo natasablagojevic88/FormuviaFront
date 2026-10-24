@@ -12,7 +12,7 @@
 	<target name="build" depends="clean">
 		<exec executable="npm" failonerror="true">
 			<arg value="run" />
-			<arg value="build:war" />
+			<arg value="build" />
 		</exec>
 	</target>
 

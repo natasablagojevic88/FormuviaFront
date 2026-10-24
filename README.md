@@ -105,9 +105,9 @@ The client can also travel inside the same WAR as the API, as one deployment. Th
 npm run build:war
 ```
 
-The result in `dist/FormuviaFront/browser/` is added to the WAR by the backend build (`maven-war-plugin`, `webResources`), beside `WEB-INF`. Two things make that build different from the one above:
+The result in `dist/FormuviaFront/browser/` goes into the WAR beside `WEB-INF`; the backend's `build.xml` does the whole chain in one step (`ant` there builds this client first, then the WAR, then adds these files to it). Two things make the client work inside the WAR without a setting of its own:
 
-- **The API address is not written down.** `src/environments/environment.war.ts` takes it from the document base, so the client always calls the address it was itself served from.
+- **The API address is not written down.** `src/environments/environment.ts` takes it from the document base, so the client always calls the address it was itself served from. It is deliberately not an empty string: that would mean `/api/...` from the root of the server, which misses the context the WAR is deployed under.
 - **The base of the document is worked out when the page opens.** `index.html` sets `<base href>` from `location.pathname`, before a single file is loaded, so the same build works at the root of the server (`ROOT.war`) and under a context (`/Formuvia/`), with no flag at build time.
 
 Everything the client loads - assets, lazy chunks, the PDF viewer - is referenced relative to that base, so nothing has to be rebuilt when the application is deployed under a different name.
