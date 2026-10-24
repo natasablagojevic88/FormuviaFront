@@ -8,8 +8,14 @@
 	<target name="clean">
 		<delete dir="${dest}" />
 	</target>
+	
+	<target name="install" depends="clean">
+			<exec executable="npm" failonerror="true">
+				<arg value="install" />
+			</exec>
+	</target>
 
-	<target name="build" depends="clean">
+	<target name="build" depends="install">
 		<exec executable="npm" failonerror="true">
 			<arg value="run" />
 			<arg value="build" />
