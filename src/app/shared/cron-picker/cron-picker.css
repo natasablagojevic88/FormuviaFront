@@ -1,0 +1,300 @@
+:host {
+  display: block;
+}
+
+.cron {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cron-intro {
+  margin: 0;
+  color: var(--c-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* one unit of time: minutes, hours, day, month, weekday, year */
+.unit {
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  background: var(--c-surface);
+  overflow: hidden;
+}
+
+.unit-open {
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px var(--c-focus);
+}
+
+.unit-invalid {
+  border-color: var(--c-danger);
+}
+
+.unit-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 0;
+  background: var(--c-surface-2);
+  color: var(--c-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.unit-head:hover {
+  background: var(--c-surface-3);
+}
+
+.unit-icon {
+  width: 18px;
+  flex: 0 0 auto;
+  color: var(--c-primary);
+  text-align: center;
+}
+
+.unit-title {
+  flex: 0 0 auto;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.unit-summary {
+  flex: 1;
+  min-width: 0;
+  color: var(--c-text-muted);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unit-chevron {
+  flex: 0 0 auto;
+  color: var(--c-text-faint);
+  font-size: 12px;
+}
+
+.unit-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border-top: 1px solid var(--c-border-soft);
+}
+
+/* a unit that is held at "any" because the other one of the two days is chosen */
+.unit-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--c-primary-soft);
+  color: var(--c-text);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.unit-note i {
+  margin-top: 2px;
+  color: var(--c-primary);
+}
+
+.modes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mode {
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.mode:hover:not(:disabled) {
+  border-color: var(--c-primary);
+}
+
+.mode-on {
+  border-color: var(--c-primary);
+  background: var(--c-primary);
+  color: var(--c-text-on-primary);
+}
+
+.mode:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.step-input {
+  width: 120px;
+}
+
+/* lists offered with one click: all, none and the usual choices of that unit */
+.quick {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.quick-button {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px dashed var(--c-border-strong);
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  color: var(--c-text-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.quick-button:hover {
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+}
+
+.chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 8px;
+}
+
+/* months and weekdays are words, not numbers, so they need more room */
+.chips-wide {
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+}
+
+.chip {
+  display: flex;
+  /* the checkbox inside is taken out of the flow, so it is held here; without this it belongs to
+     the surface of the dialog, and the browser scrolls that surface to it when it gets the focus */
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 8px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.chip:hover {
+  border-color: var(--c-primary);
+}
+
+.chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip-on {
+  border-color: var(--c-primary);
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+}
+
+.chip:has(input:focus-visible) {
+  box-shadow: 0 0 0 3px var(--c-focus);
+}
+
+/* the expression the server will make out of the choice, so it can be read as it is */
+.cron-expression {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-3);
+}
+
+.cron-expression-label {
+  color: var(--c-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cron-expression code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  color: var(--c-text);
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mode,
+  .chip {
+    transition: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .unit-head {
+    flex-wrap: wrap;
+    row-gap: 2px;
+  }
+
+  /* on a phone the summary goes under the name, so neither is cut off */
+  .unit-summary {
+    flex: 1 0 100%;
+    padding-left: 30px;
+    white-space: normal;
+  }
+
+  .mode {
+    flex: 1;
+    padding: 0 10px;
+  }
+
+  .chips {
+    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  }
+
+  .chips-wide {
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  }
+
+  .step-input {
+    width: 100%;
+  }
+}

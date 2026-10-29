@@ -18,10 +18,11 @@ import { FileField } from "./file-field/file-field";
 import { PdfDialog } from "./pdf-dialog/pdf-dialog";
 import { FileVersionsDialog } from "./file-versions-dialog/file-versions-dialog";
 import { ConfirmDialog } from "./confirm-dialog/confirm-dialog";
+import { CronPicker } from "./cron-picker/cron-picker";
 import { AdvancedSearchDialog } from "./advanced-search-dialog/advanced-search-dialog";
 
 @NgModule({
-  declarations: [PageHeader, DataTable, ConfirmDialog, AdvancedSearchDialog, HistoryPanel, IconPickerDialog, IconSelect, FileField, PdfDialog, FileVersionsDialog],
+  declarations: [PageHeader, DataTable, ConfirmDialog, AdvancedSearchDialog, HistoryPanel, IconPickerDialog, IconSelect, FileField, PdfDialog, FileVersionsDialog, CronPicker],
   imports: [
     CommonModule,
     FormsModule,
@@ -44,7 +45,8 @@ import { AdvancedSearchDialog } from "./advanced-search-dialog/advanced-search-d
     FileField,
     PdfDialog,
     FileVersionsDialog,
-    HistoryPanel
+    HistoryPanel,
+    CronPicker
   ]
 })
 export class SharedModule {}

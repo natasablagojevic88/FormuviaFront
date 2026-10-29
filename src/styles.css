@@ -163,8 +163,10 @@ body {
   background: var(--c-surface);
   color: var(--c-text);
   border-radius: 28px;
-  /* Only the body of the dialog scrolls; the surface itself never does. */
-  overflow: hidden;
+  /* Only the body of the dialog scrolls; the surface itself never does. "clip" and not "hidden":
+     a box that is only hidden is still scrolled by the browser when something out of sight inside
+     it takes the focus, and then the whole dialog slides away and stands empty. */
+  overflow: clip;
   box-shadow: var(--shadow-2);
 }
 
@@ -402,6 +404,18 @@ input[type="number"]:disabled::-webkit-inner-spin-button {
   border-color: var(--c-primary);
   background: var(--c-surface);
   box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.12);
+}
+
+/* A field that is only read: the value stays, is selected and copied and goes to the server, but
+   the field does not look nor behave like one that can be written in. */
+.fd-input[readonly],
+.fd-input[readonly]:hover,
+.fd-input[readonly]:focus {
+  border-color: var(--c-border-soft);
+  background: var(--c-surface-2);
+  color: var(--c-text-muted);
+  box-shadow: none;
+  cursor: default;
 }
 
 .fd-input.fd-invalid {

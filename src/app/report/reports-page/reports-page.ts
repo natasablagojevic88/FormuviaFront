@@ -22,7 +22,7 @@ export class ReportsPage {
   /** A row added straight in the list belongs to the group the page is showing. */
   readonly newRowValues: Record<string, string>;
   readonly groupName = signal("");
-  /** The row menu of a report leads to the parameters of that report. */
+  /** The row menu of a report leads to the parameters and to the jobs of that report. */
   readonly rowActions: RowAction[] = [];
   readonly title = signal("");
   private allColumns: DatabaseColumn[] = [];
@@ -45,6 +45,11 @@ export class ReportsPage {
       label: this.translate.get("ui.reports.parameters"),
       icon: "fa-solid fa-sliders",
     });
+    this.rowActions.push({
+      key: "jobs",
+      label: this.translate.get("ui.reports.jobs"),
+      icon: "fa-solid fa-clock-rotate-left",
+    });
     this.loadGroup();
   }
 
@@ -58,7 +63,12 @@ export class ReportsPage {
     this.router.navigate(["/report-group"]);
   }
 
-  openParameters(row: { id: string }): void {
+  /** Which of the two the row menu asks for. */
+  openAction(action: RowAction, row: { id: string }): void {
+    if (action.key === "jobs") {
+      this.router.navigate(["/report-group", this.groupId, row.id, "job"]);
+      return;
+    }
     this.router.navigate(["/report-group", this.groupId, row.id]);
   }
 

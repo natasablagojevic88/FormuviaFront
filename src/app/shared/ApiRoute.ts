@@ -226,6 +226,18 @@
         return `/api/report/parameter/${id}`;
     }
 
+    /** Jobs of one report: the report is in the path, so a job of another report never comes back. */
+    static reportJobTable(reportId: string): string {
+        return `/api/report/job/table/${reportId}`;
+    }
+
+    /** Job of a report: insert when the id is empty, otherwise update. */
+    static readonly reportJob='/api/report/job';
+
+    static reportJobId(id: string): string {
+        return `/api/report/job/${id}`;
+    }
+
     /** Order to offer for a new parameter: one more than the largest one already entered. */
     static reportParameterOrderNumber(reportId: string): string {
         return `/api/report/parameter/next-order-number/${reportId}`;

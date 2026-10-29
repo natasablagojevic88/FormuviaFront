@@ -11,6 +11,8 @@ import { ReportsPage } from "./reports-page/reports-page";
 import { ReportDialog } from "./report-dialog/report-dialog";
 import { ReportParametersPage } from "./report-parameters-page/report-parameters-page";
 import { ReportParameterDialog } from "./report-parameter-dialog/report-parameter-dialog";
+import { ReportJobsPage } from "./report-jobs-page/report-jobs-page";
+import { JobDialog } from "./job-dialog/job-dialog";
 
 @NgModule({
   declarations: [
@@ -20,6 +22,8 @@ import { ReportParameterDialog } from "./report-parameter-dialog/report-paramete
     ReportDialog,
     ReportParametersPage,
     ReportParameterDialog,
+    ReportJobsPage,
+    JobDialog,
   ],
   imports: [
     CommonModule,

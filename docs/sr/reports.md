@@ -82,6 +82,53 @@ Tako napisan izveštaj radi i sa datumom i bez njega. Bez `cast`-a baza odbija u
 
 Jasper izveštaj nema upit, pa se njegov parametar traži u samom `.jasper` fajlu: parametar koji preveden izveštaj ne nosi se odbija, a parametri koje JasperReports postavlja sam se ne računaju. Podrazumevana vrednost i lista vrednosti za njega rade isto kao za upitni izveštaj. U fajlu se parametar koji nosi identifikator postavlja kao `Object` i u upitu izveštaja se kaže šta je, isto kao i svuda drugde: `cast($P{komitent} as uuid)`.
 
+## Poslovi: izveštaj koji ide sam
+
+Izveštaj ne mora da čeka da ga neko zatraži. U meniju reda izveštaja stoji *Poslovi* i vodi na spisak poslova tog izveštaja: svaki posao kaže kada se izveštaj pokreće i šta se tada s njim radi.
+
+::: info Šta danas ima dejstvo
+Posao se unosi, menja i briše, a aplikacija ga stavlja u raspored: čuva se u bazi rasporeda, pa stoji tamo i posle restarta. Ono što posao radi kad mu dođe vreme još nije dovršeno — izveštaj se za sada niti šalje, niti upisuje u fajl, niti izvršava. Posao je zato još uvek plan: sve što je na ovoj strani opisano unosi se i čuva, vreme pokretanja se računa, ali od toga još ništa ne biva.
+:::
+
+*Dodaj* otvara formu posla. Prvo se bira šta posao radi, a forma onda traži samo ono što ta vrsta posla zahteva:
+
+- **Poslati poštom** — izveštaj ide na jednu ili više adresa. Traži server za poštu (onaj unet u [Administracija / Serveri za poštu](/sr/administration#serveri-za-postu)), adresu na koju ide, naslov, telo poruke i da li izveštaj stoji **u samoj poruci** ili ide uz nju **kao fajl**. Jasper izveštaj ne može da stoji u samoj poruci, pa se za njega nudi samo fajl.
+- **Upisati u fajl** — izveštaj se upisuje u fajl na serveru. Traži folder i naziv fajla; folder mora biti onaj u koji server ima pravo da piše.
+- **Samo izvršiti** — izveštaj odradi svoje nad podacima i ništa se ne vraća. Tako se može pokrenuti samo izveštaj vrste *UPDATE upit ili procedura*, a izveštaj te vrste ne može ništa drugo.
+
+Kad god se pravi fajl — i kao sam fajl i kao prilog poruke — bira se **vrsta fajla**: *Excel* ili *CSV*, gde se znak između dve kolone zadaje kao **razdvajač**.
+
+Ostalo je isto za svaki posao:
+
+- **Naziv** — pod njim posao stoji u rasporedu, pa ga dva posla ne mogu deliti. Daje se pri unosu i kasnije se ne menja: raspored drži posao pod nazivom koji je dobio, pa bi preimenovan posao ostao u njemu pod starim nazivom i nastavio da se pokreće pored novog. Posao kome treba drugi naziv isključuje se i unosi iznova.
+- **Telo poruke** — tekst koji ide uz izveštaj, piše se u uređivaču: masno, kurziv, naslov, lista, link, poravnanje. Šalje se kao HTML, a ko već ima svoj HTML prelazi na prikaz `HTML` i tu ga upiše.
+- **Adresa za greške** — kome se javlja kad posao ne prođe. Ako je prazna, greška se samo upisuje.
+- **Uloga** — uloga vezana za posao.
+- **Uključen** — samo uključen posao stoji u rasporedu; isključivanje ga zaustavlja bez brisanja.
+- **Samo kad ima podataka** — posao se preskače kad upit izveštaja ne vrati ni jedan red. Nudi se samo za izveštaj vrste *SELECT upit*, jer samo takav izveštaj ima redove koje bi bilo šta izbrojalo.
+
+Posao koji privremeno ne treba isključuje se preko **Uključen** i ostaje kakav jeste; *Obriši* u meniju reda ga uklanja zauvek i u istom koraku ga vadi iz rasporeda.
+
+### Kada se pokreće
+
+Ispod polja posla stoji raspored i čita se od vrha nadole: minuti, sati, dan u mesecu, mesec, dan u nedelji, godina. Svaka od šest jedinica podešava se na jedan od tri načina:
+
+- **Bilo koji** — svaka vrednost te jedinice. Minuti na *bilo koji* znači svakog minuta.
+- **Svaki n-ti** — korak: svakih 5 minuta, svakih 6 sati, svaka 3 meseca. Korak se računa od početka veće jedinice, pa korak 5 nad minutima znači 0, 5, 10 i tako do 55, i počinje ponovo na pun sat.
+- **Izbor** — samo označene vrednosti. Minuti i sati se označavaju kao brojevi, mesec i dan u nedelji po imenu. Pored oznaka stoje uobičajeni izbori — *Sve*, *Ništa*, *Svakih 15 minuta*, *Radni dani*, *Vikend* i tako dalje — i oni zamenjuju ono što je označeno, ne dodaju se na njega.
+
+Jedinica pored svog imena pokazuje na šta je podešena, pa se ceo raspored čita bez otvaranja. Dan u nedelji nema korak: ili je svaki dan u nedelji ili su to označeni dani.
+
+**Dan u mesecu i dan u nedelji ne mogu se zadati zajedno.** Posao ide ili po danima u mesecu (1. i 15.) ili po danima u nedelji (svakog ponedeljka) — raspored prima samo jedno od dva. Zato, čim se jedno zada, drugo ostaje na *bilo koji* i kaže zašto; kad se prvo pusti, drugo se vraća.
+
+Na dnu stoji izraz na koji se raspored svodi, onako kako ga raspored čita:
+
+```
+0 */5 8,16 ? * 2,6 *
+```
+
+Čita se sleva: u sekundi 0, svakih 5 minuta, u 8 i u 16 sati, bez određenog dana u mesecu, svakog meseca, u ponedeljak i petak, svake godine. Znak `?` stoji tamo gde se dan prepušta drugom polju.
+
 ## Pokretanje izveštaja
 
 Svaki izveštaj stoji u meniju, pod nazivom i ikonom svoje grupe, sa svojom ikonom pored sebe ako je izabrana: ko ima ulogu grupe vidi njene izveštaje, ko je nema ne vidi ih. Strana izveštaja ima dve strane: levo ono što izveštaj traži, desno ono što je vratio.

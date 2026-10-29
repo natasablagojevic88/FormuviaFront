@@ -82,6 +82,53 @@ Written that way the report runs both with a date and without one. Without the `
 
 A Jasper report has no query, so its parameter is looked for in the `.jasper` file itself: a parameter the compiled report does not declare is refused, and the parameters JasperReports sets by itself do not count. The default value and the list of values work the same way for it as for a query report. In the file, a parameter that carries an identifier is declared as `Object` and said out loud in the query of the report, the same way as everywhere else: `cast($P{customer} as uuid)`.
 
+## Jobs: a report that runs by itself
+
+A report does not have to wait for somebody to ask for it. In the row menu of a report stands *Jobs*, and it leads to the list of the jobs of that report: every job says when the report runs and what happens to it when it does.
+
+::: info What works today
+A job is entered, changed and deleted, and the application schedules it: it is kept in the database of the scheduler, so it stands there after a restart as well. What the job does when its time comes is not finished yet — the report is for now neither sent, nor written into a file, nor run. A job is therefore still a plan: everything written on this page is entered and kept, and the time it would run at is counted, but nothing comes of it yet.
+:::
+
+*Add* opens the form of a job. The first thing chosen is what the job does, and the form then asks only for what that kind of job needs:
+
+- **Send by mail** — the report goes to one or more addresses. It asks for the mail server (the one entered under [Administration / Mail servers](/administration#mail-servers)), the address it goes to, the subject, the body, and whether the report stands **in the mail itself** or goes along with it **as a file**. A Jasper report cannot stand in the mail itself, so for it only the file is offered.
+- **Write into a file** — the report is written into a file on the server. It asks for the folder and the name of the file; the folder has to be one the server may write into.
+- **Only run** — the report does its work over the data and nothing comes back. Only a report of the *UPDATE query or procedure* kind can be run that way, and a report of that kind cannot do anything else.
+
+Whenever a file is made — as the file itself or as the attachment of a mail — the **kind of file** is chosen: *Excel*, or *CSV* where the sign between two columns is given as the **separator**.
+
+The rest is the same for every job:
+
+- **Name** — the job stands in the scheduler under it, so two jobs cannot share it. It is given when the job is entered and is not changed afterwards: the scheduler keeps the job under the name it was given, and a renamed job would stay there under the old name and keep running beside the new one. A job that needs another name is switched off and entered anew.
+- **Body** — the text that goes with the report, written in the editor: bold, italic, a heading, a list, a link, alignment. It is sent as HTML, and whoever already has HTML of their own switches to the `HTML` view and writes it there.
+- **Address for errors** — where word is sent when the job does not go through. Left empty, the error is only written down.
+- **Role** — the role tied to the job.
+- **On** — only a job that is on is scheduled; switching it off stops the job without deleting it.
+- **Only when there is data** — the job is left out when the query of the report gives no rows. It is offered only for a report of the *SELECT query* kind, because only such a report has rows to count.
+
+A job that is not wanted for a while is switched off by **On** and stays as it is; *Delete* in the row menu removes it for good and takes it out of the scheduler at the same time.
+
+### When it runs
+
+Under the fields of the job stands the schedule, and it is read from top to bottom: minutes, hours, day of the month, month, day of the week, year. Every one of the six is set in one of three ways:
+
+- **Any** — every value of that unit. Minutes at *any* means every minute.
+- **Every n-th** — a step: every 5 minutes, every 6 hours, every 3 months. The step is counted from the beginning of the bigger unit, so a step of 5 over the minutes means 0, 5, 10 and so on to 55, and it starts again at the top of every hour.
+- **Pick** — only the values ticked. Minutes and hours are ticked as numbers, the month and the day of the week by name. Beside the ticks stand the usual choices — *All*, *None*, *Every quarter of an hour*, *Working days*, *Weekend* and so on — and they replace what is ticked, they do not add to it.
+
+A unit shows what it is set to beside its name, so the whole schedule is read without opening anything. The day of the week has no step: it is either every day of the week or the days ticked.
+
+**The day of the month and the day of the week cannot be set together.** A job either runs on days of the month (the 1st and the 15th) or on days of the week (every Monday) — the scheduler takes only one of the two. So the moment one of them is set, the other stays at *any* and says why; letting the first one go gives the other one back.
+
+At the bottom stands the expression the schedule comes down to, the way the scheduler reads it:
+
+```
+0 */5 8,16 ? * 2,6 *
+```
+
+Read from the left: at second 0, every 5 minutes, at 8 and at 16 hours, on no particular day of the month, every month, on Monday and Friday, every year. The `?` stands where a day is left to the other field.
+
 ## Running a report
 
 Every report is in the menu, under the name and the icon of its group, with its own icon beside it when one was chosen: whoever has the role of the group sees its reports there, and nobody else does. The page of a report has two sides: what the report asks for on the left, what came back on the right.

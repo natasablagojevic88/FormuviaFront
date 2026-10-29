@@ -1,0 +1,89 @@
+:host {
+  display: block;
+}
+
+/* the addresses, the subject, the path and the whole cron stand on a line of their own */
+.fd-field-wide {
+  grid-column: 1 / -1;
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  min-height: 160px;
+  color: var(--c-primary);
+  font-size: 28px;
+}
+
+/* the path of the file and the delimiter are read as they stand */
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.switches {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  padding: 6px 0;
+  cursor: pointer;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.switch-track {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--c-border);
+  transition: background 0.15s;
+}
+
+.switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--c-surface);
+  box-shadow: 0 2px 6px rgba(3, 8, 23, 0.2);
+  transition: transform 0.15s;
+}
+
+.switch input:checked + .switch-track {
+  background: var(--c-primary);
+}
+
+.switch input:checked + .switch-track .switch-thumb {
+  transform: translateX(20px);
+}
+
+.switch input:focus-visible + .switch-track {
+  box-shadow: 0 0 0 3px var(--c-focus);
+}
+
+.switch-text {
+  color: var(--c-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch-track,
+  .switch-thumb {
+    transition: none;
+  }
+}

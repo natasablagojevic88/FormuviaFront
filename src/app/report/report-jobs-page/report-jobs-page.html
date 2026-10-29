@@ -1,0 +1,16 @@
+<app-page-header
+  [title]="(reportName() ? reportName() + ' — ' : '') + (title() || ('ui.reportJobs.title' | t))"
+  [subtitle]="'ui.reportJobs.subtitle' | t"
+  [breadcrumb]="('ui.reports.title' | t) + (reportName() ? ' / ' + reportName() : '')">
+  <button type="button" class="back-button" (click)="back()">
+    <i class="fa-solid fa-arrow-left"></i>
+    {{ 'ui.back' | t }}
+  </button>
+  <button type="button" class="add-button" (click)="add()">
+    <i class="fa-solid fa-plus"></i>
+    {{ 'ui.add' | t }}
+  </button>
+</app-page-header>
+
+<app-data-table [url]="tableUrl" [newRowValues]="newRowValues" (loaded)="onLoaded($event)" (edit)="edit($event)"
+  (remove)="remove($event)"></app-data-table>

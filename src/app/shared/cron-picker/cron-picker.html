@@ -1,0 +1,78 @@
+<section class="cron">
+  <p class="cron-intro">{{ 'ui.cron.intro' | t }}</p>
+
+  @for (unit of units; track unit) {
+    <div class="unit" [class.unit-open]="open() === unit" [class.unit-invalid]="unitInvalid(unit)">
+      <button type="button" class="unit-head" (click)="toggle(unit)" [attr.aria-expanded]="open() === unit">
+        <i class="unit-icon" [class]="icon(unit)"></i>
+        <span class="unit-title">{{ title(unit) }}</span>
+        <span class="unit-summary">{{ summary(unit) }}</span>
+        <i class="fa-solid unit-chevron"
+          [class.fa-chevron-down]="open() !== unit" [class.fa-chevron-up]="open() === unit"></i>
+      </button>
+
+      @if (open() === unit) {
+        <div class="unit-body">
+          @if (locked(unit)) {
+            <p class="unit-note">
+              <i class="fa-solid fa-circle-info"></i>
+              {{ (unit === 'day' ? 'ui.cron.dayLocked' : 'ui.cron.weekdayLocked') | t }}
+            </p>
+          }
+
+          <div class="modes" role="group" [attr.aria-label]="title(unit)">
+            <button type="button" class="mode" [class.mode-on]="mode(unit) === 'any'" [disabled]="locked(unit)"
+              (click)="setMode(unit, 'any')">{{ 'ui.cron.modeAny' | t }}</button>
+            @if (hasEvery(unit)) {
+              <button type="button" class="mode" [class.mode-on]="mode(unit) === 'every'" [disabled]="locked(unit)"
+                (click)="setMode(unit, 'every')">{{ 'ui.cron.modeEvery' | t }}</button>
+            }
+            <button type="button" class="mode" [class.mode-on]="mode(unit) === 'pick'" [disabled]="locked(unit)"
+              (click)="setMode(unit, 'pick')">{{ 'ui.cron.modePick' | t }}</button>
+          </div>
+
+          @if (mode(unit) === 'every') {
+            <div class="step">
+              <span class="fd-label">{{ 'ui.cron.stepLabel' | t }}</span>
+              <input class="fd-input step-input" type="number" min="1" step="1" [max]="stepMax(unit)"
+                [value]="step(unit)" (input)="stepChanged(unit, $any($event.target).value)"
+                [attr.aria-label]="'ui.cron.stepLabel' | t" />
+              <span class="fd-help">{{ ('ui.cron.stepHint.' + unit) | t }}</span>
+            </div>
+          }
+
+          @if (mode(unit) === 'pick') {
+            <div class="quick">
+              <button type="button" class="quick-button" (click)="pickAll(unit)">{{ 'ui.cron.pickAll' | t }}</button>
+              <button type="button" class="quick-button" (click)="pickNone(unit)">{{ 'ui.cron.pickNone' | t }}</button>
+              @for (preset of presets(unit); track preset.label) {
+                <button type="button" class="quick-button" (click)="usePreset(unit, preset.values)">
+                  {{ preset.label }}
+                </button>
+              }
+            </div>
+
+            <div class="chips" [class.chips-wide]="unit === 'month' || unit === 'dayOfWeek'">
+              @for (option of options(unit); track option.value) {
+                <label class="chip" [class.chip-on]="isPicked(unit, option.value)">
+                  <input type="checkbox" [checked]="isPicked(unit, option.value)"
+                    (change)="togglePick(unit, option.value)" />
+                  <span>{{ option.label }}</span>
+                </label>
+              }
+            </div>
+          }
+
+          @if (unitInvalid(unit)) {
+            <span class="fd-field-error">{{ unitError(unit) }}</span>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <p class="cron-expression">
+    <span class="cron-expression-label">{{ 'ui.cron.expression' | t }}</span>
+    <code>{{ expression() }}</code>
+  </p>
+</section>

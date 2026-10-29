@@ -14,4 +14,4 @@
 
 <app-data-table [url]="tableUrl" [newRowValues]="newRowValues" [rowActions]="rowActions"
   (loaded)="onLoaded($event)" (edit)="edit($event)" (remove)="remove($event)"
-  (action)="openParameters($event.row)"></app-data-table>
+  (action)="openAction($event.action, $event.row)"></app-data-table>

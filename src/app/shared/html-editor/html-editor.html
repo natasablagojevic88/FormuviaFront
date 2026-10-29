@@ -1,0 +1,44 @@
+<div class="editor" [class.editor-disabled]="disabled()">
+  <div class="tools" role="toolbar" [attr.aria-label]="'ui.htmlEditor.toolbar' | t">
+    @for (tool of tools; track tool.key) {
+      <button type="button" class="tool" [disabled]="disabled() || source()" [title]="toolLabel(tool)"
+        [attr.aria-label]="toolLabel(tool)" (mousedown)="$event.preventDefault()" (click)="exec(tool)">
+        <i [class]="tool.icon"></i>
+      </button>
+    }
+    <button type="button" class="tool" [disabled]="disabled() || source()" [title]="'ui.htmlEditor.link' | t"
+      [attr.aria-label]="'ui.htmlEditor.link' | t" (mousedown)="$event.preventDefault()" (click)="openLink()">
+      <i class="fa-solid fa-link"></i>
+    </button>
+    <button type="button" class="tool" [disabled]="disabled() || source()" [title]="'ui.htmlEditor.unlink' | t"
+      [attr.aria-label]="'ui.htmlEditor.unlink' | t" (mousedown)="$event.preventDefault()" (click)="removeLink()">
+      <i class="fa-solid fa-link-slash"></i>
+    </button>
+    <span class="tools-space"></span>
+    <button type="button" class="tool tool-source" [class.tool-on]="source()" [disabled]="disabled()"
+      [title]="'ui.htmlEditor.source' | t" [attr.aria-label]="'ui.htmlEditor.source' | t"
+      [attr.aria-pressed]="source()" (click)="toggleSource()">
+      <i class="fa-solid fa-code"></i>
+    </button>
+  </div>
+
+  @if (linkOpen()) {
+    <div class="link-row">
+      <input class="fd-input link-input" type="url" [(ngModel)]="linkUrl" [ngModelOptions]="{ standalone: true }"
+        [placeholder]="'ui.htmlEditor.linkPlaceholder' | t" [attr.aria-label]="'ui.htmlEditor.link' | t" />
+      <button type="button" class="link-button" (click)="addLink()">{{ 'ui.htmlEditor.linkAdd' | t }}</button>
+      <button type="button" class="link-button link-cancel" (click)="cancelLink()">{{ 'ui.cancel' | t }}</button>
+    </div>
+  }
+
+  <div class="area-wrap">
+    <div #area class="area" [class.hidden]="source()" [attr.contenteditable]="!disabled()"
+      [attr.aria-label]="ariaLabel() || (placeholder() || null)" (input)="readBack()" (blur)="touched()"></div>
+    <textarea class="area area-source" [class.hidden]="!source()" [value]="html" [disabled]="disabled()"
+      spellcheck="false" [attr.aria-label]="'ui.htmlEditor.source' | t"
+      (input)="sourceChanged($any($event.target).value)" (blur)="touched()"></textarea>
+    @if (empty() && !source()) {
+      <span class="area-placeholder">{{ placeholder() }}</span>
+    }
+  </div>
+</div>

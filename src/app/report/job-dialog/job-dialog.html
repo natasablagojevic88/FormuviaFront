@@ -1,0 +1,161 @@
+<form class="fd" (ngSubmit)="save()">
+  <header class="fd-header">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ (isNew ? 'ui.reportJobs.addTitle' : 'ui.reportJobs.editTitle') | t }}</h2>
+      <p class="fd-subtitle">{{ 'ui.reportJobs.formSubtitle' | t }}</p>
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    @if (loading()) {
+      <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    } @else {
+      <div class="fd-grid">
+        <div class="fd-field">
+          <label class="fd-label fd-required" for="name">{{ label('name') }}</label>
+          <!-- the scheduler keeps the job under this name: changing it would leave the old job behind -->
+          <input id="name" name="name" class="fd-input" [(ngModel)]="job.name" autocomplete="off"
+            [readonly]="!isNew" required />
+          <span class="fd-help">{{ (isNew ? 'ui.reportJobs.nameHint' : 'ui.reportJobs.nameLocked') | t }}</span>
+        </div>
+
+        <div class="fd-field">
+          <span class="fd-label fd-required">{{ label('jobType') }}</span>
+          <app-search-select [options]="jobTypeOptions()" [ngModel]="job.jobType"
+            (ngModelChange)="jobTypeChanged($event)" [ngModelOptions]="{ standalone: true }"
+            icon="fa-solid fa-gears" [placeholder]="label('jobType')" [ariaLabel]="label('jobType')" />
+          <span class="fd-help">{{ 'ui.reportJobs.jobTypeHint' | t }}</span>
+        </div>
+
+        @if (isMail()) {
+          <div class="fd-field">
+            <span class="fd-label fd-required">{{ label('smtpId') }}</span>
+            <app-search-select [options]="smtpOptions()" [(ngModel)]="job.smtpId"
+              [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-server"
+              [placeholder]="label('smtpId')" [ariaLabel]="label('smtpId')" />
+            <span class="fd-help">{{ 'ui.reportJobs.smtpIdHint' | t }}</span>
+          </div>
+
+          <div class="fd-field">
+            <span class="fd-label fd-required">{{ label('jobOutputType') }}</span>
+            <app-search-select [options]="outputTypeOptions()" [ngModel]="job.jobOutputType"
+              (ngModelChange)="outputTypeChanged($event)" [ngModelOptions]="{ standalone: true }"
+              icon="fa-solid fa-paperclip" [placeholder]="label('jobOutputType')"
+              [ariaLabel]="label('jobOutputType')" />
+            <span class="fd-help">{{ 'ui.reportJobs.jobOutputTypeHint' | t }}</span>
+          </div>
+
+          <div class="fd-field fd-field-wide">
+            <label class="fd-label fd-required" for="receive">{{ label('receive') }}</label>
+            <input id="receive" name="receive" class="fd-input" [(ngModel)]="job.receive" autocomplete="off"
+              [placeholder]="'ui.reportJobs.receivePlaceholder' | t" required />
+            <span class="fd-help">{{ 'ui.reportJobs.receiveHint' | t }}</span>
+          </div>
+
+          <div class="fd-field fd-field-wide">
+            <label class="fd-label fd-required" for="mailSubject">{{ label('mailSubject') }}</label>
+            <input id="mailSubject" name="mailSubject" class="fd-input" [(ngModel)]="job.mailSubject"
+              autocomplete="off" required />
+            <span class="fd-help">{{ 'ui.reportJobs.mailSubjectHint' | t }}</span>
+          </div>
+
+          <div class="fd-field fd-field-wide">
+            <span class="fd-label">{{ label('mailBody') }}</span>
+            <app-html-editor [(ngModel)]="job.mailBody" [ngModelOptions]="{ standalone: true }"
+              [placeholder]="'ui.reportJobs.mailBodyPlaceholder' | t" [ariaLabel]="label('mailBody')" />
+            <span class="fd-help">{{ 'ui.reportJobs.mailBodyHint' | t }}</span>
+          </div>
+        }
+
+        @if (isFile()) {
+          <div class="fd-field fd-field-wide">
+            <label class="fd-label fd-required" for="filePath">{{ label('filePath') }}</label>
+            <input id="filePath" name="filePath" class="fd-input code" [(ngModel)]="job.filePath" autocomplete="off"
+              spellcheck="false" [placeholder]="'ui.reportJobs.filePathPlaceholder' | t" required />
+            <span class="fd-help">{{ 'ui.reportJobs.filePathHint' | t }}</span>
+          </div>
+        }
+
+        @if (hasFile()) {
+          <div class="fd-field">
+            <label class="fd-label fd-required" for="fileName">{{ label('fileName') }}</label>
+            <input id="fileName" name="fileName" class="fd-input" [(ngModel)]="job.fileName" autocomplete="off"
+              required />
+            <span class="fd-help">{{ 'ui.reportJobs.fileNameHint' | t }}</span>
+          </div>
+
+          <div class="fd-field">
+            <span class="fd-label">{{ label('exportType') }}</span>
+            <app-search-select [options]="exportTypeOptions()" [ngModel]="job.exportType"
+              (ngModelChange)="exportTypeChanged($event)" [ngModelOptions]="{ standalone: true }"
+              icon="fa-solid fa-file-export" [placeholder]="label('exportType')"
+              [ariaLabel]="label('exportType')" />
+            <span class="fd-help">{{ 'ui.reportJobs.exportTypeHint' | t }}</span>
+          </div>
+        }
+
+        @if (isCsv()) {
+          <div class="fd-field">
+            <label class="fd-label fd-required" for="csvDelimiter">{{ label('csvDelimiter') }}</label>
+            <input id="csvDelimiter" name="csvDelimiter" class="fd-input code" maxlength="4"
+              [(ngModel)]="job.csvDelimiter" autocomplete="off" spellcheck="false" required />
+            <span class="fd-help">{{ 'ui.reportJobs.csvDelimiterHint' | t }}</span>
+          </div>
+        }
+
+        <div class="fd-field">
+          <label class="fd-label" for="errorReceive">{{ label('errorReceive') }}</label>
+          <input id="errorReceive" name="errorReceive" class="fd-input" [(ngModel)]="job.errorReceive"
+            autocomplete="off" [placeholder]="'ui.reportJobs.receivePlaceholder' | t" />
+          <span class="fd-help">{{ 'ui.reportJobs.errorReceiveHint' | t }}</span>
+        </div>
+
+        <div class="fd-field">
+          <span class="fd-label">{{ label('roleId') }}</span>
+          <app-search-select [options]="roleOptions()" [(ngModel)]="job.roleId"
+            [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-user-shield" [placeholder]="label('roleId')"
+            [ariaLabel]="label('roleId')" />
+          <span class="fd-help">{{ 'ui.reportJobs.roleIdHint' | t }}</span>
+        </div>
+
+        <div class="fd-field fd-field-wide switches">
+          <label class="switch">
+            <input type="checkbox" name="active" [(ngModel)]="job.active" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span class="switch-text">{{ label('active') }}</span>
+          </label>
+          <span class="fd-help">{{ 'ui.reportJobs.activeHint' | t }}</span>
+
+          @if (canBeConditional()) {
+            <label class="switch">
+              <input type="checkbox" name="conditional" [(ngModel)]="job.conditional" />
+              <span class="switch-track"><span class="switch-thumb"></span></span>
+              <span class="switch-text">{{ label('conditional') }}</span>
+            </label>
+            <span class="fd-help">{{ 'ui.reportJobs.conditionalHint' | t }}</span>
+          }
+        </div>
+
+        <div class="fd-field fd-field-wide">
+          <span class="fd-label fd-required">{{ 'ui.cron.title' | t }}</span>
+          <app-cron-picker [value]="cron" />
+        </div>
+      </div>
+    }
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint">{{ 'ui.requiredFieldsMarked' | t }}</span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.cancel' | t }}</button>
+      <button type="submit" class="fd-button fd-button-primary" [disabled]="!canSave()">
+        <i class="fa-solid" [class.fa-floppy-disk]="!saving()" [class.fa-spinner]="saving()"
+          [class.fa-spin]="saving()"></i>
+        {{ 'ui.save' | t }}
+      </button>
+    </div>
+  </footer>
+</form>
