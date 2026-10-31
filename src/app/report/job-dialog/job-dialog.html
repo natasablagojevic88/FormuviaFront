@@ -86,9 +86,11 @@
               required />
             <span class="fd-help">{{ 'ui.reportJobs.fileNameHint' | t }}</span>
           </div>
+        }
 
+        @if (needsExportType()) {
           <div class="fd-field">
-            <span class="fd-label">{{ label('exportType') }}</span>
+            <span class="fd-label fd-required">{{ label('exportType') }}</span>
             <app-search-select [options]="exportTypeOptions()" [ngModel]="job.exportType"
               (ngModelChange)="exportTypeChanged($event)" [ngModelOptions]="{ standalone: true }"
               icon="fa-solid fa-file-export" [placeholder]="label('exportType')"

@@ -84,7 +84,7 @@ export class SearchSelect implements ControlValueAccessor {
 
   private readonly trigger = viewChild.required<ElementRef<HTMLButtonElement>>("trigger");
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>("search");
-  private onChange: (value: string) => void = () => {};
+  private onChange: (value: string | null) => void = () => {};
   private onTouched: () => void = () => {};
 
   constructor(private host: ElementRef<HTMLElement>) {}
@@ -93,7 +93,7 @@ export class SearchSelect implements ControlValueAccessor {
     this.value.set(value === null || value === undefined ? "" : String(value));
   }
 
-  registerOnChange(fn: (value: string) => void): void {
+  registerOnChange(fn: (value: string | null) => void): void {
     this.onChange = fn;
   }
 
@@ -105,7 +105,11 @@ export class SearchSelect implements ControlValueAccessor {
     this.disabled.set(disabled);
   }
 
-  /** The x in the field: back to no value, without opening the list. */
+  /**
+   * The x in the field: back to no value, without opening the list. The field is given back as
+   * null and not as an empty text: the value of such a field is an id or a kind on the server, and
+   * an empty text is read there as a wrong value, not as no value.
+   */
   clear(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
@@ -113,7 +117,7 @@ export class SearchSelect implements ControlValueAccessor {
       return;
     }
     this.value.set("");
-    this.onChange("");
+    this.onChange(null);
     this.onTouched();
   }
 

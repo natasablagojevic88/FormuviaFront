@@ -66,7 +66,7 @@ export class AppUserDialog implements OnInit {
     return role.description || role.code;
   }
 
-  addRole(id: string): void {
+  addRole(id: string | null): void {
     const role = this.allRoles().find((item) => item.id === id);
     this.roleToAdd = "";
     if (role) {

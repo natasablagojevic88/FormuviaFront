@@ -226,7 +226,7 @@
               } @else if (hasChain(column)) {
                 <app-chain-select class="cell-chain" [levels]="levels(column)" [compact]="true" [showLastName]="false"
                   [ngModel]="editValue" (ngModelChange)="editValue = $event; commitChain($event)"
-                  [ngModelOptions]="{ standalone: true }" (keydown.escape)="cancelEdit()"
+                  (cleared)="commitEdit()" [ngModelOptions]="{ standalone: true }" (keydown.escape)="cancelEdit()"
                   [ariaLabel]="column.description" />
               } @else if (isEnum(column) || column.columnType === 'BOOLEAN') {
                 <app-search-select class="cell-select" appearance="compact"

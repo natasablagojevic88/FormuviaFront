@@ -96,7 +96,7 @@ A job is entered, changed and deleted, and the application schedules it: it is k
 - **Write into a file** — the report is written into a file on the server. It asks for the folder and the name of the file; the folder has to be one the server may write into.
 - **Only run** — the report does its work over the data and nothing comes back. Only a report of the *UPDATE query or procedure* kind can be run that way, and a report of that kind cannot do anything else.
 
-Whenever a file is made — as the file itself or as the attachment of a mail — the **kind of file** is chosen: *Excel*, or *CSV* where the sign between two columns is given as the **separator**.
+Whenever a file is made — as the file itself or as the attachment of a mail — the **kind of file** is chosen: *Excel*, or *CSV* where the sign between two columns is given as the **separator**. It is only asked for then, and only for a report that is not a Jasper one: a Jasper document is always drawn as a PDF, a report that stands in the mail itself goes out as HTML, and a job that only runs the report makes nothing, so in all three there is no kind of file to choose.
 
 The rest is the same for every job:
 

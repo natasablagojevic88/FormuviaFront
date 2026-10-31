@@ -96,7 +96,7 @@ Posao se unosi, menja i briše, a aplikacija ga stavlja u raspored: čuva se u b
 - **Upisati u fajl** — izveštaj se upisuje u fajl na serveru. Traži folder i naziv fajla; folder mora biti onaj u koji server ima pravo da piše.
 - **Samo izvršiti** — izveštaj odradi svoje nad podacima i ništa se ne vraća. Tako se može pokrenuti samo izveštaj vrste *UPDATE upit ili procedura*, a izveštaj te vrste ne može ništa drugo.
 
-Kad god se pravi fajl — i kao sam fajl i kao prilog poruke — bira se **vrsta fajla**: *Excel* ili *CSV*, gde se znak između dve kolone zadaje kao **razdvajač**.
+Kad god se pravi fajl — i kao sam fajl i kao prilog poruke — bira se **vrsta fajla**: *Excel* ili *CSV*, gde se znak između dve kolone zadaje kao **razdvajač**. Pita se samo tada, i samo za izveštaj koji nije Jasper: Jasper dokument se uvek crta kao PDF, izveštaj koji stoji u samoj poruci ide kao HTML, a posao koji izveštaj samo pokrene ne pravi ništa — ni u jednom od ta tri nema vrste fajla da se bira.
 
 Ostalo je isto za svaki posao:
 

@@ -42,7 +42,7 @@ export class DateField implements ControlValueAccessor {
   private readonly picker = viewChild.required<ElementRef<HTMLInputElement>>("picker");
 
   private value = "";
-  private onChange: (value: string) => void = () => {};
+  private onChange: (value: string | null) => void = () => {};
   private onTouched: () => void = () => {};
 
   constructor(private language: Language) {}
@@ -70,12 +70,18 @@ export class DateField implements ControlValueAccessor {
   }
 
   writeValue(value: unknown): void {
-    this.value = value === null || value === undefined ? "" : String(value);
+    const value_ = value === null || value === undefined ? "" : String(value);
+    if (value_ === this.value) {
+      // the value it already holds comes back (a parent that keeps an emptied field as ""):
+      // what is being typed stays, otherwise the field would empty itself under the hand
+      return;
+    }
+    this.value = value_;
     this.text.set(dateToText(this.value, this.language.current()));
     this.invalid.set(false);
   }
 
-  registerOnChange(fn: (value: string) => void): void {
+  registerOnChange(fn: (value: string | null) => void): void {
     this.onChange = fn;
   }
 
@@ -149,6 +155,7 @@ export class DateField implements ControlValueAccessor {
       return;
     }
     this.value = value;
-    this.onChange(value);
+    // an emptied date goes out as null: the server reads an empty text as a wrong date, not as none
+    this.onChange(value === "" ? null : value);
   }
 }

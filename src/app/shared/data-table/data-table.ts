@@ -109,14 +109,15 @@ function toEditValue(value: any, column: DatabaseColumn, language: string): any 
 
 /** Value of the edit field -> value sent to the server. */
 function fromEditValue(text: any, column: DatabaseColumn): any {
+  // an empty cell is nothing - for a yes/no column as well, where cleared is neither yes nor no
+  if (text === "" || text === null || text === undefined) {
+    return null;
+  }
   if (column.columnType === "BOOLEAN") {
     return text === "true";
   }
   if (column.columnType === "FILE") {
     return text || null;
-  }
-  if (text === "") {
-    return null;
   }
   switch (column.columnType) {
     case "INTEGER":
@@ -351,7 +352,7 @@ export class DataTable implements AfterViewInit, OnDestroy {
     return this.readOnly() ? columns : [ACTIONS_COLUMN, ...columns];
   });
   readonly filterColumns = computed(() => this.displayedColumns().map((column) => FILTER_PREFIX + column));
-  readonly hasFilters = computed(() => Object.values(this.filters()).some((value) => value !== ""));
+  readonly hasFilters = computed(() => Object.values(this.filters()).some((value) => !!value));
   // Options for the filters of enum and boolean columns, with "All" first
   readonly filterOptions = computed(() => {
     const all: SelectOption = { value: "", label: this.translate.get("ui.all") };
@@ -945,8 +946,12 @@ export class DataTable implements AfterViewInit, OnDestroy {
     this.sendRequest.download(url).finally(() => this.downloading.set(false));
   }
 
-  /** A chained codebook is saved once the last level is chosen; the levels above only narrow the list. */
-  commitChain(value: string): void {
+  /**
+   * A chained codebook is saved once the last level is chosen; the levels above only narrow the
+   * list, so an empty value then means "not chosen yet" and nothing is saved. Emptying the last
+   * level with the x is something else and comes through (cleared).
+   */
+  commitChain(value: string | null): void {
     if (value) {
       this.commitEdit();
     }
@@ -1398,8 +1403,8 @@ export class DataTable implements AfterViewInit, OnDestroy {
     );
   }
 
-  onFilter(fieldName: string, value: string): void {
-    this.filters.update((filters) => ({ ...filters, [fieldName]: value }));
+  onFilter(fieldName: string, value: string | null): void {
+    this.filters.update((filters) => ({ ...filters, [fieldName]: value ?? "" }));
     clearTimeout(this.filterTimer);
     this.filterTimer = setTimeout(() => this.search(), FILTER_DELAY);
   }

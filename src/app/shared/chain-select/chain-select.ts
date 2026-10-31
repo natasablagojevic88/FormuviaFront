@@ -1,4 +1,4 @@
-import { Component, computed, effect, forwardRef, input, signal, untracked } from "@angular/core";
+import { Component, computed, effect, forwardRef, input, output, signal, untracked } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Translate } from "../../services/translate";
 import { ChainLevel, chainOfValue, optionsOf } from "../parent-chain";
@@ -24,6 +24,8 @@ export class ChainSelect implements ControlValueAccessor {
   /** false: the last level carries no name of its own, because the field or column already has one. */
   readonly showLastName = input(true);
   readonly ariaLabel = input("");
+  /** The last level was emptied with the x; the table knows by it that the cell is to be saved. */
+  readonly cleared = output<void>();
 
   readonly chosen = signal<string[]>([]);
   readonly disabled = signal(false);
@@ -39,7 +41,7 @@ export class ChainSelect implements ControlValueAccessor {
   );
 
   private value = "";
-  private onChange: (value: string) => void = () => {};
+  private onChange: (value: string | null) => void = () => {};
   private onTouched: () => void = () => {};
 
   constructor(private translate: Translate) {
@@ -59,7 +61,7 @@ export class ChainSelect implements ControlValueAccessor {
     this.chosen.set(chainOfValue(this.levels(), this.value));
   }
 
-  registerOnChange(fn: (value: string) => void): void {
+  registerOnChange(fn: (value: string | null) => void): void {
     this.onChange = fn;
   }
 
@@ -88,15 +90,21 @@ export class ChainSelect implements ControlValueAccessor {
   }
 
   /** Changing a level clears everything below it; the value goes out only when the last one is chosen. */
-  select(index: number, value: string): void {
+  select(index: number, value: string | null): void {
     const chosen = this.chosen().slice();
-    chosen[index] = value;
+    // the levels are kept as text, so a cleared level is empty and not missing
+    chosen[index] = value ?? "";
     for (let below = index + 1; below < chosen.length; below++) {
       chosen[below] = "";
     }
     this.chosen.set(chosen);
     this.value = chosen[chosen.length - 1] ?? "";
     this.onTouched();
-    this.onChange(this.value);
+    // nothing chosen goes out as null, as in every list: an empty text is a wrong id for the server
+    this.onChange(this.value === "" ? null : this.value);
+    if (value === null && index === chosen.length - 1) {
+      // the x on the last level: the field is emptied on purpose, not waiting for a choice below
+      this.cleared.emit();
+    }
   }
 }

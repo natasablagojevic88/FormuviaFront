@@ -180,8 +180,12 @@ export class JobDialog implements OnInit {
   /** A file is made in both cases: as the attachment of a mail and as the file itself. */
   readonly hasFile = computed(() => this.isFile() || (this.isMail() && this.outputType() === "ATTACHMENT"));
 
+  /** A Jasper document is drawn as a PDF, so there is nothing to choose: every other report is
+   * written into the kind of file that is chosen here. */
+  readonly needsExportType = computed(() => this.hasFile() && this.data.reportType !== "JASPER");
+
   /** A delimiter is only asked for when the file is a CSV. */
-  readonly isCsv = computed(() => this.hasFile() && this.exportType() === "CSV");
+  readonly isCsv = computed(() => this.needsExportType() && this.exportType() === "CSV");
 
   /** Only a query report can be left out when it gives no rows. */
   readonly canBeConditional = computed(() => this.data.reportType === "SQL");
@@ -235,9 +239,9 @@ export class JobDialog implements OnInit {
       .finally(() => this.loading.set(false));
   }
 
-  jobTypeChanged(jobType: JobType): void {
-    this.job.jobType = jobType;
-    this.jobType.set(jobType);
+  jobTypeChanged(jobType: JobType | null): void {
+    this.job.jobType = jobType ?? undefined;
+    this.jobType.set(jobType ?? undefined);
     if (jobType !== "SEND_MAIL") {
       // the server keeps neither the address nor the subject of a job that sends nothing
       this.job.receive = null;
@@ -249,16 +253,32 @@ export class JobDialog implements OnInit {
     if (jobType !== "EXPORT_FILE") {
       this.job.filePath = null;
     }
+    if (jobType === "EXECUTE") {
+      // the report only does its work over the data: nothing comes out of it, so no file is made
+      this.clearFile();
+    }
   }
 
-  outputTypeChanged(outputType: JobOutputType): void {
+  outputTypeChanged(outputType: JobOutputType | null): void {
     this.job.jobOutputType = outputType;
-    this.outputType.set(outputType);
+    this.outputType.set(outputType ?? undefined);
+    if (outputType === "INLINE") {
+      // the report stands in the mail itself, as HTML: there is no file, so no kind of file either
+      this.clearFile();
+    }
   }
 
-  exportTypeChanged(exportType: JobExportType): void {
+  /** Nothing is made into a file, so neither the kind of file nor what goes with it is kept. */
+  private clearFile(): void {
+    this.job.exportType = null;
+    this.job.csvDelimiter = null;
+    this.job.fileName = null;
+    this.exportType.set(undefined);
+  }
+
+  exportTypeChanged(exportType: JobExportType | null): void {
     this.job.exportType = exportType;
-    this.exportType.set(exportType);
+    this.exportType.set(exportType ?? undefined);
   }
 
   /** The server reads the same thing: without a kind of file there is nothing to separate. */
@@ -285,6 +305,10 @@ export class JobDialog implements OnInit {
     if (this.hasFile() && !this.job.fileName?.trim()) {
       return false;
     }
+    // a file is made out of a report that is not a Jasper one: the server asks for its kind
+    if (this.needsExportType() && !this.job.exportType) {
+      return false;
+    }
     return !(this.isCsv() && !this.job.csvDelimiter?.trim());
   }
 
@@ -306,6 +330,16 @@ export class JobDialog implements OnInit {
     // a Jasper document is always a file; the server reads the kind of output for it either way
     if (this.data.reportType === "JASPER" && !job["jobOutputType"]) {
       job["jobOutputType"] = "ATTACHMENT";
+    }
+    if (!this.hasFile()) {
+      // a job that makes no file carries no name of one either
+      job["fileName"] = null;
+    }
+    if (!this.needsExportType()) {
+      // no kind of file is chosen here, so neither it nor the separator goes along, even if an
+      // older row of the job was saved with them
+      job["exportType"] = null;
+      job["csvDelimiter"] = null;
     }
     this.sendRequest.post(ApiRoute.reportJob, job)
       .then((saved: JobItem) => this.dialogRef.close(saved))

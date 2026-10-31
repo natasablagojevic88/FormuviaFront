@@ -95,13 +95,13 @@ export class ReportDialog implements OnInit {
     return !this.data.id;
   }
 
-  typeChanged(type: ReportType): void {
+  typeChanged(type: ReportType | null): void {
     if (!this.isNew) {
       // the kind of a saved report is not changed: the server refuses a changed one
       return;
     }
-    this.report.type = type;
-    this.type.set(type);
+    this.report.type = type ?? undefined;
+    this.type.set(type ?? undefined);
     if (type !== "JASPER") {
       // the server keeps no file for a query report either
       this.report.fileUpload = null;
