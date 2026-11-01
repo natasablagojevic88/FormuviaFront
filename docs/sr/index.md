@@ -23,6 +23,9 @@ features:
   - title: Svaka tabela radi isto
     details: Filtriranje, napredna pretraga, sortiranje, straničenje, izmena u tabeli, istorija i export u Excel.
     link: /sr/tables
+  - title: Izveštaj koji ide sam
+    details: Izveštaj odlazi poštom ili u fajl po svom rasporedu, a strana Poslovi pokazuje kako se završilo svako njegovo pokretanje.
+    link: /sr/jobs
 ---
 
 ## Šta je Formuvia
@@ -36,7 +39,7 @@ Oko toga stoji ono što poslovnoj aplikaciji ionako treba: nalozi i uloge, zapis
 ## Kome je ovo uputstvo namenjeno
 
 - **Ako unosite i pretražujete podatke**, pročitajte [Prijavu](/sr/getting-started) i [Rad sa tabelama](/sr/tables). To je sve što vam treba.
-- **Ako gradite aplikaciju**, nastavite sa [Modelom](/sr/model) i [Dizajnom forme](/sr/form-design), ljude podesite u [Administraciji](/sr/administration), a dokumente aplikacije složite u grupe u [Izveštajima](/sr/reports).
+- **Ako gradite aplikaciju**, nastavite sa [Modelom](/sr/model) i [Dizajnom forme](/sr/form-design), ljude podesite u [Administraciji](/sr/administration), dokumente aplikacije složite u grupe u [Izveštajima](/sr/reports), a ono što ide samo pratite u [Poslovima](/sr/jobs).
 
 ## Dokle je Formuvia stigla
 

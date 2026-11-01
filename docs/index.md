@@ -23,6 +23,9 @@ features:
   - title: Every table screen works the same
     details: Filtering, advanced search, sorting, paging, editing in the table, history and export to Excel.
     link: /tables
+  - title: A report that runs by itself
+    details: A report goes out by mail or into a file on a timetable of its own, and the Jobs page shows how every run of it ended.
+    link: /jobs
 ---
 
 ## What Formuvia is
@@ -36,7 +39,7 @@ Around that sits everything a business application needs anyway: accounts and ro
 ## Who this guide is for
 
 - **If you enter and look up data**, read [Signing in](/getting-started) and [Working with tables](/tables). That is everything you need.
-- **If you build the application**, continue with [Model](/model) and [Form design](/form-design), set people up in [Administration](/administration), and sort the documents of the application into groups in [Reports](/reports).
+- **If you build the application**, continue with [Model](/model) and [Form design](/form-design), set people up in [Administration](/administration), sort the documents of the application into groups in [Reports](/reports), and watch what runs by itself in [Jobs](/jobs).
 
 ## Where Formuvia is today
 
