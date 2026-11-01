@@ -28,6 +28,15 @@ describe("cron value", () => {
     expect(cronExpression(value)).toBe("0 0,15,30 * * * ? *");
   });
 
+  it("any minute beside a chosen hour is the top of that hour", () => {
+    const value: CronValue = { ...emptyCron(), anyHours: false, inHours: "8" };
+    expect(cronExpression(value)).toBe("0 0 8 * * ? *");
+  });
+
+  it("any minute with any hour stays every minute", () => {
+    expect(cronExpression({ ...emptyCron(), anyDay: false, inDay: "1" })).toBe("0 * * 1 * ? *");
+  });
+
   it("the day of the month gives way to the weekday, because Quartz takes only one", () => {
     const value: CronValue = { ...emptyCron(), anyDOfWeek: false, inDOfWeek: "2,6" };
     expect(cronExpression(value)).toBe("0 * * ? * 2,6 *");

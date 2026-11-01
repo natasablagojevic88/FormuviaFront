@@ -17,7 +17,7 @@ Jedan red je jedan posao iz rasporeda, sa svim što je o njemu pročitano u tren
 | **Ishod** | kako se poslednje pokretanje završilo: *Prošao*, *Nije prošao* ili *U toku* dok još radi |
 | **Završeno** | kada je to poslednje pokretanje bilo gotovo |
 
-Posao koji se još nikad nije pokretao to i piše umesto ishoda. Isključen posao zadržava poslednje pokretanje i ishod — samo sledeće pokretanje nema šta da pokaže, jer ga nema.
+Posao koji se još nikad nije pokretao to i piše umesto ishoda. Isključen posao zadržava ishod poslednjeg pokretanja i kada je završeno, ali su *Poslednje pokretanje* i *Sledeće pokretanje* prazni: isključivanje vadi posao iz rasporeda, a ta dva vremena se čitaju iz rasporeda, a ne iz onog što je upisano.
 
 Ceo spisak dolazi odjednom, bez strana: poslovi jedne aplikacije se broje u desetinama, ne u hiljadama. *Osveži* u zaglavlju čita sve ponovo, i to je način da se vidi kako se završio posao koji je upravo radio.
 

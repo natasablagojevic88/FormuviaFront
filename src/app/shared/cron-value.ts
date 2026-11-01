@@ -144,7 +144,9 @@ export function cronExpression(value: CronValue): string {
   const weekday = cronDayOfWeekChosen(value);
   return [
     "0",
-    part("minutes"),
+    // the server reads "any minute" beside a chosen hour as the top of that hour, not as every
+    // minute of it (JobItemUpdate.cronMaker), so the expression shown here says the same
+    value.anyMinutes && !value.anyHours ? "0" : part("minutes"),
     part("hours"),
     // the day of the month gives way to the weekday: Quartz wants '?' in one of the two
     weekday ? "?" : part("day"),

@@ -39,11 +39,7 @@ Pošto `admin` implicitno ima sve uloge, administrator vidi sve i nije mu potreb
 
 ## Serveri za poštu
 
-*Administracija / Serveri za poštu* čuva servere preko kojih aplikacija šalje poštu. To je obična tabelarna strana, pa pretraga, sortiranje, strane, istorija i izvoz u Excel rade kao i svuda.
-
-::: info Šta danas ima dejstvo
-Serveri za poštu se ovde upisuju, menjaju i brišu, uz njih se čuva lozinka, i svaki se može isprobati probnom poštom. Pošta koju aplikacija sama šalje — obaveštenja, izveštaji — se tek pravi.
-:::
+*Administracija / Serveri za poštu* čuva servere preko kojih aplikacija šalje poštu: probnu poruku iz menija reda, i sve što [posao izveštaja](/sr/reports#poslovi-izvestaj-koji-ide-sam) šalje sam — izveštaj, i javljanje o poslu koji nije prošao. To je obična tabelarna strana, pa pretraga, sortiranje, strane, istorija i izvoz u Excel rade kao i svuda.
 
 *Dodaj* traži:
 

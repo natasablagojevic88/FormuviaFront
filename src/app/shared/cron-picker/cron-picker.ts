@@ -238,6 +238,10 @@ export class CronPicker implements OnInit {
     const value = this.value();
     const mode = cronMode(value, unit);
     if (mode === "any") {
+      // beside a chosen hour the server takes any minute as the top of that hour
+      if (unit === "minutes" && !value.anyHours) {
+        return this.translate.get("ui.cron.topOfHour");
+      }
       return this.translate.get("ui.cron.any." + unit);
     }
     if (mode === "every") {

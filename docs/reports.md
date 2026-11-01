@@ -110,7 +110,7 @@ A job that is not wanted for a while is switched off by **On** and stays as it i
 
 Under the fields of the job stands the schedule, and it is read from top to bottom: minutes, hours, day of the month, month, day of the week, year. Every one of the six is set in one of three ways:
 
-- **Any** — every value of that unit. Minutes at *any* means every minute.
+- **Any** — every value of that unit. Minutes at *any* mean every minute while the hours are at *any* too; the moment an hour is chosen they mean the **top of that hour**, because a job set to 8 h is meant to run at 8, not sixty times between 8 and 9.
 - **Every n-th** — a step: every 5 minutes, every 6 hours, every 3 months. The step is counted from the beginning of the bigger unit, so a step of 5 over the minutes means 0, 5, 10 and so on to 55, and it starts again at the top of every hour.
 - **Pick** — only the values ticked. Minutes and hours are ticked as numbers, the month and the day of the week by name. Beside the ticks stand the usual choices — *All*, *None*, *Every quarter of an hour*, *Working days*, *Weekend* and so on — and they replace what is ticked, they do not add to it.
 

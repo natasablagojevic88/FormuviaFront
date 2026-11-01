@@ -39,11 +39,7 @@ Since `admin` implicitly holds every role, an administrator sees everything, and
 
 ## Mail servers
 
-*Administration / Mail servers* keeps the servers the application sends mail through. It is an ordinary table screen, so searching, sorting, pages, history and Excel export work on it as everywhere else.
-
-::: info What works today
-The mail servers are written down, changed and deleted here, the password is kept for them, and each one can be tried out with a test mail. Mail that the application sends by itself — notices, reports — is still being built.
-:::
+*Administration / Mail servers* keeps the servers the application sends mail through: the test mail from the row menu, and everything a [job of a report](/reports#jobs-a-report-that-runs-by-itself) sends by itself — the report, and the word about a job that did not go through. It is an ordinary table screen, so searching, sorting, pages, history and Excel export work on it as everywhere else.
 
 *Add* asks for:
 

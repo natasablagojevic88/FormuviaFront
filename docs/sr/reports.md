@@ -110,7 +110,7 @@ Posao koji privremeno ne treba isključuje se preko **Uključen** i ostaje kakav
 
 Ispod polja posla stoji raspored i čita se od vrha nadole: minuti, sati, dan u mesecu, mesec, dan u nedelji, godina. Svaka od šest jedinica podešava se na jedan od tri načina:
 
-- **Bilo koji** — svaka vrednost te jedinice. Minuti na *bilo koji* znači svakog minuta.
+- **Bilo koji** — svaka vrednost te jedinice. Minuti na *bilo koji* znače svakog minuta dok su i sati na *bilo koji*; čim se izabere sat, znače **pun taj sat**, jer posao podešen na 8 h treba da ide u 8, a ne šezdeset puta između 8 i 9.
 - **Svaki n-ti** — korak: svakih 5 minuta, svakih 6 sati, svaka 3 meseca. Korak se računa od početka veće jedinice, pa korak 5 nad minutima znači 0, 5, 10 i tako do 55, i počinje ponovo na pun sat.
 - **Izbor** — samo označene vrednosti. Minuti i sati se označavaju kao brojevi, mesec i dan u nedelji po imenu. Pored oznaka stoje uobičajeni izbori — *Sve*, *Ništa*, *Svakih 15 minuta*, *Radni dani*, *Vikend* i tako dalje — i oni zamenjuju ono što je označeno, ne dodaju se na njega.
 

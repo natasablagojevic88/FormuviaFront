@@ -17,7 +17,7 @@ One row is one job of the scheduler, with everything about it read at the moment
 | **Outcome** | how the last run ended: *Went through*, *Failed*, or *Running* while it is still working |
 | **Finished** | when that last run was over |
 
-A job that has never run yet says so instead of an outcome. A job that was switched off keeps its last run and its outcome — only the next run has nothing to show, because there is none.
+A job that has never run yet says so instead of an outcome. A job that was switched off keeps the outcome of its last run and when it finished, but *Last run* and *Next run* are both empty: switching a job off takes it out of the timetable, and those two times are read from the timetable, not from what was written down.
 
 The whole list comes at once, without pages: the jobs of an application are counted in tens, not in thousands. *Refresh* in the header reads them all again, which is the way to see how a job that has just been running ended.
 
