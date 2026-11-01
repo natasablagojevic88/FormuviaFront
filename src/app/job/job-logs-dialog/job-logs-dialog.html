@@ -1,0 +1,22 @@
+<div class="fd">
+  <header class="fd-header">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ 'ui.jobs.logsTitle' | t }}</h2>
+      <p class="fd-subtitle">{{ data.name }}</p>
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body logs-body">
+    <app-data-table [url]="url" [readOnly]="true" [canDelete]="false"></app-data-table>
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint">{{ 'ui.jobs.logsHint' | t }}</span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.close' | t }}</button>
+    </div>
+  </footer>
+</div>

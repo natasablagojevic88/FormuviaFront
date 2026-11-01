@@ -1,0 +1,97 @@
+<app-page-header
+  [title]="'ui.jobs.title' | t"
+  [subtitle]="'ui.jobs.subtitle' | t"
+  [breadcrumb]="'ui.jobs.breadcrumb' | t">
+  <button type="button" class="reload-button" (click)="refresh()" [disabled]="loading()">
+    <i class="fa-solid fa-rotate"></i>
+    <span class="reload-label">{{ 'ui.jobs.reload' | t }}</span>
+  </button>
+</app-page-header>
+
+<div class="jobs-card">
+  <div class="toolbar">
+    <div class="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" [ngModel]="search()" (ngModelChange)="search.set($event)"
+        [placeholder]="'ui.jobs.searchPlaceholder' | t" [attr.aria-label]="'ui.jobs.searchPlaceholder' | t" />
+      @if (search()) {
+        <button type="button" class="search-clear" (click)="search.set('')" [attr.aria-label]="'ui.clear' | t">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      }
+    </div>
+    <span class="count">{{ 'ui.jobs.count' | t }}: {{ shown().length }}</span>
+  </div>
+
+  @if (shown().length === 0) {
+    <p class="empty">{{ (loading() ? 'ui.jobs.loading' : 'ui.noResults') | t }}</p>
+  } @else {
+    <div class="table-scroll">
+      <table class="jobs-table">
+        <thead>
+          <tr>
+            <th class="actions-head">{{ 'ui.actions' | t }}</th>
+            <th>{{ 'ui.jobs.name' | t }}</th>
+            <th>{{ 'ui.jobs.active' | t }}</th>
+            <th>{{ 'ui.jobs.previousFire' | t }}</th>
+            <th>{{ 'ui.jobs.nextFire' | t }}</th>
+            <th>{{ 'ui.jobs.outcome' | t }}</th>
+            <th>{{ 'ui.jobs.lastEndDate' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of shown(); track row.jobId ?? row.name) {
+            <tr [class.row-working]="working() === row.jobId">
+              <td class="actions" [attr.data-label]="'ui.actions' | t">
+                @if (row.reportId) {
+                  <button type="button" class="icon-button" (click)="run(row)"
+                    [disabled]="!row.jobId || working() !== null"
+                    [attr.aria-label]="'ui.jobs.run' | t" [title]="'ui.jobs.run' | t">
+                    <i class="fa-solid fa-play"></i>
+                  </button>
+                }
+                <button type="button" class="icon-button" (click)="refreshRow(row)"
+                  [disabled]="!row.jobId || working() !== null"
+                  [attr.aria-label]="'ui.jobs.refreshRow' | t" [title]="'ui.jobs.refreshRow' | t">
+                  <i class="fa-solid fa-rotate"></i>
+                </button>
+                <button type="button" class="icon-button" (click)="showLogs(row)"
+                  [disabled]="!row.jobId || working() !== null"
+                  [attr.aria-label]="'ui.jobs.logs' | t" [title]="'ui.jobs.logs' | t">
+                  <i class="fa-solid fa-clock-rotate-left"></i>
+                </button>
+                @if (canEdit() && row.reportId) {
+                  <button type="button" class="icon-button" (click)="edit(row)"
+                    [disabled]="working() !== null"
+                    [attr.aria-label]="'ui.edit' | t" [title]="'ui.edit' | t">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                }
+              </td>
+              <td [attr.data-label]="'ui.jobs.name' | t"><span class="name">{{ row.name }}</span></td>
+              <td [attr.data-label]="'ui.jobs.active' | t">
+                <span class="flag" [class.on]="row.active">{{ (row.active ? 'ui.yes' : 'ui.no') | t }}</span>
+              </td>
+              <td [attr.data-label]="'ui.jobs.previousFire' | t">{{ dateTime(row.previousFire) }}</td>
+              <td [attr.data-label]="'ui.jobs.nextFire' | t">{{ dateTime(row.nextFire) }}</td>
+              <td [attr.data-label]="'ui.jobs.outcome' | t">
+                @if (row.status) {
+                  <span [class]="'status ' + row.status">{{ statusText(row.status) }}</span>
+                  @if (row.errorText) {
+                    <button type="button" class="icon-button error-button" (click)="showError(row)"
+                      [attr.aria-label]="'ui.jobs.errorText' | t" [title]="'ui.jobs.errorText' | t">
+                      <i class="fa-solid fa-triangle-exclamation"></i>
+                    </button>
+                  }
+                } @else {
+                  <span class="muted">{{ 'ui.jobs.neverRan' | t }}</span>
+                }
+              </td>
+              <td [attr.data-label]="'ui.jobs.lastEndDate' | t">{{ dateTime(row.lastEndDate) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

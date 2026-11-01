@@ -1,0 +1,22 @@
+<div class="fd">
+  <header class="fd-header fd-danger">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ 'ui.jobs.errorTitle' | t }}</h2>
+      <p class="fd-subtitle">{{ data.name }}</p>
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    <pre class="error-text">{{ data.text }}</pre>
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint"></span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.close' | t }}</button>
+    </div>
+  </footer>
+</div>

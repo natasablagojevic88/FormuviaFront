@@ -1,0 +1,392 @@
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+app-page-header {
+  flex-shrink: 0;
+}
+
+/* the same white button as on the other pages: it sits on the blue bar */
+.reload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--c-on-dark);
+  color: #1f5eff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(3, 8, 23, 0.15);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.reload-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(3, 8, 23, 0.2);
+}
+
+.reload-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* the same card as the generic table: the page around it gives the space */
+.jobs-card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  border-radius: 24px;
+  background: var(--c-surface);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--c-border-soft);
+  background: var(--c-surface-2);
+}
+
+.search {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  max-width: 420px;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: 12px;
+  background: var(--c-surface);
+  color: var(--c-text-muted);
+}
+
+.search:focus-within {
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px var(--c-focus);
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--c-text);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.search-clear {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--c-text-muted);
+  cursor: pointer;
+}
+
+.search-clear:hover {
+  background: var(--c-surface-2);
+  color: var(--c-text);
+}
+
+.count {
+  flex-shrink: 0;
+  color: var(--c-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.empty {
+  padding: 32px 16px;
+  color: var(--c-text-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* a wide list scrolls inside the card, never the whole page */
+.table-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.jobs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.jobs-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--c-border-soft);
+  background: var(--c-surface-2);
+  color: var(--c-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.jobs-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--c-border-soft);
+  color: var(--c-text);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.jobs-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.jobs-table tbody tr:hover {
+  background: var(--c-surface-2);
+}
+
+.row-working {
+  opacity: 0.6;
+}
+
+/* a long name may not stretch the list */
+.name {
+  display: inline-block;
+  max-width: 320px;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+.flag {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  color: var(--c-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.flag.on {
+  background: var(--c-success-soft);
+  color: var(--c-success-strong);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  color: var(--c-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status.SUCCESS {
+  background: var(--c-success-soft);
+  color: var(--c-success-strong);
+}
+
+.status.FAIL {
+  background: var(--c-danger-softer);
+  color: var(--c-danger);
+}
+
+.status.IN_PROGRESS {
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+}
+
+.muted {
+  color: var(--c-text-muted);
+}
+
+/* the commands stand first, as in the generic table, and the column is only as wide as they are */
+.actions-head,
+.actions {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.icon-button {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 12px;
+  background: var(--c-surface);
+  color: var(--c-text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background-color 0.15s;
+}
+
+.icon-button:hover:not(:disabled) {
+  border-color: var(--c-primary);
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+}
+
+.icon-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.error-button {
+  width: 28px;
+  height: 28px;
+  margin-left: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--c-danger);
+}
+
+.error-button:hover:not(:disabled) {
+  background: var(--c-danger-softer);
+  color: var(--c-danger);
+}
+
+/* A row becomes a card: the name of the column on the left, the value on the right, actions at the bottom */
+@media (max-width: 900px) {
+  .jobs-card {
+    border-radius: 18px;
+  }
+
+  .toolbar {
+    flex-wrap: wrap;
+    padding: 12px;
+  }
+
+  .search {
+    max-width: none;
+    height: 44px;
+  }
+
+  /* 16px stops iOS from zooming the page when the field is focused */
+  .search input {
+    font-size: 16px;
+  }
+
+  .count {
+    flex-basis: 100%;
+  }
+
+  .reload-button {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .table-scroll {
+    padding: 12px;
+    background: var(--c-surface-2);
+  }
+
+  .jobs-table,
+  .jobs-table tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .jobs-table thead {
+    display: none;
+  }
+
+  .jobs-table tbody tr {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 12px;
+    border: 1px solid var(--c-border-soft);
+    border-radius: 16px;
+    background: var(--c-surface);
+    box-shadow: 0 4px 14px rgba(3, 8, 23, 0.05);
+  }
+
+  .jobs-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .jobs-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 0;
+    white-space: normal;
+  }
+
+  .jobs-table td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    color: var(--c-text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .name {
+    max-width: none;
+    text-align: right;
+  }
+
+  /* in a card the commands go to the bottom, without the name of the column above them */
+  .jobs-table td.actions {
+    order: 1;
+    width: auto;
+    justify-content: flex-end;
+    border-top: 1px solid var(--c-border-soft);
+    /* one less than the card, so the tinted strip stays inside its rounded corner */
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    background: var(--c-surface-2);
+  }
+
+  .jobs-table td.actions::before {
+    content: none;
+  }
+
+  .icon-button {
+    width: 44px;
+    height: 44px;
+  }
+}

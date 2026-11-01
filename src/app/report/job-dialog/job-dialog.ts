@@ -177,6 +177,14 @@ export class JobDialog implements OnInit {
   /** The report is written into a file on the server. */
   readonly isFile = computed(() => this.jobType() === "EXPORT_FILE");
 
+  /**
+   * A job that sends nothing by itself still sends the word about an error, and that mail needs a
+   * server too; it is read from the form, not from a signal, so it follows the address as it is typed.
+   */
+  needsErrorSmtp(): boolean {
+    return !this.isMail() && !!this.job.errorReceive?.trim();
+  }
+
   /** A file is made in both cases: as the attachment of a mail and as the file itself. */
   readonly hasFile = computed(() => this.isFile() || (this.isMail() && this.outputType() === "ATTACHMENT"));
 
@@ -298,6 +306,9 @@ export class JobDialog implements OnInit {
         || !this.job.jobOutputType) {
         return false;
       }
+    }
+    if (this.needsErrorSmtp() && !this.job.smtpId) {
+      return false;
     }
     if (this.isFile() && !this.job.filePath?.trim()) {
       return false;

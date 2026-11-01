@@ -30,15 +30,16 @@
           <span class="fd-help">{{ 'ui.reportJobs.jobTypeHint' | t }}</span>
         </div>
 
-        @if (isMail()) {
-          <div class="fd-field">
-            <span class="fd-label fd-required">{{ label('smtpId') }}</span>
-            <app-search-select [options]="smtpOptions()" [(ngModel)]="job.smtpId"
-              [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-server"
-              [placeholder]="label('smtpId')" [ariaLabel]="label('smtpId')" />
-            <span class="fd-help">{{ 'ui.reportJobs.smtpIdHint' | t }}</span>
-          </div>
+        <!-- every job needs a server: the one that sends the report, and every other one for the word about an error -->
+        <div class="fd-field">
+          <span class="fd-label" [class.fd-required]="isMail()">{{ label('smtpId') }}</span>
+          <app-search-select [options]="smtpOptions()" [(ngModel)]="job.smtpId"
+            [ngModelOptions]="{ standalone: true }" icon="fa-solid fa-server"
+            [placeholder]="label('smtpId')" [ariaLabel]="label('smtpId')" />
+          <span class="fd-help">{{ (isMail() ? 'ui.reportJobs.smtpIdHint' : 'ui.reportJobs.smtpIdErrorHint') | t }}</span>
+        </div>
 
+        @if (isMail()) {
           <div class="fd-field">
             <span class="fd-label fd-required">{{ label('jobOutputType') }}</span>
             <app-search-select [options]="outputTypeOptions()" [ngModel]="job.jobOutputType"
@@ -114,6 +115,7 @@
             autocomplete="off" [placeholder]="'ui.reportJobs.receivePlaceholder' | t" />
           <span class="fd-help">{{ 'ui.reportJobs.errorReceiveHint' | t }}</span>
         </div>
+
 
         <div class="fd-field">
           <span class="fd-label">{{ label('roleId') }}</span>

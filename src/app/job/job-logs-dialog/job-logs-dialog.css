@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+/* the table brings its own card, so the body of the dialog adds no frame around it */
+.logs-body {
+  padding-top: 4px;
+}
+
+.logs-body ::ng-deep .table-card {
+  box-shadow: none;
+}

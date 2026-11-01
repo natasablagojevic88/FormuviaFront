@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+/* the trace is read as it was written: it keeps its rows, and a long one is scrolled */
+.error-text {
+  max-height: 50vh;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 14px;
+  background: var(--c-surface-2);
+  color: var(--c-text);
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .error-text {
+    max-height: 60vh;
+    font-size: 12px;
+  }
+}
