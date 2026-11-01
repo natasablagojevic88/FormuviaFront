@@ -84,15 +84,11 @@ A Jasper report has no query, so its parameter is looked for in the `.jasper` fi
 
 ## Jobs: a report that runs by itself
 
-A report does not have to wait for somebody to ask for it. In the row menu of a report stands *Jobs*, and it leads to the list of the jobs of that report: every job says when the report runs and what happens to it when it does.
-
-::: info What works today
-A job is entered, changed and deleted, and the application schedules it: it is kept in the database of the scheduler, so it stands there after a restart as well. What the job does when its time comes is not finished yet — the report is for now neither sent, nor written into a file, nor run. A job is therefore still a plan: everything written on this page is entered and kept, and the time it would run at is counted, but nothing comes of it yet.
-:::
+A report does not have to wait for somebody to ask for it. In the row menu of a report stands *Jobs*, and it leads to the list of the jobs of that report: every job says when the report runs and what happens to it when it does. How those jobs have been faring — every one of them, over every report — is read on the [Jobs](/jobs) page, and a job can be run by hand from there.
 
 *Add* opens the form of a job. The first thing chosen is what the job does, and the form then asks only for what that kind of job needs:
 
-- **Send by mail** — the report goes to one or more addresses. It asks for the mail server (the one entered under [Administration / Mail servers](/administration#mail-servers)), the address it goes to, the subject, the body, and whether the report stands **in the mail itself** or goes along with it **as a file**. A Jasper report cannot stand in the mail itself, so for it only the file is offered.
+- **Send by mail** — the report goes to one or more addresses. It asks for the address it goes to, the subject, the body, and whether the report stands **in the mail itself** or goes along with it **as a file**. A Jasper report cannot stand in the mail itself, so for it only the file is offered.
 - **Write into a file** — the report is written into a file on the server. It asks for the folder and the name of the file; the folder has to be one the server may write into.
 - **Only run** — the report does its work over the data and nothing comes back. Only a report of the *UPDATE query or procedure* kind can be run that way, and a report of that kind cannot do anything else.
 
@@ -102,7 +98,8 @@ The rest is the same for every job:
 
 - **Name** — the job stands in the scheduler under it, so two jobs cannot share it. It is given when the job is entered and is not changed afterwards: the scheduler keeps the job under the name it was given, and a renamed job would stay there under the old name and keep running beside the new one. A job that needs another name is switched off and entered anew.
 - **Body** — the text that goes with the report, written in the editor: bold, italic, a heading, a list, a link, alignment. It is sent as HTML, and whoever already has HTML of their own switches to the `HTML` view and writes it there.
-- **Address for errors** — where word is sent when the job does not go through. Left empty, the error is only written down.
+- **Mail server** — the one entered under [Administration / Mail servers](/administration#mail-servers). A job that sends the report by mail cannot be saved without it, and every other job asks for it too, because the word about an error goes out through it.
+- **Address for errors** — where word is sent when the job does not go through. Left empty, the error is only written down; filled in, the mail server has to be chosen as well, or there is nothing for that word to go through.
 - **Role** — the role tied to the job.
 - **On** — only a job that is on is scheduled; switching it off stops the job without deleting it.
 - **Only when there is data** — the job is left out when the query of the report gives no rows. It is offered only for a report of the *SELECT query* kind, because only such a report has rows to count.

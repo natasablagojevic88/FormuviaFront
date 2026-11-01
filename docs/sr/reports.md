@@ -84,15 +84,11 @@ Jasper izveštaj nema upit, pa se njegov parametar traži u samom `.jasper` fajl
 
 ## Poslovi: izveštaj koji ide sam
 
-Izveštaj ne mora da čeka da ga neko zatraži. U meniju reda izveštaja stoji *Poslovi* i vodi na spisak poslova tog izveštaja: svaki posao kaže kada se izveštaj pokreće i šta se tada s njim radi.
-
-::: info Šta danas ima dejstvo
-Posao se unosi, menja i briše, a aplikacija ga stavlja u raspored: čuva se u bazi rasporeda, pa stoji tamo i posle restarta. Ono što posao radi kad mu dođe vreme još nije dovršeno — izveštaj se za sada niti šalje, niti upisuje u fajl, niti izvršava. Posao je zato još uvek plan: sve što je na ovoj strani opisano unosi se i čuva, vreme pokretanja se računa, ali od toga još ništa ne biva.
-:::
+Izveštaj ne mora da čeka da ga neko zatraži. U meniju reda izveštaja stoji *Poslovi* i vodi na spisak poslova tog izveštaja: svaki posao kaže kada se izveštaj pokreće i šta se tada s njim radi. Kako ti poslovi prolaze — svi oni, preko svih izveštaja — čita se na strani [Poslovi](/sr/jobs), odakle se posao može i pokrenuti rukom.
 
 *Dodaj* otvara formu posla. Prvo se bira šta posao radi, a forma onda traži samo ono što ta vrsta posla zahteva:
 
-- **Poslati poštom** — izveštaj ide na jednu ili više adresa. Traži server za poštu (onaj unet u [Administracija / Serveri za poštu](/sr/administration#serveri-za-postu)), adresu na koju ide, naslov, telo poruke i da li izveštaj stoji **u samoj poruci** ili ide uz nju **kao fajl**. Jasper izveštaj ne može da stoji u samoj poruci, pa se za njega nudi samo fajl.
+- **Poslati poštom** — izveštaj ide na jednu ili više adresa. Traži adresu na koju ide, naslov, telo poruke i da li izveštaj stoji **u samoj poruci** ili ide uz nju **kao fajl**. Jasper izveštaj ne može da stoji u samoj poruci, pa se za njega nudi samo fajl.
 - **Upisati u fajl** — izveštaj se upisuje u fajl na serveru. Traži folder i naziv fajla; folder mora biti onaj u koji server ima pravo da piše.
 - **Samo izvršiti** — izveštaj odradi svoje nad podacima i ništa se ne vraća. Tako se može pokrenuti samo izveštaj vrste *UPDATE upit ili procedura*, a izveštaj te vrste ne može ništa drugo.
 
@@ -102,7 +98,8 @@ Ostalo je isto za svaki posao:
 
 - **Naziv** — pod njim posao stoji u rasporedu, pa ga dva posla ne mogu deliti. Daje se pri unosu i kasnije se ne menja: raspored drži posao pod nazivom koji je dobio, pa bi preimenovan posao ostao u njemu pod starim nazivom i nastavio da se pokreće pored novog. Posao kome treba drugi naziv isključuje se i unosi iznova.
 - **Telo poruke** — tekst koji ide uz izveštaj, piše se u uređivaču: masno, kurziv, naslov, lista, link, poravnanje. Šalje se kao HTML, a ko već ima svoj HTML prelazi na prikaz `HTML` i tu ga upiše.
-- **Adresa za greške** — kome se javlja kad posao ne prođe. Ako je prazna, greška se samo upisuje.
+- **Server za poštu** — onaj unet u [Administracija / Serveri za poštu](/sr/administration#serveri-za-postu). Posao koji šalje izveštaj poštom bez njega se ne može snimiti, a traži se i za svaki drugi posao, jer kroz njega ide javljanje o grešci.
+- **Adresa za greške** — kome se javlja kad posao ne prođe. Ako je prazna, greška se samo upisuje; ako je popunjena, mora se izabrati i server za poštu, inače javljanje nema kuda.
 - **Uloga** — uloga vezana za posao.
 - **Uključen** — samo uključen posao stoji u rasporedu; isključivanje ga zaustavlja bez brisanja.
 - **Samo kad ima podataka** — posao se preskače kad upit izveštaja ne vrati ni jedan red. Nudi se samo za izveštaj vrste *SELECT upit*, jer samo takav izveštaj ima redove koje bi bilo šta izbrojalo.

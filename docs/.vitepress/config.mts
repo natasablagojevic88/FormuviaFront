@@ -32,6 +32,7 @@ export default defineConfig({
               { text: "What Formuvia is", link: "/" },
               { text: "Signing in", link: "/getting-started" },
               { text: "Working with tables", link: "/tables" },
+              { text: "Jobs", link: "/jobs" },
             ],
           },
           {
@@ -70,6 +71,7 @@ export default defineConfig({
               { text: "Šta je Formuvia", link: "/sr/" },
               { text: "Prijava na sistem", link: "/sr/getting-started" },
               { text: "Rad sa tabelama", link: "/sr/tables" },
+              { text: "Poslovi", link: "/sr/jobs" },
             ],
           },
           {

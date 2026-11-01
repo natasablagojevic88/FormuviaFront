@@ -272,6 +272,24 @@
         return `/api/model/${id}`;
     }
 
+    /** Every job of the scheduler this user may see; they all come at once, so there is no paging. */
+    static readonly jobList='/api/job/list';
+
+    /** One job of the scheduler, with the state of its last run. */
+    static jobId(id: string): string {
+        return `/api/job/${id}`;
+    }
+
+    /** Runs the job once, now; its timetable stays as it is. */
+    static jobExecute(id: string): string {
+        return `/api/job/execute/${id}`;
+    }
+
+    /** The runs written down for one job, as a table; the server adds the filter by that job. */
+    static jobLogs(id: string): string {
+        return `/api/job/logs/${id}`;
+    }
+
     static history(className: string, id: string): string {
         return `/api/history/${className}/${id}`;
     }

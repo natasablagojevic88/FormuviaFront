@@ -30,6 +30,11 @@ const routes: Routes = [
     loadChildren: () => import('./report/report-groups-module').then(m => m.ReportGroupsModule)
   },
   {
+    // the path is the same as in the menu from the server (menu.xml: /job/list)
+    path: 'job',
+    loadChildren: () => import('./job/jobs-module').then(m => m.JobsModule)
+  },
+  {
     path: 'roles',
     loadChildren: () => import('./administration/roles-module').then(m => m.RolesModule)
   },

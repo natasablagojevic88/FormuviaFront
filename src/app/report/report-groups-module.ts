@@ -12,7 +12,7 @@ import { ReportDialog } from "./report-dialog/report-dialog";
 import { ReportParametersPage } from "./report-parameters-page/report-parameters-page";
 import { ReportParameterDialog } from "./report-parameter-dialog/report-parameter-dialog";
 import { ReportJobsPage } from "./report-jobs-page/report-jobs-page";
-import { JobDialog } from "./job-dialog/job-dialog";
+import { ReportDialogsModule } from "./report-dialogs-module";
 
 @NgModule({
   declarations: [
@@ -23,7 +23,6 @@ import { JobDialog } from "./job-dialog/job-dialog";
     ReportParametersPage,
     ReportParameterDialog,
     ReportJobsPage,
-    JobDialog,
   ],
   imports: [
     CommonModule,
@@ -31,6 +30,7 @@ import { JobDialog } from "./job-dialog/job-dialog";
     MatDialogModule,
     ReportGroupsRoutingModule,
     SharedModule,
+    ReportDialogsModule,
   ],
 })
 export class ReportGroupsModule {}
