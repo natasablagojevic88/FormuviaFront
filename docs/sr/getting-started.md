@@ -10,7 +10,7 @@ Prvi nalog je `admin`, sa lozinkom izabranom pri instalaciji. Promenite je odmah
 
 ## Kako se snaći
 
-**Meni** je sa leve strane. Šta je u njemu zavisi od vaših uloga — vidite samo ono što smete da otvorite. Na telefonu je meni sakriven; otvara se dugmetom u gornjoj traci i prelazi preko strane.
+**Meni** je sa leve strane. Šta je u njemu zavisi od vaših uloga — vidite samo ono što smete da otvorite. Na telefonu je meni sakriven; otvara se dugmetom u gornjoj traci i prelazi preko strane. Stavke koje nose druge stavke počinju skupljene, pa se ceo meni vidi odjednom; klik na stavku je raširava, a grupa u kojoj je strana na kojoj se nalazite širi se sama.
 
 **Gornja traka** nosi jezik i temu, i naziv strane na kojoj se nalazite.
 

@@ -8,5 +8,5 @@
   </button>
 </app-page-header>
 
-<app-data-table [url]="tableUrl" [rowActions]="rowActions" (loaded)="onLoaded($event)" (edit)="edit($event)"
-  (remove)="remove($event)" (action)="openReports($event.row)"></app-data-table>
+<app-data-table [url]="tableUrl" [rowActions]="rowActions" [restoreState]="restore" (loaded)="onLoaded($event)"
+  (edit)="edit($event)" (remove)="remove($event)" (action)="openReports($event.row)"></app-data-table>

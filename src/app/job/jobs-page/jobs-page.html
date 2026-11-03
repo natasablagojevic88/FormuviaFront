@@ -43,30 +43,32 @@
           @for (row of shown(); track row.jobId ?? row.name) {
             <tr [class.row-working]="working() === row.jobId">
               <td class="actions" [attr.data-label]="'ui.actions' | t">
-                @if (row.reportId) {
-                  <button type="button" class="icon-button" (click)="run(row)"
+                <div class="actions-buttons">
+                  @if (row.reportId) {
+                    <button type="button" class="icon-button" (click)="run(row)"
+                      [disabled]="!row.jobId || working() !== null"
+                      [attr.aria-label]="'ui.jobs.run' | t" [title]="'ui.jobs.run' | t">
+                      <i class="fa-solid fa-play"></i>
+                    </button>
+                  }
+                  <button type="button" class="icon-button" (click)="refreshRow(row)"
                     [disabled]="!row.jobId || working() !== null"
-                    [attr.aria-label]="'ui.jobs.run' | t" [title]="'ui.jobs.run' | t">
-                    <i class="fa-solid fa-play"></i>
+                    [attr.aria-label]="'ui.jobs.refreshRow' | t" [title]="'ui.jobs.refreshRow' | t">
+                    <i class="fa-solid fa-rotate"></i>
                   </button>
-                }
-                <button type="button" class="icon-button" (click)="refreshRow(row)"
-                  [disabled]="!row.jobId || working() !== null"
-                  [attr.aria-label]="'ui.jobs.refreshRow' | t" [title]="'ui.jobs.refreshRow' | t">
-                  <i class="fa-solid fa-rotate"></i>
-                </button>
-                <button type="button" class="icon-button" (click)="showLogs(row)"
-                  [disabled]="!row.jobId || working() !== null"
-                  [attr.aria-label]="'ui.jobs.logs' | t" [title]="'ui.jobs.logs' | t">
-                  <i class="fa-solid fa-clock-rotate-left"></i>
-                </button>
-                @if (canEdit() && row.reportId) {
-                  <button type="button" class="icon-button" (click)="edit(row)"
-                    [disabled]="working() !== null"
-                    [attr.aria-label]="'ui.edit' | t" [title]="'ui.edit' | t">
-                    <i class="fa-solid fa-pen"></i>
+                  <button type="button" class="icon-button" (click)="showLogs(row)"
+                    [disabled]="!row.jobId || working() !== null"
+                    [attr.aria-label]="'ui.jobs.logs' | t" [title]="'ui.jobs.logs' | t">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
                   </button>
-                }
+                  @if (canEdit() && row.reportId) {
+                    <button type="button" class="icon-button" (click)="edit(row)"
+                      [disabled]="working() !== null"
+                      [attr.aria-label]="'ui.edit' | t" [title]="'ui.edit' | t">
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                  }
+                </div>
               </td>
               <td [attr.data-label]="'ui.jobs.name' | t"><span class="name">{{ row.name }}</span></td>
               <td [attr.data-label]="'ui.jobs.active' | t">

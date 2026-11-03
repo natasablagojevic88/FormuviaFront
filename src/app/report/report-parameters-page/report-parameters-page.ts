@@ -66,7 +66,7 @@ export class ReportParametersPage {
   }
 
   back(): void {
-    this.router.navigate(["/report-group", this.groupId]);
+    this.router.navigate(["/report-group", this.groupId], { queryParams: { restore: "1" } });
   }
 
   onLoaded(table: DatabaseTable<any>): void {

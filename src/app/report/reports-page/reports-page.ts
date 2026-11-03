@@ -25,6 +25,8 @@ export class ReportsPage {
   /** The row menu of a report leads to the parameters and to the jobs of that report. */
   readonly rowActions: RowAction[] = [];
   readonly title = signal("");
+  /** true when the page was reached by the Back button of a child; only then is the list restored. */
+  readonly restore: boolean;
   private allColumns: DatabaseColumn[] = [];
 
   private readonly table = viewChild.required(DataTable);
@@ -38,6 +40,7 @@ export class ReportsPage {
     private translate: Translate
   ) {
     this.groupId = route.snapshot.paramMap.get("groupId") ?? "";
+    this.restore = route.snapshot.queryParamMap.get("restore") === "1";
     this.tableUrl = ApiRoute.reportTable(this.groupId);
     this.newRowValues = { reportGroupId: this.groupId };
     this.rowActions.push({
@@ -60,11 +63,14 @@ export class ReportsPage {
   }
 
   back(): void {
-    this.router.navigate(["/report-group"]);
+    this.router.navigate(["/report-group"], { queryParams: { restore: "1" } });
   }
 
   /** Which of the two the row menu asks for. */
   openAction(action: RowAction, row: { id: string }): void {
+    // the list is put aside so the way back finds the same page, with this report marked
+    this.table().selectRow(row);
+    this.table().saveState();
     if (action.key === "jobs") {
       this.router.navigate(["/report-group", this.groupId, row.id, "job"]);
       return;

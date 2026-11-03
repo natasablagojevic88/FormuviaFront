@@ -516,8 +516,12 @@ export class DataTable implements AfterViewInit, OnDestroy {
     return url + (parent ? "|" + parent.value : "");
   }
 
-  /** Saved only when going into a subtable, so that the way back lands on the same place. */
-  private saveState(): void {
+  /**
+   * The page, the filters and the marked row are put aside, so that the way back lands on the same
+   * place. A subtable does it on its own (openChild); a page that leads to a child of its own
+   * (the groups of reports and the reports) calls it before it leaves.
+   */
+  saveState(): void {
     if (!this.loadedUrl || !this.lastTable) {
       return;
     }

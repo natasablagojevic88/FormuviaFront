@@ -10,7 +10,7 @@ The first account is `admin`, with the password chosen during installation. Chan
 
 ## Finding your way around
 
-**The menu** is on the left. What it contains depends on the roles you have — you only see what you are allowed to open. On a phone the menu is hidden; open it with the button in the top bar and it slides in over the page.
+**The menu** is on the left. What it contains depends on the roles you have — you only see what you are allowed to open. On a phone the menu is hidden; open it with the button in the top bar and it slides in over the page. Entries that hold other entries start folded, so the whole menu is read at once; a click on one unfolds it, and the group holding the page you are on unfolds on its own.
 
 **The top bar** holds the language and the theme, and the name of the page you are on.
 

@@ -1,4 +1,4 @@
-import { Component, signal } from "@angular/core";
+import { Component, effect, signal } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { NavigationEnd, Router } from "@angular/router";
@@ -14,7 +14,8 @@ import { MenuItem, Session } from "../../services/session";
   styleUrl: "./sidebar.css",
 })
 export class Sidebar {
-  private readonly closedGroups = signal(new Set<string>());
+  /** Groups start folded, so the whole menu is read at once; only the page being shown is unfolded. */
+  private readonly openGroups = signal(new Set<string>());
 
   constructor(
     public session: Session,
@@ -24,21 +25,41 @@ export class Sidebar {
   ) {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd), takeUntilDestroyed())
-      .subscribe(() => this.layout.menuOpen.set(false));
+      .subscribe(() => {
+        this.layout.menuOpen.set(false);
+        this.unfoldTo(this.router.url);
+      });
+    // the menu comes with the session, after the sidebar is drawn, so the page is found again then
+    effect(() => {
+      if (this.session.user()) {
+        this.unfoldTo(this.router.url);
+      }
+    });
   }
 
   isOpen(item: MenuItem): boolean {
-    return !this.closedGroups().has(item.name);
+    return this.openGroups().has(item.name);
   }
 
   toggle(item: MenuItem): void {
-    const groups = new Set(this.closedGroups());
+    const groups = new Set(this.openGroups());
     if (groups.has(item.name)) {
       groups.delete(item.name);
     } else {
       groups.add(item.name);
     }
-    this.closedGroups.set(groups);
+    this.openGroups.set(groups);
+  }
+
+  /** The groups leading to the page being shown stand open; what the user opened stays open. */
+  private unfoldTo(url: string): void {
+    const path = this.session.menuPathOf(url);
+    if (!path.length) {
+      return;
+    }
+    const groups = new Set(this.openGroups());
+    path.forEach((name) => groups.add(name));
+    this.openGroups.set(groups);
   }
 
   changePassword(): void {

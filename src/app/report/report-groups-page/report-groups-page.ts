@@ -1,6 +1,6 @@
 import { Component, signal, viewChild } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { Notify } from "../../services/notify";
 import { SendRequest } from "../../services/send-request";
 import { Translate } from "../../services/translate";
@@ -19,6 +19,8 @@ import { ReportGroupDialog, ReportGroupDialogData } from "../report-group-dialog
 })
 export class ReportGroupsPage {
   readonly tableUrl = ApiRoute.reportGroupTable;
+  /** true when the page was reached by the Back button of the reports; only then is the list restored. */
+  readonly restore: boolean;
   readonly title = signal("");
   /** The row menu of a group leads to the reports of that group. */
   readonly rowActions: RowAction[] = [];
@@ -30,6 +32,7 @@ export class ReportGroupsPage {
   constructor(
     private dialog: MatDialog,
     private router: Router,
+    route: ActivatedRoute,
     private sendRequest: SendRequest,
     private notify: Notify,
     private translate: Translate
@@ -39,10 +42,14 @@ export class ReportGroupsPage {
       label: this.translate.get("ui.reportGroups.reports"),
       icon: "fa-solid fa-file-invoice",
     });
+    this.restore = route.snapshot.queryParamMap.get("restore") === "1";
     this.loadRoles();
   }
 
   openReports(row: { id: string }): void {
+    // the list is put aside so the way back finds the same page, with this group marked
+    this.table().selectRow(row);
+    this.table().saveState();
     this.router.navigate(["/report-group", row.id]);
   }
 

@@ -24,7 +24,7 @@ The name and the role are required. Picking the role is the whole of the access 
 
 ## Reports of a group
 
-⋯ → **Reports** on a group opens the reports of that group. *Back* in the header leads to the list of groups again.
+⋯ → **Reports** on a group opens the reports of that group. *Back* in the header leads to the list of groups again, exactly as it was left — the same page, the same filters and sorting, with the group gone into still marked.
 
 The list shows the type, the name and the description of every report of the group. *Add* and *Edit* open its form, and ⋯ on the row holds *Parameters*, *History* and *Delete*. The name, the description and the query itself can also be changed straight in the list, the same way as in the groups; for a longer query the form is the more comfortable place.
 
@@ -51,7 +51,7 @@ A Jasper report has no query, and the first two types keep no file. Editing a Ja
 
 ## Parameters of a report
 
-⋯ → **Parameters** on a report opens the parameters of that report. *Back* in the header leads to the reports of the group again.
+⋯ → **Parameters** on a report opens the parameters of that report. *Back* in the header leads to the reports of the group again, with the report gone into still marked.
 
 A parameter is what the report asks for before it runs: the date to look from, a customer, a branch. In the query it stands as `:code`, where the value itself would otherwise stand:
 

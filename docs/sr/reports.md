@@ -24,7 +24,7 @@ Naziv i uloga su obavezni. Izborom uloge je pravilo pristupa završeno: ko ima t
 
 ## Izveštaji grupe
 
-⋯ → **Izveštaji** na grupi otvara izveštaje te grupe. *Nazad* u zaglavlju vodi ponovo na spisak grupa.
+⋯ → **Izveštaji** na grupi otvara izveštaje te grupe. *Nazad* u zaglavlju vodi ponovo na spisak grupa, tačno onakav kakav je ostavljen — ista strana, isti filteri i sortiranje, i grupa u koju se ušlo i dalje označena.
 
 Spisak prikazuje vrstu, naziv i opis svakog izveštaja grupe. *Dodaj* i *Izmeni* otvaraju njegovu formu, a ⋯ na redu nosi *Parametre*, *Istoriju* i *Obriši*. Naziv, opis i sam upit mogu i da se menjaju pravo u spisku, isto kao u grupama; za duži upit je forma udobnija.
 
@@ -51,7 +51,7 @@ Jasper izveštaj nema upit, a prve dve vrste ne čuvaju fajl. Izmena Jasper izve
 
 ## Parametri izveštaja
 
-⋯ → **Parametri** na izveštaju otvara parametre tog izveštaja. *Nazad* u zaglavlju vodi ponovo na izveštaje grupe.
+⋯ → **Parametri** na izveštaju otvara parametre tog izveštaja. *Nazad* u zaglavlju vodi ponovo na izveštaje grupe, sa izveštajem u koji se ušlo i dalje označenim.
 
 Parametar je ono što izveštaj traži pre pokretanja: datum od kog se gleda, komitent, ogranak. U upitu stoji kao `:sifra`, tamo gde bi inače stajala vrednost:
 

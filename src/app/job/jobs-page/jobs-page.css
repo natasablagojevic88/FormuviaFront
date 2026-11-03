@@ -239,7 +239,8 @@ app-page-header {
   white-space: nowrap;
 }
 
-.actions {
+/* the buttons stand in a box of their own: a td turned into a flex box loses its collapsed border */
+.actions-buttons {
   display: flex;
   gap: 6px;
 }
