@@ -59,3 +59,29 @@ What is changed — the timetable among it — takes effect at once: the row is 
 ::: tip
 A job without a report behind it cannot be run from here, and it cannot be changed: a job works over a report, and there is none. What stands written down about its earlier runs stays and is read with 🕘.
 :::
+
+## Running a job from the outside
+
+🔗 on the row opens the **webhook keys** of the job: with such a key another program runs this job whenever it needs to, without logging in. The button stands beside ✎, for the same user and for a job that still belongs to a report.
+
+How the call is made is written in the dialog, and it is the same for every key of the job:
+
+| | |
+|---|---|
+| **Request** | `POST` |
+| **Header** | `Authorization: Bearer <key>` |
+| **Body** | none; the job needs nothing from the caller |
+
+*New key* makes one, and every key gets an **address of its own**: taking one key away leaves the others working. Beside the key stands a note of what it is for — who it was given to — and that note is only written down here, the caller never sees it. The address and the key are copied with the button beside them, and *Copy the whole call* gives the line for the terminal:
+
+```
+curl -X POST -H "Authorization: Bearer <key>" https://your-server/api/execute/webhook/<address of the key>
+```
+
+The job then does the same thing it does when the scheduler runs it, and the run is written down among the runs of the job, so it is read with 🕘 like any other. The answer comes back when the job is over, not when it is taken over.
+
+::: warning
+A key runs the job even when the job is switched **off**: *On* holds only for the timetable. A job that must not run at all is left without keys.
+:::
+
+A key is kept as it was made and is read here at any time, so hand it over only to the one it was made for. *Delete* takes it away, and from that moment a call with it does nothing.

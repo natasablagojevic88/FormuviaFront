@@ -5,11 +5,15 @@ import { Notify } from "../../services/notify";
 import { SendRequest } from "../../services/send-request";
 import { Translate } from "../../services/translate";
 import { ApiRoute } from "../../shared/ApiRoute";
-import { DataTable } from "../../shared/data-table/data-table";
+import { DataTable, RowAction } from "../../shared/data-table/data-table";
 import { DatabaseColumn, DatabaseTable } from "../../shared/database-table";
 import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
 import { JobDialog, JobDialogData, JobItemRow } from "../job-dialog/job-dialog";
+import { WebhookDialog, WebhookDialogData } from "../webhook-dialog/webhook-dialog";
 import { ReportType } from "../report-dialog/report-dialog";
+
+/** Key of the item of the row menu that opens the keys of the webhook of that job. */
+const WEBHOOK_ACTION = "webhook";
 
 @Component({
   selector: "app-report-jobs-page",
@@ -27,6 +31,8 @@ export class ReportJobsPage {
   /** The kind of the report: it decides what a job may do with it. */
   readonly reportType = signal<ReportType | undefined>(undefined);
   readonly title = signal("");
+  /** The keys of the webhook belong to a job, so they are reached from the row of that job. */
+  readonly rowActions: RowAction[];
   private allColumns: DatabaseColumn[] = [];
 
   private readonly table = viewChild.required(DataTable);
@@ -43,6 +49,7 @@ export class ReportJobsPage {
     this.reportId = route.snapshot.paramMap.get("reportId") ?? "";
     this.tableUrl = ApiRoute.reportJobTable(this.reportId);
     this.newRowValues = { reportId: this.reportId };
+    this.rowActions = [{ key: WEBHOOK_ACTION, label: translate.get("ui.webhook.title"), icon: "fa-solid fa-link" }];
     this.loadReport();
   }
 
@@ -53,6 +60,15 @@ export class ReportJobsPage {
         this.reportName.set(report?.name ?? "");
         this.reportType.set(report?.type);
       });
+  }
+
+  /** An item of the row menu: so far only the keys of the webhook of that job. */
+  rowAction(event: { action: RowAction; row: JobItemRow }): void {
+    if (event.action.key !== WEBHOOK_ACTION) {
+      return;
+    }
+    const data: WebhookDialogData = { jobId: event.row.id ?? "", jobName: event.row.name ?? "" };
+    this.dialog.open(WebhookDialog, { width: "720px", data, autoFocus: "first-heading" });
   }
 
   back(): void {

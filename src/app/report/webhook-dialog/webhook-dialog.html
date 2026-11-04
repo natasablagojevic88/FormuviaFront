@@ -1,0 +1,93 @@
+<div class="fd">
+  <header class="fd-header">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ 'ui.webhook.title' | t }}</h2>
+      <p class="fd-subtitle">{{ data.jobName }}</p>
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    <section class="call">
+      <h3 class="call-title">{{ 'ui.webhook.callTitle' | t }}</h3>
+      <p class="call-text">{{ 'ui.webhook.callText' | t }}</p>
+      <dl class="call-list">
+        <dt>{{ 'ui.webhook.method' | t }}</dt>
+        <dd><code>POST</code></dd>
+        <dt>{{ 'ui.webhook.headerName' | t }}</dt>
+        <dd><code>Authorization: Bearer {{ 'ui.webhook.keyMark' | t }}</code></dd>
+        <dt>{{ 'ui.webhook.bodyName' | t }}</dt>
+        <dd>{{ 'ui.webhook.bodyText' | t }}</dd>
+      </dl>
+    </section>
+
+    <section class="new-key">
+      <div class="fd-field new-field">
+        <span class="fd-label">{{ 'ui.webhook.description' | t }}</span>
+        <input type="text" class="fd-input" [(ngModel)]="description" [disabled]="saving()"
+          [placeholder]="'ui.webhook.descriptionPlaceholder' | t" (keydown.enter)="add()" />
+        <span class="fd-help">{{ 'ui.webhook.descriptionHint' | t }}</span>
+      </div>
+      <button type="button" class="fd-button fd-button-primary new-button" (click)="add()" [disabled]="saving()">
+        <i class="fa-solid fa-plus"></i>
+        {{ 'ui.webhook.add' | t }}
+      </button>
+    </section>
+
+    @if (loading()) {
+      <p class="empty">{{ 'ui.loading' | t }}</p>
+    } @else if (rows().length === 0) {
+      <p class="empty">{{ 'ui.webhook.empty' | t }}</p>
+    } @else {
+      <ul class="keys">
+        @for (row of rows(); track row.id) {
+          <li class="key">
+            <div class="key-head">
+              <span class="key-name" [class.key-noname]="!row.description">
+                {{ row.description || ('ui.webhook.noDescription' | t) }}
+              </span>
+              <button type="button" class="icon-button key-remove" (click)="remove(row)" [disabled]="saving()"
+                [title]="'ui.delete' | t" [attr.aria-label]="'ui.delete' | t">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+
+            <div class="key-line">
+              <span class="key-label">{{ 'ui.webhook.url' | t }}</span>
+              <input type="text" class="fd-input key-value" readonly [value]="callUrl(row)"
+                (focus)="$any($event.target).select()" [attr.aria-label]="'ui.webhook.url' | t" />
+              <button type="button" class="icon-button" (click)="copy(callUrl(row))"
+                [title]="'ui.copy' | t" [attr.aria-label]="'ui.copy' | t">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+
+            <div class="key-line">
+              <span class="key-label">{{ 'ui.webhook.key' | t }}</span>
+              <input type="text" class="fd-input key-value" readonly [value]="row.bearerToken"
+                (focus)="$any($event.target).select()" [attr.aria-label]="'ui.webhook.key' | t" />
+              <button type="button" class="icon-button" (click)="copy(row.bearerToken)"
+                [title]="'ui.copy' | t" [attr.aria-label]="'ui.copy' | t">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+
+            <button type="button" class="fd-button fd-button-secondary key-curl" (click)="copy(callCurl(row))">
+              <i class="fa-solid fa-terminal"></i>
+              {{ 'ui.webhook.copyCurl' | t }}
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint">{{ 'ui.webhook.hint' | t }}</span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.close' | t }}</button>
+    </div>
+  </footer>
+</div>

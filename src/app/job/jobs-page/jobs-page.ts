@@ -10,6 +10,7 @@ import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/co
 import { DatabaseParameter, DatabaseTable } from "../../shared/database-table";
 import { formatDateTime } from "../../shared/date-format";
 import { JobDialog, JobDialogData, JobItemRow } from "../../report/job-dialog/job-dialog";
+import { WebhookDialog, WebhookDialogData } from "../../report/webhook-dialog/webhook-dialog";
 import { ReportType } from "../../report/report-dialog/report-dialog";
 import { JobErrorDialog, JobErrorDialogData } from "../job-error-dialog/job-error-dialog";
 import { JobLogsDialog, JobLogsDialogData } from "../job-logs-dialog/job-logs-dialog";
@@ -136,6 +137,18 @@ export class JobsPage {
   showError(row: JobRow): void {
     const data: JobErrorDialogData = { name: row.name, text: row.errorText ?? "" };
     this.dialog.open(JobErrorDialog, { width: "720px", data, autoFocus: "first-heading" });
+  }
+
+  /**
+   * The keys that let the outside world run this job. The server allows them to the admin role
+   * alone, the same role the change of a job asks for, so the button stands under canEdit as well.
+   */
+  showWebhook(row: JobRow): void {
+    if (!row.jobId) {
+      return;
+    }
+    const data: WebhookDialogData = { jobId: row.jobId, jobName: row.name };
+    this.dialog.open(WebhookDialog, { width: "720px", data, autoFocus: "first-heading" });
   }
 
   /** Every run of the job that was written down, with the outcome and the error of each. */

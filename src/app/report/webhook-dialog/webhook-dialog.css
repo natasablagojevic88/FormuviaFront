@@ -1,0 +1,212 @@
+:host {
+  display: block;
+}
+
+/* how the call is made: it stands apart, because it is the same for every key of this job */
+.call {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: var(--radius);
+  background: var(--c-surface-2);
+}
+
+.call-title {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.call-text {
+  margin: 0;
+  color: var(--c-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.call-list {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 12px;
+  margin: 4px 0 0;
+}
+
+.call-list dt {
+  color: var(--c-text-muted);
+  font-size: 13px;
+}
+
+.call-list dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--c-text);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.call-list code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--c-surface-3);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+/* a new key: the description beside the button, and under it on a narrow screen */
+.new-key {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.new-field {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.new-button {
+  flex-shrink: 0;
+  /* the label of the field stands above the input, so the button is pushed down to meet it */
+  margin-top: 22px;
+}
+
+.empty {
+  margin: 16px 0 0;
+  color: var(--c-text-muted);
+  font-size: 13px;
+}
+
+.keys {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.key {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: var(--radius);
+  background: var(--c-surface);
+}
+
+.key-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.key-name {
+  min-width: 0;
+  flex: 1 1 auto;
+  color: var(--c-text);
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.key-noname {
+  color: var(--c-text-muted);
+  font-weight: 400;
+  font-style: italic;
+}
+
+.key-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.key-label {
+  flex: 0 0 auto;
+  width: 72px;
+  color: var(--c-text-muted);
+  font-size: 13px;
+}
+
+.key-value {
+  min-width: 0;
+  flex: 1 1 auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+.key-curl {
+  align-self: flex-start;
+}
+
+.icon-button {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 12px;
+  background: var(--c-surface);
+  color: var(--c-text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background-color 0.15s;
+}
+
+.icon-button:hover:not(:disabled) {
+  border-color: var(--c-primary);
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+}
+
+.key-remove:hover:not(:disabled) {
+  border-color: var(--c-danger);
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+}
+
+.icon-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+@media (max-width: 600px) {
+  .call-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .call-list dd {
+    margin-bottom: 6px;
+  }
+
+  /* the description takes the whole width and the button stands under it */
+  .new-key {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .new-button {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  /* the label goes above the value, so the long address is left as much room as there is */
+  .key-line {
+    flex-wrap: wrap;
+  }
+
+  .key-label {
+    width: 100%;
+  }
+
+  .key-curl {
+    width: 100%;
+  }
+}

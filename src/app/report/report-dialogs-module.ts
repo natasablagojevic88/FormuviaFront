@@ -5,14 +5,15 @@ import { MatDialogModule } from "@angular/material/dialog";
 
 import { SharedModule } from "../shared/shared-module";
 import { JobDialog } from "./job-dialog/job-dialog";
+import { WebhookDialog } from "./webhook-dialog/webhook-dialog";
 
 /**
- * The form of a job, on its own so that both screens that open it can have it: the jobs of one
- * report (Reports) and the list of every job of the scheduler (Jobs).
+ * The form of a job and the keys of its webhook, on their own so that both screens that open them
+ * can have them: the jobs of one report (Reports) and the list of every job of the scheduler (Jobs).
  */
 @NgModule({
-  declarations: [JobDialog],
+  declarations: [JobDialog, WebhookDialog],
   imports: [CommonModule, FormsModule, MatDialogModule, SharedModule],
-  exports: [JobDialog],
+  exports: [JobDialog, WebhookDialog],
 })
 export class ReportDialogsModule {}

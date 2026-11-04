@@ -126,6 +126,12 @@ Na dnu stoji izraz na koji se raspored svodi, onako kako ga raspored čita:
 
 Čita se sleva: u sekundi 0, svakih 5 minuta, u 8 i u 16 sati, bez određenog dana u mesecu, svakog meseca, u ponedeljak i petak, svake godine. Znak `?` stoji tamo gde se dan prepušta drugom polju.
 
+### Pokretanje posla izvan aplikacije
+
+Posao pokreće i onaj koga u aplikaciji nema. *Webhook* u meniju reda posla otvara njegove **ključeve**: sa ključem drugi program — onaj koji pravi podatke, sopstveni raspoređivač, dugme u trećoj aplikaciji — pokreće ovaj posao kad mu zatreba, bez prijave.
+
+U dijalogu piše kako se poziv šalje, i to važi za svaki ključ tog posla: `POST` na adresu ključa, sa ključem u zaglavlju kao `Authorization: Bearer <ključ>`, bez tela. Svaki ključ ima svoju adresu, pa se jedan ukida bez diranja ostalih, a pored svakog stoji napomena čemu služi. Sve o tome, i šta znači pokretanje izvan aplikacije, stoji na strani [Poslovi](/sr/jobs#pokretanje-posla-izvan-aplikacije).
+
 ## Pokretanje izveštaja
 
 Svaki izveštaj stoji u meniju, pod nazivom i ikonom svoje grupe, sa svojom ikonom pored sebe ako je izabrana: ko ima ulogu grupe vidi njene izveštaje, ko je nema ne vidi ih. Strana izveštaja ima dve strane: levo ono što izveštaj traži, desno ono što je vratio.

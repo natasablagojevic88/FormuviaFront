@@ -290,6 +290,26 @@
         return `/api/job/logs/${id}`;
     }
 
+    /** Webhook keys of one job, as a table; the server adds the filter by that job. */
+    static webhookTable(jobId: string): string {
+        return `/api/webhook/table/${jobId}`;
+    }
+
+    /** A webhook key: without an id a new key is made, with one its description is changed. */
+    static readonly webhook='/api/webhook';
+
+    static webhookId(id: string): string {
+        return `/api/webhook/${id}`;
+    }
+
+    /**
+     * Address that runs the job from the outside. It is never called by this application but written
+     * down for the user to copy, so WebhookDialog puts the address of the server in front of it.
+     */
+    static webhookExecute(id: string): string {
+        return `/api/execute/webhook/${id}`;
+    }
+
     static history(className: string, id: string): string {
         return `/api/history/${className}/${id}`;
     }

@@ -126,6 +126,12 @@ At the bottom stands the expression the schedule comes down to, the way the sche
 
 Read from the left: at second 0, every 5 minutes, at 8 and at 16 hours, on no particular day of the month, every month, on Monday and Friday, every year. The `?` stands where a day is left to the other field.
 
+### Running a job from the outside
+
+A job is also run by somebody who is not in the application at all. *Webhook* in the row menu of the job opens its **keys**: with a key, another program — the one that makes the data, a scheduler of its own, a button in a third application — runs this job whenever it needs to, without logging in.
+
+The dialog says how the call is made, and it holds for every key of that job: `POST` to the address of the key, with the key in the header as `Authorization: Bearer <key>`, and no body. Every key has an address of its own, so one key is taken away without touching the others, and beside each stands a note of what it is for. The whole of it, together with what a run from the outside means, is on the [Jobs](/jobs#running-a-job-from-the-outside) page.
+
 ## Running a report
 
 Every report is in the menu, under the name and the icon of its group, with its own icon beside it when one was chosen: whoever has the role of the group sees its reports there, and nobody else does. The page of a report has two sides: what the report asks for on the left, what came back on the right.

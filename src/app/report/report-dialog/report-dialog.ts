@@ -26,9 +26,8 @@ interface Report {
   /** Font Awesome classes of the picture beside the report in the menu. */
   icon?: string;
   sqlQuery?: string;
-  /** Stored file of the report; the server sends its identifier, and the name when it has one. */
-  jasterFileId?: string | null;
-  jasterFileFileName?: string | null;
+  /** Stored file of the report; the server sends only its identifier. */
+  jasperFileId?: string | null;
   /** The file sent for this report; the server takes it over when the report is saved. */
   fileUpload?: FileValue | null;
 }
@@ -111,12 +110,12 @@ export class ReportDialog implements OnInit {
 
   /** The report already carries a file; without a new one it keeps that one. */
   get hasStoredFile(): boolean {
-    return !!this.report.jasterFileId;
+    return !!this.report.jasperFileId;
   }
 
-  /** Name of the file in the form: the one just chosen, otherwise the one the report already holds. */
+  /** Name of the file in the form; only a file just chosen has one, a stored file is shown as such. */
   fileNameShown(): string {
-    return this.report.fileUpload?.fileName ?? this.report.jasterFileFileName ?? "";
+    return this.report.fileUpload?.fileName ?? "";
   }
 
   chooseFile(input: HTMLInputElement): void {

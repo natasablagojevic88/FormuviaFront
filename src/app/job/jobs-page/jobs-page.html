@@ -62,6 +62,11 @@
                     <i class="fa-solid fa-clock-rotate-left"></i>
                   </button>
                   @if (canEdit() && row.reportId) {
+                    <button type="button" class="icon-button" (click)="showWebhook(row)"
+                      [disabled]="!row.jobId || working() !== null"
+                      [attr.aria-label]="'ui.webhook.title' | t" [title]="'ui.webhook.title' | t">
+                      <i class="fa-solid fa-link"></i>
+                    </button>
                     <button type="button" class="icon-button" (click)="edit(row)"
                       [disabled]="working() !== null"
                       [attr.aria-label]="'ui.edit' | t" [title]="'ui.edit' | t">

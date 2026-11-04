@@ -59,3 +59,29 @@ Ono što se izmeni — raspored među tim — ima dejstvo odmah: red se posle sn
 ::: tip
 Posao iza kog nema izveštaja ne može se odavde pokrenuti, niti menjati: posao radi nad izveštajem, a njega nema. Ono što je upisano o njegovim ranijim pokretanjima ostaje i čita se preko 🕘.
 :::
+
+## Pokretanje posla izvan aplikacije
+
+🔗 u redu otvara **webhook ključeve** posla: sa takvim ključem drugi program pokreće ovaj posao kad mu zatreba, bez prijave. Dugme stoji pored ✎, za istog korisnika i za posao koji još pripada izveštaju.
+
+Kako se poziv šalje, piše u dijalogu, i isto je za svaki ključ tog posla:
+
+| | |
+|---|---|
+| **Poziv** | `POST` |
+| **Zaglavlje** | `Authorization: Bearer <ključ>` |
+| **Telo** | nema ga; poslu ne treba ništa od onoga ko ga poziva |
+
+*Nov ključ* pravi jedan, a svaki ključ dobija **svoju adresu**: ukidanje jednog ključa ostavlja ostale da rade. Pored ključa stoji napomena čemu služi — kome je dat — i ta napomena se zapisuje samo ovde, onaj ko poziva je ne vidi. Adresa i ključ se kopiraju dugmetom pored njih, a *Kopiraj ceo poziv* daje liniju za terminal:
+
+```
+curl -X POST -H "Authorization: Bearer <ključ>" https://vas-server/api/execute/webhook/<adresa ključa>
+```
+
+Posao tada radi isto što radi i kad ga pokrene raspoređivač, a pokretanje se zapisuje među pokretanja posla, pa se čita sa 🕘 kao i svako drugo. Odgovor se vraća kad se posao završi, a ne kad bude primljen.
+
+::: warning
+Ključ pokreće posao i kad je posao **isključen**: *Uključen* važi samo za vremenski raspored. Posao koji ne sme da se pokreće ostaje bez ključeva.
+:::
+
+Ključ ostaje kakav je napravljen i ovde se u svakom trenutku čita, pa ga dajte samo onome za koga je napravljen. *Obriši* ga ukida, i od tog trenutka poziv sa njim ne radi ništa.
