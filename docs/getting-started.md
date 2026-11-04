@@ -16,6 +16,8 @@ The first account is `admin`, with the password chosen during installation. Chan
 
 **Your name** is at the bottom of the menu. Click it to change your password; the icon next to it signs you out.
 
+![The Roles screen with the menu on the left and the language and theme in the top bar](/screenshots/en/roles.png)
+
 ## Language
 
 Formuvia speaks three languages, chosen in the top bar:
@@ -27,6 +29,8 @@ Formuvia speaks three languages, chosen in the top bar:
 | **Српски** | Serbian, Cyrillic script |
 
 The choice is remembered in your browser, so the next time you open Formuvia it comes up in the same language. It applies to everything: buttons, column headers, menu items and error messages alike.
+
+![The language picker open in the top bar](/screenshots/en/language.png)
 
 ## Light and dark theme
 
@@ -41,6 +45,8 @@ This is remembered per browser as well. It changes nothing about your data — o
 ## Change your password
 
 Click your name at the bottom of the menu and choose **Change password**. Enter the new password twice; the two entries must match or the dialog will not let you save.
+
+![The Change password dialog](/screenshots/en/change-password.png)
 
 ## On a phone
 

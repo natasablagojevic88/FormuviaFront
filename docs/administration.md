@@ -37,6 +37,8 @@ What a user sees follows directly from this: the menu is built from their roles,
 
 Since `admin` implicitly holds every role, an administrator sees everything, and you do not need to assign them anything else.
 
+![The Edit user dialog with the role chips](/screenshots/en/user-dialog.png)
+
 ## Mail servers
 
 *Administration / Mail servers* keeps the servers the application sends mail through: the test mail from the row menu, and everything a [job of a report](/reports#jobs-a-report-that-runs-by-itself) sends by itself — the report, and the word about a job that did not go through. It is an ordinary table screen, so searching, sorting, pages, history and Excel export work on it as everywhere else.
@@ -51,6 +53,8 @@ Since `admin` implicitly holds every role, an administrator sees everything, and
 - **Sign in** — switch it on when the server asks for a user. The **username** and the **password** are then asked for as well.
 
 The password is written only: it never comes back out of the server, so the field is empty every time the form is opened. Left empty while editing, the stored password stays as it is; it has to be entered when a server starts signing in. Switching *Sign in* off clears both the username and the password.
+
+![The New mail server dialog](/screenshots/en/mail-server-dialog.png)
 
 ### Trying a server out
 

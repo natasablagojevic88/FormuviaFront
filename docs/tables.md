@@ -8,6 +8,8 @@ Tables you define yourself in the [Model](/model) appear in the menu and open a 
 
 A table screen has three parts: a **header** with the title and the *Add* button, a **toolbar** with search and export, and the **list** itself with a paginator at the bottom.
 
+![A table screen: header with Add, toolbar, and the list with column filters](/screenshots/en/users.png)
+
 ## Finding a record
 
 ### Filtering by column
@@ -31,6 +33,8 @@ Add a condition, pick the column, pick what to compare and enter the value:
 | is empty / is not empty | records with nothing stored in that column |
 
 All conditions must match at once. **Apply** runs the search and the conditions stay visible as chips in the toolbar, so you can see what is filtering the list; the × on a chip removes that one condition, and **Clear all** removes them all.
+
+![The Advanced search dialog with one condition](/screenshots/en/advanced-search.png)
 
 ### Sorting and paging
 
@@ -152,3 +156,5 @@ Column headers disappear along with the table layout, so the two things that liv
 - **filtering** — use *Advanced search*
 
 Everything else, including editing a cell and the ⋯ menu, works as it does on a computer.
+
+![The Users table on a phone, shown as cards](/screenshots/en/phone-table.png){width=300}

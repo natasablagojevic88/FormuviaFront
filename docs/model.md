@@ -28,6 +28,8 @@ Each row of the tree has a **+** button that adds the right kind of child — *A
 
 A menu needs only a **name** and an **icon**. The name is what people see in the navigation; the icon is picked from a searchable list.
 
+![The Add menu dialog](/screenshots/en/model-add-menu.png)
+
 ## Adding a table
 
 A table needs more, because a table is real.

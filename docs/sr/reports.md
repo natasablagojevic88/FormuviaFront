@@ -18,6 +18,8 @@ Spisak prikazuje naziv grupe, ulogu koja uz nju ide i njenu ikonu. To je isti sp
 
 Naziv i uloga su obavezni. Izborom uloge je pravilo pristupa završeno: ko ima tu ulogu dobija izveštaje grupe, ko je nema ne vidi ih nikada.
 
+![Dijalog Nova grupa za izveštaje](/screenshots/sr/report-group-dialog.png)
+
 ### Izmena i brisanje grupe
 
 ⋯ → *Izmeni* otvara istu formu; naziv, uloga i ikona mogu da se menjaju kad god, a promena uloge od tog trenutka menja i to kome su izveštaji dostupni. ⋯ → *Obriši* skida grupu zajedno sa izveštajima u njoj.

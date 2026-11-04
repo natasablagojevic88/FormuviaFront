@@ -28,6 +28,8 @@ Svaki red drveta ima dugme **+** koje dodaje odgovarajuće dete — *Dodaj meni*
 
 Meniju trebaju samo **naziv** i **ikona**. Naziv je ono što ljudi vide u navigaciji, a ikona se bira iz liste sa pretragom.
 
+![Dijalog Dodaj meni](/screenshots/sr/model-add-menu.png)
+
 ## Dodavanje tabele
 
 Tabeli treba više, jer je tabela stvarna.

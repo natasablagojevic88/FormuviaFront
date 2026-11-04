@@ -8,6 +8,8 @@ Tabele koje sami definišete u [Modelu](/sr/model) pojavljuju se u meniju i otva
 
 Ekran sa tabelom ima tri dela: **zaglavlje** sa naslovom i dugmetom *Dodaj*, **traku** sa pretragom i exportom, i samu **listu** sa straničenjem na dnu.
 
+![Ekran tabele: zaglavlje sa Dodaj, traka sa alatima i lista sa filterima po kolonama](/screenshots/sr/users.png)
+
 ## Kako da nađete zapis
 
 ### Filtriranje po koloni
@@ -31,6 +33,8 @@ Dodate uslov, izaberete kolonu, izaberete šta se poredi i unesete vrednost:
 | prazno / nije prazno | zapise kod kojih u toj koloni nema ničega |
 
 Svi uslovi moraju da važe istovremeno. **Primeni** pokreće pretragu, a uslovi ostaju vidljivi kao čipovi u traci, da se vidi šta filtrira listu; × na čipu uklanja taj jedan uslov, a **Obriši sve** uklanja ih sve.
+
+![Dijalog Napredna pretraga sa jednim uslovom](/screenshots/sr/advanced-search.png)
 
 ### Sortiranje i straničenje
 
@@ -152,3 +156,5 @@ Zaglavlja kolona nestaju zajedno sa izgledom tabele, pa se dve stvari koje su u 
 - **filtriranje** — kroz *Naprednu pretragu*
 
 Sve ostalo, uključujući izmenu ćelije i ⋯ meni, radi kao i na računaru.
+
+![Tabela Korisnici na telefonu, prikazana kao kartice](/screenshots/sr/phone-table.png){width=300}

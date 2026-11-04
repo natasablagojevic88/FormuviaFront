@@ -16,6 +16,8 @@ Prvi nalog je `admin`, sa lozinkom izabranom pri instalaciji. Promenite je odmah
 
 **Vaše ime** je na dnu menija. Klikom na njega menjate lozinku; ikonica pored njega vas odjavljuje.
 
+![Ekran Uloge sa menijem levo i jezikom i temom u gornjoj traci](/screenshots/sr/roles.png)
+
 ## Jezik
 
 Formuvia govori tri jezika, biraju se u gornjoj traci:
@@ -27,6 +29,8 @@ Formuvia govori tri jezika, biraju se u gornjoj traci:
 | **Српски** | ćirilica |
 
 Izbor se pamti u pregledaču, pa sledeći put Formuvia otvara isti jezik. Važi za sve: dugmad, nazive kolona, stavke menija i poruke o greškama.
+
+![Otvoren izbor jezika u gornjoj traci](/screenshots/sr/language.png)
 
 ## Svetla i tamna tema
 
@@ -41,6 +45,8 @@ I ovo se pamti po pregledaču. Na podatke ne utiče — menja samo izgled ekrana
 ## Promena sopstvene lozinke
 
 Kliknite na svoje ime na dnu menija i izaberite **Promena lozinke**. Novu lozinku unosite dvaput; dok se dva unosa ne poklope, dijalog neće dozvoliti snimanje.
+
+![Dijalog Promena lozinke](/screenshots/sr/change-password.png)
 
 ## Na telefonu
 

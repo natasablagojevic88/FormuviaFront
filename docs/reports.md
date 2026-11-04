@@ -18,6 +18,8 @@ The list shows the name of the group, the role that goes with it and its icon. I
 
 The name and the role are required. Picking the role is the whole of the access rule: whoever has that role gets the reports of the group, whoever does not never sees them.
 
+![The New group dialog for reports](/screenshots/en/report-group-dialog.png)
+
 ### Editing and deleting a group
 
 ⋯ → *Edit* opens the same form; the name, the role and the icon can be changed whenever, and changing the role changes who gets the reports from that moment on. ⋯ → *Delete* removes the group together with the reports in it.

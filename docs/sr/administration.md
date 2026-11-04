@@ -37,6 +37,8 @@ Ono što korisnik vidi sledi direktno iz ovoga: meni se gradi iz njegovih uloga,
 
 Pošto `admin` implicitno ima sve uloge, administrator vidi sve i nije mu potrebno dodeljivati ništa drugo.
 
+![Dijalog Izmena korisnika sa ulogama](/screenshots/sr/user-dialog.png)
+
 ## Serveri za poštu
 
 *Administracija / Serveri za poštu* čuva servere preko kojih aplikacija šalje poštu: probnu poruku iz menija reda, i sve što [posao izveštaja](/sr/reports#poslovi-izvestaj-koji-ide-sam) šalje sam — izveštaj, i javljanje o poslu koji nije prošao. To je obična tabelarna strana, pa pretraga, sortiranje, strane, istorija i izvoz u Excel rade kao i svuda.
@@ -51,6 +53,8 @@ Pošto `admin` implicitno ima sve uloge, administrator vidi sve i nije mu potreb
 - **Prijava** — uključuje se kad server traži korisnika. Tada se traže i **korisničko ime** i **lozinka**.
 
 Lozinka se samo upisuje: sa servera nikad ne izlazi, pa je polje prazno svaki put kad se forma otvori. Ostavljena prazna pri izmeni, sačuvana lozinka ostaje kakva je; mora se uneti kad server tek počne da se prijavljuje. Isključena *Prijava* briše i korisničko ime i lozinku.
+
+![Dijalog Nov server za poštu](/screenshots/sr/mail-server-dialog.png)
 
 ### Proba servera
 
