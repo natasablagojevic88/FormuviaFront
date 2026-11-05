@@ -200,4 +200,16 @@ npm run icons
 
 ## License
 
-MIT – see [LICENSE](LICENSE).
+Copyright (c) 2026 Nataša Blagojević
+
+Formuvia is free software: you may use it, study it, change it and pass it on under the
+**GNU Affero General Public License, version 3** – see [LICENSE](LICENSE).
+
+In short: run it for any purpose, business included, and change it as you like. If you run a
+changed version and let other people use it over a network, you have to offer those people the
+source of your version, under the same licence.
+
+A commercial licence, without those obligations, is available from the author for anyone who
+needs one.
+
+The name *Formuvia* and its logo are not covered by the licence.
