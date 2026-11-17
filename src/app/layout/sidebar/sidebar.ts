@@ -6,6 +6,7 @@ import { filter } from "rxjs";
 import { Layout } from "../../services/layout";
 import { ChangePasswordDialog } from "../change-password-dialog/change-password-dialog";
 import { MenuItem, Session } from "../../services/session";
+import { environment } from "../../../environments/environment";
 
 @Component({
   selector: "app-sidebar",
@@ -16,6 +17,16 @@ import { MenuItem, Session } from "../../services/session";
 export class Sidebar {
   /** Groups start folded, so the whole menu is read at once; only the page being shown is unfolded. */
   private readonly openGroups = signal(new Set<string>());
+
+  /**
+   * The licence and the source of this version, offered at the bottom of the menu.
+   *
+   * Article 13 of the AGPL asks whoever changes Formuvia and serves it over a network to offer its
+   * users the source of that changed version; the address comes from the environment, so changing
+   * it is one line, not a hunt through the templates.
+   */
+  readonly licenceUrl = "https://www.gnu.org/licenses/agpl-3.0.html";
+  readonly sourceUrl = environment.sourceUrl;
 
   constructor(
     public session: Session,

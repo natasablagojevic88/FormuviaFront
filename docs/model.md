@@ -22,7 +22,7 @@ The root is **Model**. Under it the rules are fixed:
 
 A subtable is what makes *Related tables* appear in the ⋯ menu of a row: open a customer and you get to that customer's orders. The chain can be as deep as you need.
 
-Each row of the tree has a **+** button that adds the right kind of child — *Add menu*, *Add table* or *Add subtable*, depending on where you are — and a ⋯ button with *Edit*, *Delete*, *Form design* (tables only) and *History*.
+Each row of the tree has a **+** button that adds the right kind of child — *Add menu*, *Add table* or *Add subtable*, depending on where you are — and a ⋯ button with *Edit*, *Delete*, *Form design* (tables only), *Import from a folder* (only a table straight under a menu) and *History*.
 
 ## Adding a menu
 
@@ -119,6 +119,43 @@ The report is then offered in the ⋯ menu of every row of that table, under its
 ::: tip
 Leave the font out of the report and it gets the one the server offers, which has š, đ, č, ć and ž in it. A report that names a font of its own needs that same font on the server; if it is not there, making the report fails and says which font is missing.
 :::
+
+## Import from a folder
+
+A table can take its data from files as well as from people. ⋯ → **Import from a folder** on a table opens the jobs that do it: each one looks into a folder on the server at the time it is given, takes the filled-in [entry templates](/tables#the-entry-template) of this table it finds there, and writes their rows into the table. Whoever makes the data — another program, a colleague, an export from an old system — only has to leave the file in that folder.
+
+The item stands only on a table straight under a menu. A subtable does not have it: its rows belong to a record of the table above it, and a file left in a folder cannot say which record that is.
+
+### How it goes
+
+The page says it at the top, under *How the import works*, and it is the same four steps every time:
+
+1. **Fill in the template.** It is downloaded from the list of the table with *Template* and filled in the usual way. Download it again after the form design changes, or the import will not recognise its columns.
+2. **Put the file into the folder of the job.** Only `.xlsx` files are taken. When the job has a file name, only the files whose name begins with it are taken: with `konta`, both `konta.xlsx` and `konta-march.xlsx` go in, `accounts.xlsx` does not.
+3. **The job imports it** — at the time set in its timetable, at once with ▶ on the [Jobs](/jobs) page, or when another program calls its webhook.
+4. **Check the outcome.** A file that went in is moved into a folder called `backup` inside the folder of the job; a file that did not go in is moved into `error`. Either way it is no longer in the folder, so the next run does not take it again.
+
+Every file goes in **as a whole**, just like with *Import* in the list: if one row is not accepted, nothing from that file is written. The other files of the same run are not held back by it. A run in which any file did not go in is marked *Failed*, its error lists those files, and it goes to the address for errors of the job.
+
+The error of the job says which file, not which row. To see the row and what is wrong with it, import that same file by hand with *Import* in the list of the table — the message there says it — then fix the file and copy it back into the folder of the job.
+
+::: tip
+The page opens with the four steps unfolded while the table has no job yet, and folded once it has one, so the list gets the room. Click the heading to open or fold them; the page remembers the choice.
+:::
+
+### The form of an import job
+
+*Add* opens a shorter form than the one of a report: an import job only imports, so its kind is not chosen, and nothing about mail or the kind of file is asked.
+
+- **Name** — the job stands in the scheduler under it, and it cannot be changed afterwards, exactly as with the [jobs of a report](/reports#jobs-a-report-that-runs-by-itself).
+- **Folder** — the folder **on the server**, written in full, for example `/var/formuvia/import/konta`. Not a folder on your own computer: the job runs on the server and looks there. The server has to be allowed to read the folder and to write into it, because it makes `backup` and `error` inside it by itself.
+- **File name** — not required. Only the files whose name begins with it are imported; left empty, every `.xlsx` in the folder is.
+- **Mail server** and **Address for errors** — where word goes when a run does not go through; without them the error is only written down.
+- **Role**, **On** and the **timetable** — the same as for any other job; see [When it runs](/reports#when-it-runs).
+
+The job writes the rows without asking for the add role of the table: it is the administrator who makes the job, and from then on anyone who can put a file into the folder brings data into the table. Choose the folder with that in mind.
+
+The webhook keys of an import job are in the row menu, under *Webhook*, the same as for the job of a report ([Running a job from the outside](/jobs#running-a-job-from-the-outside)).
 
 ## Editing
 

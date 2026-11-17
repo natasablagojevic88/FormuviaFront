@@ -126,6 +126,10 @@ The row of names is protected and cannot be overwritten, and the file remembers 
 
 The file goes in as a whole: if the server cannot accept a row, nothing at all is written and the message says which row it was and what is wrong with it. Fix that row and send the file again — there is no half-finished import to clean up. Conditions are judged for each row on its own, against what that row holds: a value in a column whose *Shown while* condition does not hold for that row is not kept, just as the field would not be on the form for such a record. When it goes through, the list opens on the first page, without filters, newest first, so the imported records are the ones you see.
 
+::: tip
+The same file can also be imported without opening the application: the administrator can give a table a job that picks filled-in templates up from a folder on the server by itself. See [Import from a folder](/model#import-from-a-folder).
+:::
+
 ## Numbers
 
 A whole number is shown exactly as it is stored, without thousands separators — a code, a year or an invoice number should read the way it was entered.

@@ -33,6 +33,11 @@ export class ModelPage {
   readonly roots = signal<ModelNode[]>([]);
   readonly loading = signal(false);
   readonly selectedKey = signal<string | null>(null);
+  /**
+   * Tables that stand straight under a menu. Only they get import jobs: a subtable needs the record
+   * its rows belong to, and a file in a folder cannot say which (the server refuses it as well).
+   */
+  private readonly topTables = signal<Set<string>>(new Set());
   private roles: Role[] = [];
 
   /** true only when the page was opened by the Back button of the form design. */
@@ -70,6 +75,7 @@ export class ModelPage {
     this.sendRequest.get(ApiRoute.modelTree)
       .then((root: ModelNode) => {
         this.roots.set([root]);
+        this.topTables.set(this.findTopTables(root));
         setTimeout(() => this.restoreState(root));
       })
       .finally(() => this.loading.set(false));
@@ -95,7 +101,7 @@ export class ModelPage {
   }
 
   /**
-   * Coming back from the form design: the tree is restored as it was and the selected node is brought
+   * Coming back from the form design or the import jobs: the tree is restored as it was and the selected node is brought
    * into view. Opening Model from the menu, or reloading the page, starts from the root again.
    */
   private restoreState(root: ModelNode): void {
@@ -122,7 +128,7 @@ export class ModelPage {
     }
   }
 
-  /** The state is read only on a return from the form design, and is used up while reading. */
+  /** The state is read only on a return from the form design or the import jobs, and is used up while reading. */
   private readState(): TreeState | null {
     if (!this.restore) {
       return null;
@@ -142,6 +148,23 @@ export class ModelPage {
       visit(node);
       this.walk(node.children ?? [], visit);
     });
+  }
+
+  private findTopTables(root: ModelNode): Set<string> {
+    const ids = new Set<string>();
+    this.walk([root], (node) => {
+      if (node.type !== "MENU") {
+        return;
+      }
+      (node.children ?? [])
+        .filter((child) => child.type === "TABLE" && child.id)
+        .forEach((child) => ids.add(child.id!));
+    });
+    return ids;
+  }
+
+  canImport(node: ModelNode): boolean {
+    return !!node.id && this.topTables().has(node.id);
   }
 
   key(node: ModelNode): string {
@@ -189,6 +212,13 @@ export class ModelPage {
     this.select(node);
     this.saveState();
     this.router.navigate(["/model/columns", node.id]);
+  }
+
+  /** Jobs that import filled-in templates of this table from a folder on the server. */
+  importJobs(node: ModelNode): void {
+    this.select(node);
+    this.saveState();
+    this.router.navigate(["/model/jobs", node.id]);
   }
 
   history(node: ModelNode): void {

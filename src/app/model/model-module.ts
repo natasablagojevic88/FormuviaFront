@@ -12,9 +12,11 @@ import { ModelDialog } from "./model-dialog/model-dialog";
 import { ColumnsPage } from "./columns-page/columns-page";
 import { ColumnDialog } from "./column-dialog/column-dialog";
 import { FunctionHelpDialog } from "./function-help-dialog/function-help-dialog";
+import { ModelJobsPage } from "./model-jobs-page/model-jobs-page";
+import { ReportDialogsModule } from "../report/report-dialogs-module";
 
 @NgModule({
-  declarations: [ModelPage, ModelDialog, ColumnsPage, ColumnDialog, FunctionHelpDialog],
-  imports: [CommonModule, FormsModule, MatDialogModule, MatMenuModule, MatTreeModule, ModelRoutingModule, SharedModule],
+  declarations: [ModelPage, ModelDialog, ColumnsPage, ColumnDialog, FunctionHelpDialog, ModelJobsPage],
+  imports: [CommonModule, FormsModule, MatDialogModule, MatMenuModule, MatTreeModule, ModelRoutingModule, SharedModule, ReportDialogsModule],
 })
 export class ModelModule {}

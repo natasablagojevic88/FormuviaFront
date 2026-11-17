@@ -1,0 +1,62 @@
+<app-page-header
+  [title]="(modelName() ? modelName() + ' — ' : '') + ('ui.modelJobs.title' | t)"
+  [subtitle]="'ui.modelJobs.subtitle' | t"
+  [breadcrumb]="('ui.model.breadcrumb' | t) + (modelName() ? ' / ' + modelName() : '')">
+  <button type="button" class="back-button" (click)="back()">
+    <i class="fa-solid fa-arrow-left"></i>
+    {{ 'ui.back' | t }}
+  </button>
+  <button type="button" class="add-button" (click)="add()">
+    <i class="fa-solid fa-plus"></i>
+    {{ 'ui.add' | t }}
+  </button>
+</app-page-header>
+
+<!-- what the user has to do, in order: without it a folder on the server says nothing -->
+@if (stepsReady()) {
+  <details class="steps" [open]="stepsOpen()" (toggle)="stepsToggled($event)">
+    <summary class="steps-summary">
+      <i class="fa-solid fa-circle-info steps-icon"></i>
+      <span class="steps-title">{{ 'ui.modelJobs.howTitle' | t }}</span>
+      <i class="fa-solid fa-chevron-down steps-chevron"></i>
+    </summary>
+    <ol class="steps-list">
+      <li>
+        <span class="step-number">1</span>
+        <div class="step-text">
+          <strong>{{ 'ui.modelJobs.step1Title' | t }}</strong>
+          <span>{{ 'ui.modelJobs.step1' | t }}</span>
+        </div>
+      </li>
+      <li>
+        <span class="step-number">2</span>
+        <div class="step-text">
+          <strong>{{ 'ui.modelJobs.step2Title' | t }}</strong>
+          <span>{{ 'ui.modelJobs.step2' | t }}</span>
+        </div>
+      </li>
+      <li>
+        <span class="step-number">3</span>
+        <div class="step-text">
+          <strong>{{ 'ui.modelJobs.step3Title' | t }}</strong>
+          <span>{{ 'ui.modelJobs.step3' | t }}</span>
+        </div>
+      </li>
+      <li>
+        <span class="step-number">4</span>
+        <div class="step-text">
+          <strong>{{ 'ui.modelJobs.step4Title' | t }}</strong>
+          <span>{{ 'ui.modelJobs.step4' | t }}</span>
+        </div>
+      </li>
+    </ol>
+    <p class="steps-note">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span>{{ 'ui.modelJobs.wholeFile' | t }}</span>
+    </p>
+  </details>
+}
+
+<app-data-table [url]="tableUrl" [newRowValues]="newRowValues" [rowActions]="rowActions"
+  (loaded)="onLoaded($event)" (edit)="edit($event)" (action)="rowAction($event)"
+  (remove)="remove($event)"></app-data-table>

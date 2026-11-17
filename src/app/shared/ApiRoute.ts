@@ -234,9 +234,18 @@
     /** Job of a report: insert when the id is empty, otherwise update. */
     static readonly reportJob='/api/report/job';
 
+    /** Deletes a job by its id, whether it belongs to a report or imports into a table. */
     static reportJobId(id: string): string {
         return `/api/report/job/${id}`;
     }
+
+    /** Import jobs of one table: the table is in the path, so a job of another table never comes back. */
+    static modelJobTable(modelId: string): string {
+        return `/api/model/job/table/${modelId}`;
+    }
+
+    /** Import job of a table: insert when the id is empty, otherwise update. */
+    static readonly modelJob='/api/model/job';
 
     /** Order to offer for a new parameter: one more than the largest one already entered. */
     static reportParameterOrderNumber(reportId: string): string {

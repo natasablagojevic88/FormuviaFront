@@ -18,5 +18,17 @@ export const environment = {
   production: true,
   apiUrl: document.baseURI.replace(/\/$/, ''),
   /** Language of a first visit, until the user picks their own: 'en-US', 'sr-Latn-RS' or 'sr-RS'. */
-  defaultLanguage: 'en-US'
+  defaultLanguage: 'en-US',
+  /**
+   * Where the source of this running version lives.
+   *
+   * Formuvia is under the GNU Affero General Public License, whose article 13 says that whoever
+   * changes it and lets other people use it over a network has to offer those people the source of
+   * THEIR version. The application shows this address at the bottom of the menu and under the sign
+   * in card, so that offer is always one click away.
+   *
+   * If you change Formuvia, point this at your own repository: the people who use your version are
+   * entitled to your source, not to the one below.
+   */
+  sourceUrl: 'https://github.com/natasablagojevic88/Formuvia'
 };

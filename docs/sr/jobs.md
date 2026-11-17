@@ -2,7 +2,7 @@
 
 **Poslovi** su jedno mesto na kom stoji sve što Formuvia pokreće sama. Dolazi se iz menija, preko *Poslovi*, i za to nije potrebna posebna uloga: svaki korisnik dobija poslove vezane za ulogu koju ima, a posao bez uloge vidi samo administrator.
 
-Sam posao se unosi uz izveštaj kom pripada — u *Administraciji / Izveštaji*, u meniju reda izveštaja, pod *Poslovi* ([Izveštaji](/sr/reports#poslovi-izvestaj-koji-ide-sam) opisuju šta forma traži). Ova strana je druga strana toga: šta je raspored napravio od tih poslova i kako su prolazili.
+Sam posao se unosi uz izveštaj kom pripada — u *Administraciji / Izveštaji*, u meniju reda izveštaja, pod *Poslovi* ([Izveštaji](/sr/reports#poslovi-izvestaj-koji-ide-sam) opisuju šta forma traži). Posao koji uvozi fajlove u tabelu unosi se uz tu tabelu, u *Administraciji / Model*, preko ⋯ → *Uvoz iz foldera* ([Model](/sr/model#uvoz-iz-foldera)). Ova strana je druga strana toga: šta je raspored napravio od tih poslova i kako su prolazili.
 
 ## Šta spisak pokazuje
 
@@ -27,7 +27,7 @@ Polje iznad spiska traži po **nazivu**, i traži dok se piše. Gleda u spisak k
 
 ## Pokretanje posla odmah
 
-Dugme ▶ u redu prvo pita — posao se pokreće stvarno, a pošta koja je otišla ne vraća se — pa onda predaje posao rasporedu bez čekanja. To je isto pokretanje koje bi raspored sam započeo — ista pošta, isti fajl, isti posao nad podacima — samo ne čeka svoje vreme. Raspored se pri tome ne pomera: *Sledeće pokretanje* ostaje gde je bilo.
+Dugme ▶ u redu prvo pita — posao se pokreće stvarno, a pošta koja je otišla ne vraća se — pa onda predaje posao rasporedu bez čekanja. To je isto pokretanje koje bi raspored sam započeo — ista pošta, isti fajl, isti posao nad podacima — samo ne čeka svoje vreme. Posao uvoza uzima fajlove koji u tom trenutku čekaju u njegovom folderu. Raspored se pri tome ne pomera: *Sledeće pokretanje* ostaje gde je bilo.
 
 Dugme govori samo da je posao preuzet, ne i da je završen: pokretanje ide dalje samo, i može trajati koliko traje izveštaj. Red se čita ponovo u trenutku predaje, pa pokretanje koje još nije završeno tamo stoji kao *U toku*; ⟳ u redu, ili *Osveži* u zaglavlju, pokazuje kako se završilo.
 
@@ -52,17 +52,17 @@ To je uobičajena tabela aplikacije, pa se pokretanja sortiraju po bilo kojoj ko
 
 ## Izmena posla
 
-✎ u redu otvara formu posla, istu koju otvara i strana izveštaja. Stoji samo za posao koji još pripada izveštaju, i samo korisniku koji može da dođe do *Administracije / Izveštaji* — posao se menja tamo gde je unet, a ta strana pripada administratoru.
+✎ u redu otvara formu posla, istu koju otvara i strana izveštaja. Stoji samo za posao koji još pripada izveštaju, i samo korisniku koji može da dođe do *Administracije / Izveštaji* — posao se menja tamo gde je unet, a ta strana pripada administratoru. Posao uvoza otvara se u svojoj, kraćoj formi, za korisnika koji može da dođe do *Administracije / Model*.
 
 Ono što se izmeni — raspored među tim — ima dejstvo odmah: red se posle snimanja čita ponovo, pa je novo *Sledeće pokretanje* na ekranu bez učitavanja celog spiska.
 
 ::: tip
-Posao iza kog nema izveštaja ne može se odavde pokrenuti, niti menjati: posao radi nad izveštajem, a njega nema. Ono što je upisano o njegovim ranijim pokretanjima ostaje i čita se preko 🕘.
+Posao iza kog nema ni izveštaja ni tabele ne može se odavde pokrenuti, niti menjati: posao radi nad jednim od njih, a toga nema. Ono što je upisano o njegovim ranijim pokretanjima ostaje i čita se preko 🕘.
 :::
 
 ## Pokretanje posla izvan aplikacije
 
-🔗 u redu otvara **webhook ključeve** posla: sa takvim ključem drugi program pokreće ovaj posao kad mu zatreba, bez prijave. Dugme stoji pored ✎, za istog korisnika i za posao koji još pripada izveštaju.
+🔗 u redu otvara **webhook ključeve** posla: sa takvim ključem drugi program pokreće ovaj posao kad mu zatreba, bez prijave. Dugme stoji pored ✎, za istog korisnika i za posao koji još pripada izveštaju ili tabeli.
 
 Kako se poziv šalje, piše u dijalogu, i isto je za svaki ključ tog posla:
 

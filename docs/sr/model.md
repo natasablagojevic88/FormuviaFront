@@ -22,7 +22,7 @@ Koren je **Model**. Ispod njega su pravila fiksna:
 
 Podtabela je ono što u ⋯ meniju reda pravi *Povezane tabele*: otvorite kupca i stignete do njegovih porudžbina. Lanac može biti dubok koliko treba.
 
-Svaki red drveta ima dugme **+** koje dodaje odgovarajuće dete — *Dodaj meni*, *Dodaj tabelu* ili *Dodaj podtabelu*, u zavisnosti od toga gde ste — i dugme ⋯ sa stavkama *Izmeni*, *Obriši*, *Dizajn forme* (samo za tabele) i *Istorija*.
+Svaki red drveta ima dugme **+** koje dodaje odgovarajuće dete — *Dodaj meni*, *Dodaj tabelu* ili *Dodaj podtabelu*, u zavisnosti od toga gde ste — i dugme ⋯ sa stavkama *Izmeni*, *Obriši*, *Dizajn forme* (samo za tabele), *Uvoz iz foldera* (samo tabela direktno ispod menija) i *Istorija*.
 
 ## Dodavanje menija
 
@@ -119,6 +119,43 @@ Izveštaj se zatim nudi u ⋯ meniju svakog reda te tabele, pod svojim nazivom: 
 ::: tip
 Ako u izveštaju ne navedete font, dobiće onaj koji server nudi, a u njemu ima š, đ, č, ć i ž. Izveštaj koji navede svoj font traži taj isti font i na serveru; ako ga tamo nema, pravljenje izveštaja pukne i kaže koji font fali.
 :::
+
+## Uvoz iz foldera
+
+Tabela može da dobija podatke i iz fajlova, ne samo od ljudi. ⋯ → **Uvoz iz foldera** na tabeli otvara poslove koji to rade: svaki u zadato vreme pogleda u folder na serveru, uzme popunjene [šablone za unos](/sr/tables#sablon-za-unos) ove tabele koje tamo nađe i upiše njihove redove u tabelu. Ko god pravi podatke — drugi program, kolega, izvoz iz starog sistema — treba samo da ostavi fajl u tom folderu.
+
+Stavka stoji samo na tabeli koja je direktno ispod menija. Podtabela je nema: njeni redovi pripadaju zapisu tabele iznad nje, a fajl ostavljen u folderu ne može da kaže kom zapisu.
+
+### Kako ide
+
+Strana to kaže na vrhu, pod *Kako radi uvoz*, i uvek su to ista četiri koraka:
+
+1. **Popunite šablon.** Preuzima se iz liste tabele dugmetom *Šablon* i popunjava kao i inače. Preuzmite ga ponovo kad se promeni dizajn forme, inače uvoz neće prepoznati njegove kolone.
+2. **Stavite fajl u folder posla.** Uzimaju se samo `.xlsx` fajlovi. Kad posao ima naziv fajla, uzimaju se samo fajlovi čije ime počinje njime: uz `konta` ulaze i `konta.xlsx` i `konta-mart.xlsx`, a `racuni.xlsx` ne.
+3. **Posao ga uvozi** — u vreme zadato rasporedom, odmah dugmetom ▶ na strani [Poslovi](/sr/jobs), ili kad drugi program pozove njegov webhook.
+4. **Proverite ishod.** Fajl koji je ušao premešta se u folder `backup` unutar foldera posla; fajl koji nije ušao premešta se u `error`. U oba slučaja ga više nema u folderu, pa ga sledeće pokretanje ne uzima ponovo.
+
+Svaki fajl ulazi **u celini**, isto kao kod *Uvoza* u listi: ako jedan red nije prihvaćen, iz tog fajla se ne upisuje ništa. Ostali fajlovi istog pokretanja zbog toga ne čekaju. Pokretanje u kom neki fajl nije ušao označeno je sa *Nije prošao*, njegova greška navodi te fajlove i stiže na adresu za greške posla.
+
+Greška posla kaže koji fajl, ne i koji red. Da vidite red i šta u njemu ne valja, uvezite isti taj fajl ručno dugmetom *Uvoz* u listi tabele — tamošnja poruka to kaže — pa ispravite fajl i vratite ga u folder posla.
+
+::: tip
+Strana se otvara sa raširena četiri koraka dok tabela još nema nijedan posao, a sa skupljenim čim ga ima, da lista dobije prostor. Klik na naslov ih otvara ili skuplja; strana pamti izbor.
+:::
+
+### Forma posla uvoza
+
+*Dodaj* otvara kraću formu od one za izveštaj: posao uvoza samo uvozi, pa mu se vrsta ne bira, i ništa o pošti ili vrsti fajla se ne pita.
+
+- **Naziv** — pod njim posao stoji u rasporedu i posle se ne menja, isto kao kod [poslova izveštaja](/sr/reports#poslovi-izvestaj-koji-ide-sam).
+- **Folder** — folder **na serveru**, napisan ceo, na primer `/var/formuvia/import/konta`. Ne folder na vašem računaru: posao radi na serveru i tamo gleda. Server mora smeti da čita folder i da piše u njega, jer sam pravi `backup` i `error` u njemu.
+- **Naziv fajla** — nije obavezan. Uvoze se samo fajlovi čije ime počinje njime; ako ostane prazan, uvozi se svaki `.xlsx` iz foldera.
+- **Server za poštu** i **Adresa za greške** — kuda ide vest kad pokretanje ne prođe; bez njih se greška samo upiše.
+- **Uloga**, **Uključen** i **raspored** — isto kao kod svakog drugog posla; vidi [Kada se pokreće](/sr/reports#kada-se-pokrece).
+
+Posao upisuje redove ne pitajući za ulogu za dodavanje u tabelu: posao pravi administrator, a od tada svako ko može da stavi fajl u folder unosi podatke u tabelu. Folder birajte imajući to u vidu.
+
+Webhook ključevi posla uvoza su u meniju reda, pod *Webhook*, isto kao kod posla izveštaja ([Pokretanje posla izvan aplikacije](/sr/jobs#pokretanje-posla-izvan-aplikacije)).
 
 ## Izmena
 

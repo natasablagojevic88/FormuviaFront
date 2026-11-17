@@ -58,3 +58,11 @@ Formuvia is built to be used on a phone, not merely to fit on one:
 - dialogs scroll inside themselves instead of running off the screen
 
 Everything you can do on a computer you can do on a phone; some of it just sits in a different place.
+
+## Licence and source code
+
+At the bottom of the menu, and under the sign in card, stand two small links: **AGPL-3.0** and **Source code**.
+
+Formuvia is free software under the GNU Affero General Public License, version 3. You may run it for any purpose, business included, study how it works and change it. The licence asks one thing in return: whoever changes Formuvia and lets other people use that changed version over a network has to offer those people the source of their version.
+
+The second link is that offer. It leads to the source of the version you are using, so in an installation that somebody has changed it leads to the source of that changed version. Whoever installed Formuvia sets the address behind it; it is one setting, described in the README of the project.

@@ -184,6 +184,38 @@
   color: var(--c-on-dark);
 }
 
+/* The licence and the source of this version, offered to every user (AGPL, article 13). */
+.legal {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.legal a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 6px;
+  border-radius: 8px;
+  color: var(--c-on-dark-faint);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.legal a:hover,
+.legal a:focus-visible {
+  color: var(--c-on-dark);
+  text-decoration: underline;
+}
+
+.legal-dot {
+  color: var(--c-on-dark-faint);
+}
+
 @media (max-width: 900px) {
   :host {
     flex: none;

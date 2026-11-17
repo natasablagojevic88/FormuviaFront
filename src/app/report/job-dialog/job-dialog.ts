@@ -9,8 +9,11 @@ import { SelectOption } from "../../shared/search-select/search-select";
 import { Role } from "../../administration/app-user-dialog/app-user-dialog";
 import { ReportType } from "../report-dialog/report-dialog";
 
-/** What the job does when it runs: sends the report by mail, only runs it, or writes it to a file. */
-export type JobType = "SEND_MAIL" | "EXECUTE" | "EXPORT_FILE";
+/**
+ * What the job does when it runs: sends the report by mail, only runs it, or writes it to a file;
+ * a job of a table reads filled-in templates from a folder and imports them (IMPORT_FILE).
+ */
+export type JobType = "SEND_MAIL" | "EXECUTE" | "EXPORT_FILE" | "IMPORT_FILE";
 
 /** Whether the report stands in the mail itself or goes along as a file. */
 export type JobOutputType = "INLINE" | "ATTACHMENT";
@@ -18,10 +21,12 @@ export type JobOutputType = "INLINE" | "ATTACHMENT";
 /** Kind of the file the report is written into. */
 export type JobExportType = "CSV" | "EXCEL";
 
-/** A job of a report, as the server keeps it (JobItemDTO); the cron fields are kept apart. */
+/** A job of a report or of a table, as the server keeps it (JobItemDTO); the cron fields are kept apart. */
 export interface JobItem {
   id?: string;
-  reportId: string;
+  reportId?: string | null;
+  /** The table an import job writes into; a job of a report has none. */
+  modelId?: string | null;
   name: string;
   jobType?: JobType;
   active: boolean;
@@ -63,7 +68,12 @@ export interface JobItemRow extends JobItem {
 
 export interface JobDialogData {
   /** The report the job belongs to; it comes from the page, not from the form. */
-  reportId: string;
+  reportId?: string;
+  /**
+   * The table an import job belongs to, instead of a report: the job then only imports files from a
+   * folder, so the form asks for nothing a report would need.
+   */
+  modelId?: string;
   /** The kind of the report: it decides what the job may do with it. */
   reportType?: ReportType;
   /** allColumns from the table response: translated names of every JobItemDTO field. */
@@ -171,6 +181,11 @@ export class JobDialog implements OnInit {
     return fromColumn.length ? fromColumn : this.smtps();
   });
 
+  /** A job of a table: it reads filled-in templates from a folder and imports them into that table. */
+  get isImport(): boolean {
+    return !!this.data.modelId;
+  }
+
   /** The report goes out by mail: it needs a server, an address and a subject. */
   readonly isMail = computed(() => this.jobType() === "SEND_MAIL");
 
@@ -207,8 +222,13 @@ export class JobDialog implements OnInit {
     const row = this.data.job;
     this.job = {
       ...(row ?? { name: "", active: true, conditional: false }),
-      reportId: this.data.reportId,
+      reportId: this.data.reportId ?? null,
+      modelId: this.data.modelId ?? null,
     };
+    if (this.isImport) {
+      // a job of a table can only import, so the kind is not chosen
+      this.job.jobType = "IMPORT_FILE";
+    }
     this.cron = cronFromRow(row);
     this.jobType.set(this.job.jobType);
     this.outputType.set(this.job.jobOutputType ?? undefined);
@@ -310,7 +330,7 @@ export class JobDialog implements OnInit {
     if (this.needsErrorSmtp() && !this.job.smtpId) {
       return false;
     }
-    if (this.isFile() && !this.job.filePath?.trim()) {
+    if ((this.isFile() || this.isImport) && !this.job.filePath?.trim()) {
       return false;
     }
     if (this.hasFile() && !this.job.fileName?.trim()) {
@@ -328,6 +348,10 @@ export class JobDialog implements OnInit {
       return;
     }
     this.saving.set(true);
+    if (this.isImport) {
+      this.saveImport();
+      return;
+    }
     const job: Record<string, unknown> = {
       ...this.job,
       id: this.data.job?.id,
@@ -353,6 +377,37 @@ export class JobDialog implements OnInit {
       job["csvDelimiter"] = null;
     }
     this.sendRequest.post(ApiRoute.reportJob, job)
+      .then((saved: JobItem) => this.dialogRef.close(saved))
+      .catch(() => this.saving.set(false));
+  }
+
+  /**
+   * An import job carries only the folder, the beginning of the file names, the word about an error
+   * and the timetable; everything a report would need is sent empty.
+   */
+  private saveImport(): void {
+    const job: Record<string, unknown> = {
+      ...this.job,
+      id: this.data.job?.id,
+      reportId: null,
+      modelId: this.data.modelId,
+      name: this.job.name.trim(),
+      jobType: "IMPORT_FILE",
+      active: !!this.job.active,
+      conditional: false,
+      filePath: this.job.filePath?.trim() || null,
+      fileName: this.job.fileName?.trim() || null,
+      errorReceive: this.job.errorReceive?.trim() || null,
+      receive: null,
+      mailSubject: null,
+      mailBody: null,
+      jobOutputType: null,
+      exportType: null,
+      csvDelimiter: null,
+      jobCronId: this.data.job?.jobCronId ?? null,
+      ...cronToDto(this.cron),
+    };
+    this.sendRequest.post(ApiRoute.modelJob, job)
       .then((saved: JobItem) => this.dialogRef.close(saved))
       .catch(() => this.saving.set(false));
   }

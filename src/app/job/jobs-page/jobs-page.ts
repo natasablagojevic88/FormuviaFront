@@ -29,10 +29,15 @@ export interface JobRow {
   errorText?: string | null;
   jobId?: string | null;
   reportId?: string | null;
+  /** The table an import job writes into; a job of a report has none. */
+  modelId?: string | null;
 }
 
 /** The address of the reports in the menu: the jobs of a report are changed from there. */
 const REPORTS_URL = "/report-group";
+
+/** The address of the model in the menu: the import jobs of a table are changed from there. */
+const MODEL_URL = "/model";
 
 /**
  * Every job of the scheduler, whatever report it belongs to. The server sends them all at once, so
@@ -67,7 +72,20 @@ export class JobsPage {
    * A job is only changed from the reports, and the server allows that screen to the admin role
    * alone. The menu it sends says whether this user has it, so the page offers the change only then.
    */
-  readonly canEdit = computed(() => this.menuHas(REPORTS_URL));
+  readonly canEditReports = computed(() => this.menuHas(REPORTS_URL));
+
+  /** The import jobs of a table are entered in the model, which belongs to the administrator as well. */
+  readonly canEditImports = computed(() => this.menuHas(MODEL_URL));
+
+  /** A job still has something to work over: a report, or the table it imports into. */
+  hasTarget(row: JobRow): boolean {
+    return !!row.reportId || !!row.modelId;
+  }
+
+  /** Whether this user may change the job, and reach its webhook keys, from here. */
+  canEdit(row: JobRow): boolean {
+    return row.modelId ? this.canEditImports() : !!row.reportId && this.canEditReports();
+  }
 
   constructor(
     private dialog: MatDialog,
@@ -104,7 +122,9 @@ export class JobsPage {
     const id = row.jobId;
     const data: ConfirmDialogData = {
       title: this.translate.get("ui.jobs.runTitle"),
-      message: this.translate.get("ui.jobs.runConfirm").replace("{0}", row.name),
+      // an import job sends nothing and writes no file: it takes the files waiting in its folder
+      message: this.translate.get(row.modelId ? "ui.jobs.runImportConfirm" : "ui.jobs.runConfirm")
+        .replace("{0}", row.name),
       confirmText: this.translate.get("ui.jobs.run"),
     };
     this.dialog.open(ConfirmDialog, { width: "460px", data })
@@ -166,6 +186,10 @@ export class JobsPage {
    * report, because that decides what the job may do with it.
    */
   edit(row: JobRow): void {
+    if (row.jobId && row.modelId) {
+      this.editImport(row.jobId, row.modelId);
+      return;
+    }
     if (!row.jobId || !row.reportId) {
       return;
     }
@@ -191,6 +215,23 @@ export class JobsPage {
               job,
             });
           });
+      });
+  }
+
+  /** An import job opens in the same form, which then asks only for what an import needs. */
+  private editImport(jobId: string, modelId: string): void {
+    const parameter: DatabaseParameter = {
+      pageIndex: 0,
+      pageSize: 1,
+      filters: [{ field: "id", columnType: "UUID", searchOperation: "EQUALS", field1: jobId }],
+      orders: [],
+    };
+    this.sendRequest.post(ApiRoute.modelJobTable(modelId), parameter)
+      .then((table: DatabaseTable<JobItemRow>) => {
+        const job = table.list?.[0];
+        if (job) {
+          this.openForm({ modelId, columns: table.allColumns ?? table.column, job });
+        }
       });
   }
 

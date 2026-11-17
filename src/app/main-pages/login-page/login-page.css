@@ -288,6 +288,39 @@
 }
 
 /* Responsive */
+/* The licence and the source of this version (AGPL, article 13) - see login-page.ts.
+   The card is painted light at every width and does not follow the theme, so these two links
+   take the colours of the card, the same grey as .subtitle, and not the --c-* tokens. */
+.legal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 20px;
+  font-size: 0.8125rem;
+}
+
+.legal a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 6px;
+  border-radius: 8px;
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.legal a:hover,
+.legal a:focus-visible {
+  color: #0f172a;
+  text-decoration: underline;
+}
+
+.legal-dot {
+  color: #94a3b8;
+}
+
 @media (max-width: 1024px) {
   .login-grid {
     grid-template-columns: 1fr;

@@ -73,6 +73,12 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
         </form>
+
+        <div class="legal">
+          <a [href]="licenceUrl" target="_blank" rel="noopener noreferrer" [title]="'ui.about.licenceTitle' | t">AGPL-3.0</a>
+          <span class="legal-dot" aria-hidden="true">·</span>
+          <a [href]="sourceUrl" target="_blank" rel="noopener noreferrer" [title]="'ui.about.sourceTitle' | t">{{ 'ui.about.source' | t }}</a>
+        </div>
       </div>
     </section>
 

@@ -2,20 +2,40 @@
 	<property name="dest" location="dist" />
 	<property name="war-dest"
 		location="${dest}/FormuviaFront/Formuvia.war" />
+	<property name="war-doc-dest"
+		location="Documention.war" />
 	<property name="code-dest"
 		location="${dest}/FormuviaFront/browser" />
+	<property name="doc-dest"
+		location="docs/.vitepress/dist" />
 
 	<target name="clean">
 		<delete dir="${dest}" />
 	</target>
-	
+
 	<target name="install" depends="clean">
-			<exec executable="npm" failonerror="true">
-				<arg value="install" />
-			</exec>
+		<exec executable="npm" failonerror="true">
+			<arg value="install" />
+		</exec>
 	</target>
 
-	<target name="build" depends="install">
+
+	<target name="build-doc" depends="install">
+		<exec executable="npx" failonerror="true">
+			<arg value="vitepress" />
+			<arg value="build" />
+			<arg value="docs" />
+		</exec>
+	</target>
+
+	<target name="build-doc-war" depends="build-doc">
+		<war destfile="${war-doc-dest}" needxmlfile="false"
+			whenmanifestonly="fail">
+			<fileset dir="${doc-dest}" />
+		</war>
+	</target>
+
+	<target name="build" depends="build-doc-war">
 		<exec executable="npm" failonerror="true">
 			<arg value="run" />
 			<arg value="build" />
@@ -23,7 +43,8 @@
 	</target>
 
 	<target name="package" depends="build">
-		<war destfile="${war-dest}" needxmlfile="false" whenmanifestonly="fail">
+		<war destfile="${war-dest}" needxmlfile="false"
+			whenmanifestonly="fail">
 			<fileset dir="${code-dest}" />
 		</war>
 	</target>

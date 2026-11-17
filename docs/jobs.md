@@ -2,7 +2,7 @@
 
 **Jobs** is the one place where everything that Formuvia runs by itself stands together. It is reached from the menu, under *Jobs*, and it needs no role of its own: every user gets the jobs that are tied to a role they have, and a job without a role is shown to an administrator alone.
 
-A job itself is entered with the report it belongs to — in *Administration / Reports*, in the row menu of a report, under *Jobs* ([Reports](/reports#jobs-a-report-that-runs-by-itself) says what the form asks for). This page is the other side of that: what the scheduler made of those jobs and how they have been faring.
+A job itself is entered with the report it belongs to — in *Administration / Reports*, in the row menu of a report, under *Jobs* ([Reports](/reports#jobs-a-report-that-runs-by-itself) says what the form asks for). A job that imports files into a table is entered with that table, in *Administration / Model*, under ⋯ → *Import from a folder* ([Model](/model#import-from-a-folder)). This page is the other side of that: what the scheduler made of those jobs and how they have been faring.
 
 ## What the list shows
 
@@ -27,7 +27,7 @@ The field above the list searches by **name**, and it searches while it is typed
 
 ## Running a job now
 
-The ▶ button on the row asks first — a job is run for real, and a mail that has gone out cannot be called back — and then hands the job over to the scheduler right away. It is the same run as the one the timetable would have started — the same mail, the same file, the same work over the data — only it does not wait for its time. The timetable itself is not moved: *Next run* stays where it was.
+The ▶ button on the row asks first — a job is run for real, and a mail that has gone out cannot be called back — and then hands the job over to the scheduler right away. It is the same run as the one the timetable would have started — the same mail, the same file, the same work over the data — only it does not wait for its time. An import job takes the files that are waiting in its folder at that moment. The timetable itself is not moved: *Next run* stays where it was.
 
 The button only says that the job was taken over, not that it is done: the run goes on by itself, and it can take as long as the report takes. The row is read again the moment the job is handed over, so a run that has not finished yet stands there as *Running*; ⟳ on the row, or *Refresh* in the header, shows how it ended.
 
@@ -52,17 +52,17 @@ It is the usual table of the application, so the runs are sorted by any column, 
 
 ## Changing a job
 
-✎ on the row opens the form of the job, the same one the report screen opens. It is there only for a job that still belongs to a report, and only for a user who may reach *Administration / Reports* — a job is changed where it was entered, and that screen belongs to the administrator.
+✎ on the row opens the form of the job, the same one the report screen opens. It is there only for a job that still belongs to a report, and only for a user who may reach *Administration / Reports* — a job is changed where it was entered, and that screen belongs to the administrator. An import job opens in its own, shorter form, for a user who may reach *Administration / Model*.
 
 What is changed — the timetable among it — takes effect at once: the row is read again after saving, so the new *Next run* is on the screen without loading the whole list.
 
 ::: tip
-A job without a report behind it cannot be run from here, and it cannot be changed: a job works over a report, and there is none. What stands written down about its earlier runs stays and is read with 🕘.
+A job without a report or a table behind it cannot be run from here, and it cannot be changed: a job works over one of the two, and there is none. What stands written down about its earlier runs stays and is read with 🕘.
 :::
 
 ## Running a job from the outside
 
-🔗 on the row opens the **webhook keys** of the job: with such a key another program runs this job whenever it needs to, without logging in. The button stands beside ✎, for the same user and for a job that still belongs to a report.
+🔗 on the row opens the **webhook keys** of the job: with such a key another program runs this job whenever it needs to, without logging in. The button stands beside ✎, for the same user and for a job that still belongs to a report or a table.
 
 How the call is made is written in the dialog, and it is the same for every key of the job:
 

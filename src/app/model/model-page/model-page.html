@@ -51,6 +51,12 @@
                 <span>{{ 'ui.column.title' | t }}</span>
               </button>
             }
+            @if (canImport(node)) {
+              <button type="button" mat-menu-item (click)="importJobs(node)">
+                <i class="fa-solid fa-file-import menu-icon"></i>
+                <span>{{ 'ui.model.importJobs' | t }}</span>
+              </button>
+            }
             <button type="button" mat-menu-item (click)="history(node)">
               <i class="fa-solid fa-clock-rotate-left menu-icon"></i>
               <span>{{ 'ui.history.title' | t }}</span>

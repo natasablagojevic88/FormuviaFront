@@ -1,8 +1,13 @@
 <form class="fd" (ngSubmit)="save()">
   <header class="fd-header">
     <div class="fd-titles">
-      <h2 class="fd-title">{{ (isNew ? 'ui.reportJobs.addTitle' : 'ui.reportJobs.editTitle') | t }}</h2>
-      <p class="fd-subtitle">{{ 'ui.reportJobs.formSubtitle' | t }}</p>
+      @if (isImport) {
+        <h2 class="fd-title">{{ (isNew ? 'ui.modelJobs.addTitle' : 'ui.modelJobs.editTitle') | t }}</h2>
+        <p class="fd-subtitle">{{ 'ui.modelJobs.formSubtitle' | t }}</p>
+      } @else {
+        <h2 class="fd-title">{{ (isNew ? 'ui.reportJobs.addTitle' : 'ui.reportJobs.editTitle') | t }}</h2>
+        <p class="fd-subtitle">{{ 'ui.reportJobs.formSubtitle' | t }}</p>
+      }
     </div>
     <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
       <i class="fa-solid fa-xmark"></i>
@@ -22,13 +27,16 @@
           <span class="fd-help">{{ (isNew ? 'ui.reportJobs.nameHint' : 'ui.reportJobs.nameLocked') | t }}</span>
         </div>
 
-        <div class="fd-field">
-          <span class="fd-label fd-required">{{ label('jobType') }}</span>
-          <app-search-select [options]="jobTypeOptions()" [ngModel]="job.jobType"
-            (ngModelChange)="jobTypeChanged($event)" [ngModelOptions]="{ standalone: true }"
-            icon="fa-solid fa-gears" [placeholder]="label('jobType')" [ariaLabel]="label('jobType')" />
-          <span class="fd-help">{{ 'ui.reportJobs.jobTypeHint' | t }}</span>
-        </div>
+        <!-- a job of a table only imports, so its kind is not chosen -->
+        @if (!isImport) {
+          <div class="fd-field">
+            <span class="fd-label fd-required">{{ label('jobType') }}</span>
+            <app-search-select [options]="jobTypeOptions()" [ngModel]="job.jobType"
+              (ngModelChange)="jobTypeChanged($event)" [ngModelOptions]="{ standalone: true }"
+              icon="fa-solid fa-gears" [placeholder]="label('jobType')" [ariaLabel]="label('jobType')" />
+            <span class="fd-help">{{ 'ui.reportJobs.jobTypeHint' | t }}</span>
+          </div>
+        }
 
         <!-- every job needs a server: the one that sends the report, and every other one for the word about an error -->
         <div class="fd-field">
@@ -38,6 +46,22 @@
             [placeholder]="label('smtpId')" [ariaLabel]="label('smtpId')" />
           <span class="fd-help">{{ (isMail() ? 'ui.reportJobs.smtpIdHint' : 'ui.reportJobs.smtpIdErrorHint') | t }}</span>
         </div>
+
+        @if (isImport) {
+          <div class="fd-field fd-field-wide">
+            <label class="fd-label fd-required" for="importPath">{{ label('filePath') }}</label>
+            <input id="importPath" name="filePath" class="fd-input code" [(ngModel)]="job.filePath"
+              autocomplete="off" spellcheck="false" [placeholder]="'ui.modelJobs.filePathPlaceholder' | t" required />
+            <span class="fd-help">{{ 'ui.modelJobs.filePathHint' | t }}</span>
+          </div>
+
+          <div class="fd-field fd-field-wide">
+            <label class="fd-label" for="importName">{{ label('fileName') }}</label>
+            <input id="importName" name="fileName" class="fd-input code" [(ngModel)]="job.fileName"
+              autocomplete="off" spellcheck="false" [placeholder]="'ui.modelJobs.fileNamePlaceholder' | t" />
+            <span class="fd-help">{{ 'ui.modelJobs.fileNameHint' | t }}</span>
+          </div>
+        }
 
         @if (isMail()) {
           <div class="fd-field">

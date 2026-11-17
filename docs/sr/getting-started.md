@@ -58,3 +58,11 @@ Formuvia je pravljena da se koristi na telefonu, ne samo da na njega stane:
 - dijalozi se skroluju iznutra umesto da izađu van ekrana
 
 Sve što možete na računaru možete i na telefonu; neke stvari samo stoje na drugom mestu.
+
+## Licenca i izvorni kod
+
+Na dnu menija, i ispod kartice za prijavu, stoje dva sitna linka: **AGPL-3.0** i **Izvorni kod**.
+
+Formuvia je slobodan softver pod licencom GNU Affero General Public License, verzija 3. Smete da je koristite za bilo šta, uključujući i posao, da proučavate kako radi i da je menjate. Licenca zauzvrat traži jedno: ko Formuviu izmeni i pusti druge ljude da tu izmenjenu verziju koriste preko mreže, mora tim ljudima ponuditi izvorni kod svoje verzije.
+
+Drugi link je upravo ta ponuda. Vodi na izvorni kod verzije koju koristite, pa u instalaciji koju je neko menjao vodi na izvorni kod te izmenjene verzije. Adresu iza njega postavlja onaj ko je Formuviu instalirao; to je jedno podešavanje, opisano u README-u projekta.

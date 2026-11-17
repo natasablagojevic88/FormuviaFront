@@ -44,7 +44,7 @@
             <tr [class.row-working]="working() === row.jobId">
               <td class="actions" [attr.data-label]="'ui.actions' | t">
                 <div class="actions-buttons">
-                  @if (row.reportId) {
+                  @if (hasTarget(row)) {
                     <button type="button" class="icon-button" (click)="run(row)"
                       [disabled]="!row.jobId || working() !== null"
                       [attr.aria-label]="'ui.jobs.run' | t" [title]="'ui.jobs.run' | t">
@@ -61,7 +61,7 @@
                     [attr.aria-label]="'ui.jobs.logs' | t" [title]="'ui.jobs.logs' | t">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                   </button>
-                  @if (canEdit() && row.reportId) {
+                  @if (canEdit(row)) {
                     <button type="button" class="icon-button" (click)="showWebhook(row)"
                       [disabled]="!row.jobId || working() !== null"
                       [attr.aria-label]="'ui.webhook.title' | t" [title]="'ui.webhook.title' | t">

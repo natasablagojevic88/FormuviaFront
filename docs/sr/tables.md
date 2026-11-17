@@ -126,6 +126,10 @@ Red sa nazivima je zaštićen i ne može se prepisati, a fajl pamti kojem polju 
 
 Fajl ulazi u celini: ako server ne može da prihvati neki red, ne upiše se ništa, a poruka kaže koji je to red i šta u njemu ne valja. Ispravite taj red i pošaljite fajl ponovo — nema polovično uvezenih podataka koje treba čistiti. Uslovi se računaju za svaki red posebno, nad onim što taj red nosi: vrednost u koloni čiji uslov *Prikazano dok* za taj red ne važi se ne zadržava, isto kao što to polje za takav zapis ne bi ni bilo na formi. Kad prođe, lista se otvara na prvoj strani, bez filtera, od najnovijeg — pa su uvezeni zapisi baš ono što vidite.
 
+::: tip
+Isti fajl se može uvesti i bez otvaranja aplikacije: administrator može tabeli dati posao koji sam pokuplja popunjene šablone iz foldera na serveru. Vidi [Uvoz iz foldera](/sr/model#uvoz-iz-foldera).
+:::
+
 ## Brojevi
 
 Ceo broj se prikazuje onako kako je upisan, bez razdvajanja hiljada — šifra, godina ili broj računa treba da se čitaju kako su uneti.

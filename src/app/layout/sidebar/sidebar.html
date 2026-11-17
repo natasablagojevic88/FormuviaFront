@@ -21,6 +21,12 @@
       </button>
     </div>
   }
+
+  <div class="legal">
+    <a [href]="licenceUrl" target="_blank" rel="noopener noreferrer" [title]="'ui.about.licenceTitle' | t">AGPL-3.0</a>
+    <span class="legal-dot" aria-hidden="true">·</span>
+    <a [href]="sourceUrl" target="_blank" rel="noopener noreferrer" [title]="'ui.about.sourceTitle' | t">{{ 'ui.about.source' | t }}</a>
+  </div>
 </aside>
 
 <ng-template #menuItems let-list>
