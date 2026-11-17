@@ -2,12 +2,10 @@
 	<property name="dest" location="dist" />
 	<property name="war-dest"
 		location="${dest}/FormuviaFront/Formuvia.war" />
-	<property name="war-doc-dest"
-		location="Documentation.war" />
+	<property name="war-doc-dest" location="Documentation.war" />
 	<property name="code-dest"
 		location="${dest}/FormuviaFront/browser" />
-	<property name="doc-dest"
-		location="docs/.vitepress/dist" />
+	<property name="doc-dest" location="docs/.vitepress/dist" />
 
 	<target name="clean">
 		<delete dir="${dest}" />
@@ -25,6 +23,8 @@
 			<arg value="vitepress" />
 			<arg value="build" />
 			<arg value="docs" />
+			<arg value="--base" />
+			<arg value="/" />
 		</exec>
 	</target>
 
