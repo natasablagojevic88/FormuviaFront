@@ -4,7 +4,7 @@ Web client for Formuvia, built with Angular 21 and Angular Material. It works on
 
 It requires the backend API from the separate repository: **Formuvia** (Java).
 
-📖 **[User guide](https://natasablagojevic88.github.io/FormuviaFront/)** – how to use Formuvia, in English and Serbian.
+📖 **[User guide](https://www.formuvia.net/)** – how to use Formuvia, in English and Serbian.
 
 ## Features
 
@@ -153,7 +153,7 @@ In a container, where `server.xml` is not yours to change, compress at the edge 
 
 ## Usage
 
-This is a quick reference. The full guide, with the model and the form designer explained step by step, is at **[https://natasablagojevic88.github.io/FormuviaFront/](https://natasablagojevic88.github.io/FormuviaFront/)**.
+This is a quick reference. The full guide, with the model and the form designer explained step by step, is at **[https://www.formuvia.net/](https://www.formuvia.net/)**.
 
 - **Language** – choose it in the top bar; the choice is remembered in the browser. Which language a new visitor starts with is set in the environment file (`defaultLanguage`).
 - **Theme** – the button next to the language switches light → dark → follow the system.
@@ -189,7 +189,7 @@ npm test
 
 ## User guide
 
-The guide in `docs/` is a VitePress site, published to GitHub Pages at [https://natasablagojevic88.github.io/FormuviaFront/](https://natasablagojevic88.github.io/FormuviaFront/) on every push to `main` that touches it.
+The guide in `docs/` is a VitePress site, served at [https://www.formuvia.net/](https://www.formuvia.net/).
 
 ```sh
 npm run docs:dev      # preview at http://localhost:5173
@@ -198,6 +198,21 @@ npm run docs:preview  # serve the built site
 ```
 
 English pages are in `docs/`, Serbian ones in `docs/sr/`; both are kept in step.
+
+### Deploying the guide
+
+`ant -f buildForWar.xml` - and the backend's `ant`, which runs it - builds the guide as well and packs it into `Documentation.war` in the root of this project. It holds only static HTML, so any servlet container serves it; deployed as `ROOT.war`, the guide opens at the root of the server, the way [https://www.formuvia.net/](https://www.formuvia.net/) runs.
+
+The guide is built for one path and only works under it: the addresses of its styles, scripts and images are written into every page. By default that path is the root (`/`). To serve it under another path, build with the variable `DOCS_BASE`, which begins and ends with `/`, and deploy it under that same path:
+
+```sh
+DOCS_BASE=/docs/ ant -f buildForWar.xml    # Documentation.war for https://server/docs/
+DOCS_BASE=/docs/ npm run docs:build        # only the files, in docs/.vitepress/dist
+```
+
+Behind a proxy that adds a prefix of its own, `DOCS_BASE` is the path the browser sees, not the one inside the container. A guide built for the wrong path still opens, but as bare text, with no styles and with links that lead nowhere. Use `DOCS_BASE` rather than `vitepress build --base`: the icon of the browser tab takes its path from the variable only.
+
+The pages keep their `.html` ending (`/model.html`), since a servlet container does not look for `model.html` when `/model` is asked for.
 
 ## Icon list
 

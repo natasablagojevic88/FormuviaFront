@@ -1,13 +1,19 @@
 import { defineConfig } from "vitepress";
 
 // Uputstvo za korisnike; engleski je primarni jezik, srpski je drugi locale (/sr/).
-// Objavljuje se na GitHub Pages, pa je base ime repozitorijuma.
+// Objavljuje se na https://www.formuvia.net/, u korenu servera, pa je base "/". Pod drugom putanjom
+// gradi se sa promenljivom DOCS_BASE (npr. /docs/), ne sa --base: ikonica u head-u ne dobija base
+// od VitePress-a, pa mora da je zna i konfiguracija.
+const base = process.env.DOCS_BASE ?? "/";
+
 export default defineConfig({
   title: "Formuvia",
-  base: "/FormuviaFront/",
+  base,
   lastUpdated: true,
-  cleanUrls: true,
-  head: [["link", { rel: "icon", href: "/FormuviaFront/formuvia.png" }]],
+  // Strane zadržavaju .html: Tomcat ne nalazi model.html kad se traži /model, pa bi link otvoren
+  // direktno ili F5 na podstrani dao 404.
+  cleanUrls: false,
+  head: [["link", { rel: "icon", href: `${base}formuvia.png` }]],
 
   themeConfig: {
     logo: "/formuvia.png",

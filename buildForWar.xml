@@ -23,8 +23,6 @@
 			<arg value="vitepress" />
 			<arg value="build" />
 			<arg value="docs" />
-			<arg value="--base" />
-			<arg value="/" />
 		</exec>
 	</target>
 
