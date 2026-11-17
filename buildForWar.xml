@@ -3,7 +3,7 @@
 	<property name="war-dest"
 		location="${dest}/FormuviaFront/Formuvia.war" />
 	<property name="war-doc-dest"
-		location="Documention.war" />
+		location="Documentation.war" />
 	<property name="code-dest"
 		location="${dest}/FormuviaFront/browser" />
 	<property name="doc-dest"
