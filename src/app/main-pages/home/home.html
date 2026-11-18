@@ -1,1 +1,14 @@
-<p>home works!</p>
+@if (ready()) {
+  <app-page-header
+    [title]="('ui.home.welcome' | t) + (name() ? ', ' + name() : '')"
+    [subtitle]="(setup().length ? 'ui.home.adminSubtitle' : 'ui.home.userSubtitle') | t"
+    guide="home">
+  </app-page-header>
+
+  @if (setup().length) {
+    <app-page-guide key="home.setup" title="ui.home.setupTitle" [steps]="setup()" note="ui.home.setupNote"
+      [openByDefault]="true" />
+  } @else {
+    <app-page-guide key="home.use" title="ui.home.useTitle" [steps]="use" [openByDefault]="true" />
+  }
+}

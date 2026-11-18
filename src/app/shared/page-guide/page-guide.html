@@ -1,0 +1,36 @@
+@if (ready()) {
+  <details class="guide" [open]="open()" (toggle)="toggled($event)">
+    <summary class="guide-summary">
+      <i class="fa-solid fa-circle-info guide-icon"></i>
+      <span class="guide-title">{{ title() | t }}</span>
+      <i class="fa-solid fa-chevron-down guide-chevron"></i>
+    </summary>
+    <ol class="guide-list" [class.legend]="!numbered()">
+      @for (step of steps(); track step.title; let i = $index) {
+        <li>
+          @if (step.icon) {
+            <span class="step-mark icon"><i [class]="step.icon"></i></span>
+          } @else {
+            <span class="step-mark">{{ i + 1 }}</span>
+          }
+          <div class="step-text">
+            <strong>{{ step.title | t }}</strong>
+            <span>{{ step.text | t }}</span>
+            @if (step.link) {
+              <a class="step-link" [routerLink]="step.link">
+                {{ 'ui.guide.open' | t }}
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            }
+          </div>
+        </li>
+      }
+    </ol>
+    @if (note()) {
+      <p class="guide-note" [class.warning]="noteKind() === 'warning'">
+        <i [class]="noteKind() === 'warning' ? 'fa-solid fa-triangle-exclamation' : 'fa-solid fa-lightbulb'"></i>
+        <span>{{ note() | t }}</span>
+      </p>
+    }
+  </details>
+}

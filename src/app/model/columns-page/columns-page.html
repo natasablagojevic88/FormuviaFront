@@ -1,11 +1,15 @@
 <app-page-header [title]="(model()?.name || '') + ' — ' + ('ui.column.title' | t)"
   [subtitle]="'ui.column.subtitle' | t"
-  [breadcrumb]="('ui.model.title' | t) + ' / ' + (model()?.name || '')">
+  [breadcrumb]="('ui.model.title' | t) + ' / ' + (model()?.name || '')"
+  guide="formDesign">
   <button type="button" class="back-button" (click)="back()">
     <i class="fa-solid fa-arrow-left"></i>
     {{ 'ui.back' | t }}
   </button>
 </app-page-header>
+
+<app-page-guide key="formDesign" title="ui.column.guideTitle" [steps]="guide" note="ui.column.guideNote"
+  noteKind="warning" [openByDefault]="guideOpen()" />
 
 <div class="designer">
   @if (loading() && !model()) {

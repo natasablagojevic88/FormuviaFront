@@ -10,6 +10,7 @@ It requires the backend API from the separate repository: **Formuvia** (Java).
 
 - Login and logout
 - Menu based on the user's roles
+- Help inside the application: the first screen walks an administrator through setting Formuvia up - roles, users, tables, the mail server, reports - each step leading to its screen, and tells everyone else how a table works; the main screens of the administration, the model, the form design and the jobs carry a short guide of their own at the top, open while the screen is still empty and folded once it holds something; and every screen links to its page of the user guide, in the language of the interface
 - User administration: paged table with search, advanced filters and sorting; add, edit and delete users, and assign their roles
 - Role administration: add, edit and delete the roles that grant access
 - Mail servers: the servers the application sends mail through are entered under *Administration* — a name, the sender address, the server and its port, the protection of the connection and, when the server asks for one, the username and password; the password is written only and never comes back out of the server, and a *Test mail* in the row menu sends one mail through the server to see whether it works
@@ -70,6 +71,7 @@ Development settings are in `src/environments/environment.development.ts`:
 | `apiUrl` | address of the backend; it must allow this origin in its `cors.url` setting (`http://localhost:4200` by default) |
 | `defaultLanguage` | language a visitor gets before choosing one: `en-US`, `sr-Latn-RS` or `sr-RS`; the choice they make is kept in the browser |
 | `sourceUrl` | where the source of this version lives; the application offers it at the bottom of the menu and under the sign in card (see *License* below) |
+| `guideUrl` | address of the user guide; *Read in the guide* under the title of every screen opens its page there (`https://www.formuvia.net/` by default; point it at your own copy of the guide, see *Deploying the guide*) |
 
 ## Building for production
 
@@ -80,7 +82,8 @@ Development settings are in `src/environments/environment.development.ts`:
      production: true,
      apiUrl: 'https://api.example.com/Formuvia',
      defaultLanguage: 'sr-Latn-RS',
-     sourceUrl: 'https://github.com/natasablagojevic88/Formuvia'
+     sourceUrl: 'https://github.com/natasablagojevic88/Formuvia',
+     guideUrl: 'https://www.formuvia.net/'
    };
    ```
 
@@ -158,6 +161,7 @@ This is a quick reference. The full guide, with the model and the form designer 
 - **Language** – choose it in the top bar; the choice is remembered in the browser. Which language a new visitor starts with is set in the environment file (`defaultLanguage`).
 - **Theme** – the button next to the language switches light → dark → follow the system.
 - **Menu** – on the left; on phones open it with the menu button in the top bar.
+- **Help** – the first screen says where to start; a short guide at the top of a screen folds into one line with a click, and the choice is remembered; *Read in the guide* under the title opens the page of the user guide about that screen.
 - **Tables on a phone** – each row is shown as a card; choose the sort column in the toolbar above the list and filter through *Advanced search*.
 - **Tables** – filter using the search fields under the column headers, open *Advanced search* for more filter options, click a column header to sort, use the paginator at the bottom. *Export to Excel* downloads all rows matching the current filters and sort order (not only the current page).
 - **Quick edit** – the *Quick edit* button in the table toolbar shows every editable column; *Edit* then opens the row in the table itself and *New row* adds an empty row at the top, offered only where a required field is not left outside the table. Required fields are marked with `*`.

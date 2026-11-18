@@ -43,6 +43,37 @@
   opacity: 0.88;
 }
 
+/* under the subtitle, on the blue bar: white like the rest of the text there */
+.guide-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  margin-top: 8px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--c-on-dark);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.guide-link:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.guide-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
+}
+
+.guide-external {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
 .actions {
   display: flex;
   flex-shrink: 0;

@@ -11,12 +11,16 @@ import { HistoryPanel } from "../../shared/history-panel/history-panel";
 import { Role } from "../../administration/app-user-dialog/app-user-dialog";
 import { ModelDialog, ModelDialogData } from "../model-dialog/model-dialog";
 import { childTypeOf, ModelNode } from "../model";
+import { GuideStep } from "../../shared/page-guide/page-guide";
 
 const ROOT_KEY = "root";
 /** Open nodes and the selected node are kept for as long as the browser tab lives. */
 const STATE_KEY = "formuvia.model.tree";
 /** Name of the DTO class of the model, for the history (GET /api/history/{className}/{id}). */
 const HISTORY_CLASS = "ModelDTO";
+
+/** The way from an empty tree to a table people can use. */
+const GUIDE: GuideStep[] = [1, 2, 3, 4].map((n) => ({ title: `ui.model.guide${n}Title`, text: `ui.model.guide${n}` }));
 
 interface TreeState {
   expanded: string[];
@@ -38,6 +42,9 @@ export class ModelPage {
    * its rows belong to, and a file in a folder cannot say which (the server refuses it as well).
    */
   private readonly topTables = signal<Set<string>>(new Set());
+  readonly guide = GUIDE;
+  /** Open while the model has no table yet; unknown until the tree comes. */
+  readonly guideOpen = signal<boolean | null>(null);
   private roles: Role[] = [];
 
   /** true only when the page was opened by the Back button of the form design. */
@@ -76,6 +83,7 @@ export class ModelPage {
       .then((root: ModelNode) => {
         this.roots.set([root]);
         this.topTables.set(this.findTopTables(root));
+        this.guideOpen.set(this.topTables().size === 0);
         setTimeout(() => this.restoreState(root));
       })
       .finally(() => this.loading.set(false));

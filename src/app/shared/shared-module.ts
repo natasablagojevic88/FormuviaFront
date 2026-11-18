@@ -7,6 +7,7 @@ import { MatPaginatorModule } from "@angular/material/paginator";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { MatSortModule } from "@angular/material/sort";
 import { MatTableModule } from "@angular/material/table";
+import { RouterModule } from "@angular/router";
 import { TranslateModule } from "./translate-module";
 import { FormControlsModule } from "./form-controls-module";
 import { PageHeader } from "./page-header/page-header";
@@ -20,9 +21,10 @@ import { FileVersionsDialog } from "./file-versions-dialog/file-versions-dialog"
 import { ConfirmDialog } from "./confirm-dialog/confirm-dialog";
 import { CronPicker } from "./cron-picker/cron-picker";
 import { AdvancedSearchDialog } from "./advanced-search-dialog/advanced-search-dialog";
+import { PageGuide } from "./page-guide/page-guide";
 
 @NgModule({
-  declarations: [PageHeader, DataTable, ConfirmDialog, AdvancedSearchDialog, HistoryPanel, IconPickerDialog, IconSelect, FileField, PdfDialog, FileVersionsDialog, CronPicker],
+  declarations: [PageHeader, DataTable, ConfirmDialog, AdvancedSearchDialog, HistoryPanel, IconPickerDialog, IconSelect, FileField, PdfDialog, FileVersionsDialog, CronPicker, PageGuide],
   imports: [
     CommonModule,
     FormsModule,
@@ -32,6 +34,7 @@ import { AdvancedSearchDialog } from "./advanced-search-dialog/advanced-search-d
     MatProgressBarModule,
     MatSortModule,
     MatTableModule,
+    RouterModule,
     TranslateModule,
     FormControlsModule,
   ],
@@ -46,7 +49,8 @@ import { AdvancedSearchDialog } from "./advanced-search-dialog/advanced-search-d
     PdfDialog,
     FileVersionsDialog,
     HistoryPanel,
-    CronPicker
+    CronPicker,
+    PageGuide
   ]
 })
 export class SharedModule {}

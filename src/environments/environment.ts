@@ -30,5 +30,12 @@ export const environment = {
    * If you change Formuvia, point this at your own repository: the people who use your version are
    * entitled to your source, not to the one below.
    */
-  sourceUrl: 'https://github.com/natasablagojevic88/Formuvia'
+  sourceUrl: 'https://github.com/natasablagojevic88/Formuvia',
+  /**
+   * The user guide, which the screens link to: the link in the header of a page opens the page of the
+   * guide about that screen. The guide is built from docs/ into its own WAR (Documentation.war, see
+   * the README); point this at your copy when you serve the guide yourself, for example where the
+   * users have no access to the internet.
+   */
+  guideUrl: 'https://www.formuvia.net/'
 };

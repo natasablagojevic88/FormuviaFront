@@ -6,8 +6,16 @@ import { Translate } from "../../services/translate";
 import { ApiRoute } from "../../shared/ApiRoute";
 import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
 import { DataTable } from "../../shared/data-table/data-table";
+import { GuideStep } from "../../shared/page-guide/page-guide";
 import { DatabaseColumn, DatabaseTable } from "../../shared/database-table";
 import { AppUserDialog, AppUserDialogData } from "../app-user-dialog/app-user-dialog";
+
+/** The short guide above the list. */
+const GUIDE: GuideStep[] = [
+  { title: "ui.users.guide1Title", text: "ui.users.guide1" },
+  { title: "ui.users.guide2Title", text: "ui.users.guide2" },
+  { title: "ui.users.guide3Title", text: "ui.users.guide3" },
+];
 
 @Component({
   selector: "app-users-page",
@@ -18,6 +26,9 @@ import { AppUserDialog, AppUserDialogData } from "../app-user-dialog/app-user-di
 export class UsersPage {
   readonly tableUrl = ApiRoute.appuserTable;
   readonly title = signal("");
+  readonly guide = GUIDE;
+  /** Open while there is no user yet besides the administrator; unknown until the first page of the list comes. */
+  readonly guideOpen = signal<boolean | null>(null);
   private allColumns: DatabaseColumn[] = [];
 
   private readonly table = viewChild.required(DataTable);
@@ -32,6 +43,8 @@ export class UsersPage {
   onLoaded(table: DatabaseTable<any>): void {
     this.title.set(table.name);
     this.allColumns = table.allColumns ?? table.column;
+    // only the administrator made at the first start: nobody else has been let in yet
+    this.guideOpen.set(table.total <= 1);
   }
 
   add(): void {

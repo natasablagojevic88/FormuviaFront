@@ -1,5 +1,9 @@
-<app-page-header [title]="'ui.model.title' | t" [subtitle]="'ui.model.subtitle' | t" [breadcrumb]="'ui.model.breadcrumb' | t">
+<app-page-header [title]="'ui.model.title' | t" [subtitle]="'ui.model.subtitle' | t" [breadcrumb]="'ui.model.breadcrumb' | t"
+  guide="model">
 </app-page-header>
+
+<app-page-guide key="model" title="ui.model.guideTitle" [steps]="guide" note="ui.model.guideNote"
+  [openByDefault]="guideOpen()" />
 
 <div class="tree-card">
   @if (loading() && !roots().length) {

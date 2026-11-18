@@ -16,7 +16,15 @@ Prvi nalog je `admin`, sa lozinkom izabranom pri instalaciji. Promenite je odmah
 
 **Vaše ime** je na dnu menija. Klikom na njega menjate lozinku; ikonica pored njega vas odjavljuje.
 
-![Ekran Uloge sa menijem levo i jezikom i temom u gornjoj traci](/screenshots/sr/roles.png)
+## Pomoć na svakom ekranu
+
+Ovo uputstvo ne mora da stoji otvoreno pored aplikacije — aplikacija sama pokazuje put:
+
+- **Prvi ekran** posle prijave kaže odakle da krenete. Administrator dobija prve korake podešavanja Formuvie, redom kojim zavise jedan od drugog — uloge, korisnici, tabele, server za poštu, izveštaji — svaki sa *Otvori*, koje vodi na njegov ekran. Svi ostali dobijaju kratko objašnjenje kako se radi sa tabelom.
+- **Kratko uputstvo** stoji na vrhu glavnih ekrana administracije, modela, dizajna forme i poslova: nekoliko koraka, ili šta radi koje dugme. Otvoreno je dok je ekran još prazan — u modelu još nema tabele, nema servera za poštu, nema posla — a skupljeno u jedan red čim u njemu nešto ima, da ne zauzima mesto listi. Klik na taj red ga otvara ili skuplja, a vaš izbor se pamti u browseru.
+- **Pročitajte u uputstvu**, ispod naslova svakog ekrana, otvara stranu ovog uputstva o tom ekranu, u novom tabu i na vašem jeziku. Oba srpska pisma vode na srpsko uputstvo, koje je pisano latinicom.
+
+![Ekran Uloge sa otvorenim kratkim uputstvom, menijem levo i jezikom i temom u gornjoj traci](/screenshots/sr/roles.png)
 
 ## Jezik
 

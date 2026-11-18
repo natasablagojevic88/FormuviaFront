@@ -1,4 +1,4 @@
-<app-page-header [title]="title()" [breadcrumb]="breadcrumb()">
+<app-page-header [title]="title()" [breadcrumb]="breadcrumb()" guide="tables">
   @if (trail().length) {
     <button type="button" class="back-button" (click)="back(trail().length - 1)">
       <i class="fa-solid fa-arrow-left"></i>

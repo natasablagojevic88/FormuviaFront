@@ -1,12 +1,15 @@
 <app-page-header
   [title]="title() || ('ui.reportGroups.title' | t)"
   [subtitle]="'ui.reportGroups.subtitle' | t"
-  [breadcrumb]="'ui.reportGroups.breadcrumb' | t">
+  [breadcrumb]="'ui.reportGroups.breadcrumb' | t"
+  guide="reportGroups">
   <button type="button" class="add-button" (click)="add()">
     <i class="fa-solid fa-plus"></i>
     {{ 'ui.add' | t }}
   </button>
 </app-page-header>
+
+<app-page-guide key="reportGroups" title="ui.reportGroups.guideTitle" [steps]="guide" [openByDefault]="guideOpen()" />
 
 <app-data-table [url]="tableUrl" [rowActions]="rowActions" [restoreState]="restore" (loaded)="onLoaded($event)"
   (edit)="edit($event)" (remove)="remove($event)" (action)="openReports($event.row)"></app-data-table>

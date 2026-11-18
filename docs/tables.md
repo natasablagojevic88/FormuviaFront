@@ -6,9 +6,9 @@ Every table screen in Formuvia works the same way. Learn it once and it applies 
 Tables you define yourself in the [Model](/model) appear in the menu and open the same screen as the built-in ones, so everything on this page holds for them too — editing straight in the list included. What they have on top of it — procedures, reports over a record, the entry template — is described below, where it comes up.
 :::
 
-A table screen has three parts: a **header** with the title and the *Add* button, a **toolbar** with search and export, and the **list** itself with a paginator at the bottom.
+A table screen has three parts: a **header** with the title, the *Add* button and *Read in the guide*, which opens this page, a **toolbar** with search and export, and the **list** itself with a paginator at the bottom.
 
-![A table screen: header with Add, toolbar, and the list with column filters](/screenshots/en/users.png)
+![A table screen: header with Add and the link to the guide, toolbar, and the list with column filters](/screenshots/en/table.png)
 
 ## Finding a record
 

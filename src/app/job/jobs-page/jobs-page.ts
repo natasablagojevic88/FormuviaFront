@@ -14,6 +14,7 @@ import { WebhookDialog, WebhookDialogData } from "../../report/webhook-dialog/we
 import { ReportType } from "../../report/report-dialog/report-dialog";
 import { JobErrorDialog, JobErrorDialogData } from "../job-error-dialog/job-error-dialog";
 import { JobLogsDialog, JobLogsDialogData } from "../job-logs-dialog/job-logs-dialog";
+import { GuideStep } from "../../shared/page-guide/page-guide";
 
 /** How the last run of a job ended. */
 export type JobLogStatus = "IN_PROGRESS" | "SUCCESS" | "FAIL";
@@ -46,6 +47,16 @@ const MODEL_URL = "/model";
  * A job can be run by hand, read again on its own, and - for a job that belongs to a report - opened
  * in the same form the report screen uses.
  */
+/** What each button of a row does; the titles are the labels the buttons themselves carry. */
+const GUIDE: GuideStep[] = [
+  { icon: "fa-solid fa-play", title: "ui.jobs.run", text: "ui.jobs.guideRun" },
+  { icon: "fa-solid fa-rotate", title: "ui.jobs.refreshRow", text: "ui.jobs.guideRefresh" },
+  { icon: "fa-solid fa-clock-rotate-left", title: "ui.jobs.logs", text: "ui.jobs.guideLogs" },
+  { icon: "fa-solid fa-triangle-exclamation", title: "ui.jobs.errorText", text: "ui.jobs.guideError" },
+  { icon: "fa-solid fa-link", title: "ui.webhook.title", text: "ui.jobs.guideWebhook" },
+  { icon: "fa-solid fa-pen", title: "ui.edit", text: "ui.jobs.guideEdit" },
+];
+
 @Component({
   selector: "app-jobs-page",
   standalone: false,
@@ -58,6 +69,9 @@ export class JobsPage {
   readonly loading = signal(false);
   /** The job a request is running for; its row waits and the buttons of every row rest until it is over. */
   readonly working = signal<string | null>(null);
+  readonly guide = GUIDE;
+  /** Open while there is no job at all; unknown until the list has come once. */
+  readonly guideOpen = signal<boolean | null>(null);
 
   /** The jobs whose name holds what was typed; everything is here already, so nothing is asked again. */
   readonly shown = computed(() => {
@@ -252,7 +266,10 @@ export class JobsPage {
   private load(): void {
     this.loading.set(true);
     this.sendRequest.get(ApiRoute.jobList)
-      .then((rows: JobRow[]) => this.rows.set(rows ?? []))
+      .then((rows: JobRow[]) => {
+        this.rows.set(rows ?? []);
+        this.guideOpen.set(!rows?.length);
+      })
       .finally(() => this.loading.set(false));
   }
 

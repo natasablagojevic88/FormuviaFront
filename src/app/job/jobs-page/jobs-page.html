@@ -1,12 +1,16 @@
 <app-page-header
   [title]="'ui.jobs.title' | t"
   [subtitle]="'ui.jobs.subtitle' | t"
-  [breadcrumb]="'ui.jobs.breadcrumb' | t">
+  [breadcrumb]="'ui.jobs.breadcrumb' | t"
+  guide="jobs">
   <button type="button" class="reload-button" (click)="refresh()" [disabled]="loading()">
     <i class="fa-solid fa-rotate"></i>
     <span class="reload-label">{{ 'ui.jobs.reload' | t }}</span>
   </button>
 </app-page-header>
+
+<app-page-guide key="jobs" title="ui.jobs.guideTitle" [steps]="guide" note="ui.jobs.guideNote"
+  [openByDefault]="guideOpen()" />
 
 <div class="jobs-card">
   <div class="toolbar">

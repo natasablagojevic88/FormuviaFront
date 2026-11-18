@@ -6,8 +6,17 @@ import { Translate } from "../../services/translate";
 import { ApiRoute } from "../../shared/ApiRoute";
 import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
 import { DataTable } from "../../shared/data-table/data-table";
+import { GuideStep } from "../../shared/page-guide/page-guide";
 import { DatabaseColumn, DatabaseTable } from "../../shared/database-table";
 import { RoleDialog, RoleDialogData } from "../role-dialog/role-dialog";
+
+/** The short guide above the list. */
+const GUIDE: GuideStep[] = [
+  { title: "ui.roles.guide1Title", text: "ui.roles.guide1" },
+  { title: "ui.roles.guide2Title", text: "ui.roles.guide2", link: "/users" },
+  { title: "ui.roles.guide3Title", text: "ui.roles.guide3", link: "/model" },
+  { title: "ui.roles.guide4Title", text: "ui.roles.guide4" },
+];
 
 @Component({
   selector: "app-roles-page",
@@ -18,6 +27,9 @@ import { RoleDialog, RoleDialogData } from "../role-dialog/role-dialog";
 export class RolesPage {
   readonly tableUrl = ApiRoute.roleTable;
   readonly title = signal("");
+  readonly guide = GUIDE;
+  /** Open while only the two built-in roles exist; unknown until the first page of the list comes. */
+  readonly guideOpen = signal<boolean | null>(null);
   private allColumns: DatabaseColumn[] = [];
 
   private readonly table = viewChild.required(DataTable);
@@ -32,6 +44,8 @@ export class RolesPage {
   onLoaded(table: DatabaseTable<any>): void {
     this.title.set(table.name);
     this.allColumns = table.allColumns ?? table.column;
+    // only admin and user, the two the application starts with
+    this.guideOpen.set(table.total <= 2);
   }
 
   add(): void {

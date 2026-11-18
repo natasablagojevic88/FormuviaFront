@@ -1,7 +1,7 @@
 <app-page-header
   [title]="(groupName() ? groupName() + ' — ' : '') + (title() || ('ui.reports.title' | t))"
   [subtitle]="'ui.reports.subtitle' | t"
-  [breadcrumb]="('ui.reportGroups.title' | t) + (groupName() ? ' / ' + groupName() : '')">
+  [breadcrumb]="('ui.reportGroups.title' | t) + (groupName() ? ' / ' + groupName() : '')" guide="reports">
   <button type="button" class="back-button" (click)="back()">
     <i class="fa-solid fa-arrow-left"></i>
     {{ 'ui.back' | t }}

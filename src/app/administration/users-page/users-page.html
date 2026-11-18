@@ -1,11 +1,14 @@
 <app-page-header
   [title]="title() || ('ui.users.title' | t)"
   [subtitle]="'ui.users.subtitle' | t"
-  [breadcrumb]="'ui.users.breadcrumb' | t">
+  [breadcrumb]="'ui.users.breadcrumb' | t"
+  guide="users">
   <button type="button" class="add-button" (click)="add()">
     <i class="fa-solid fa-plus"></i>
     {{ 'ui.add' | t }}
   </button>
 </app-page-header>
+
+<app-page-guide key="users" title="ui.users.guideTitle" [steps]="guide" [openByDefault]="guideOpen()" />
 
 <app-data-table [url]="tableUrl" (loaded)="onLoaded($event)" (edit)="edit($event)" (remove)="remove($event)"></app-data-table>

@@ -9,8 +9,10 @@ app-page-header {
   flex-shrink: 0;
 }
 
+/* with the guide open on a low screen the page scrolls, rather than the list being squeezed away */
 app-data-table {
   flex: 1;
+  min-height: 360px;
 }
 
 .add-button {

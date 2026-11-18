@@ -7,6 +7,14 @@
     @if (subtitle()) {
       <p class="subtitle">{{ subtitle() }}</p>
     }
+    @if (guideHref(); as href) {
+      <!-- the whole story of the screen, for whoever wants more than the subtitle and the steps -->
+      <a class="guide-link" [href]="href" target="_blank" rel="noopener">
+        <i class="fa-solid fa-circle-question"></i>
+        <span>{{ 'ui.guide.read' | t }}</span>
+        <i class="fa-solid fa-arrow-up-right-from-square guide-external"></i>
+      </a>
+    }
   </div>
   <div class="actions">
     <ng-content></ng-content>

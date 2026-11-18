@@ -7,9 +7,18 @@ import { Translate } from "../../services/translate";
 import { ApiRoute } from "../../shared/ApiRoute";
 import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
 import { DataTable, RowAction } from "../../shared/data-table/data-table";
+import { GuideStep } from "../../shared/page-guide/page-guide";
 import { DatabaseColumn, DatabaseTable } from "../../shared/database-table";
 import { Role } from "../../administration/app-user-dialog/app-user-dialog";
 import { ReportGroupDialog, ReportGroupDialogData } from "../report-group-dialog/report-group-dialog";
+
+/** The short guide above the list. */
+const GUIDE: GuideStep[] = [
+  { title: "ui.reportGroups.guide1Title", text: "ui.reportGroups.guide1" },
+  { title: "ui.reportGroups.guide2Title", text: "ui.reportGroups.guide2" },
+  { title: "ui.reportGroups.guide3Title", text: "ui.reportGroups.guide3" },
+  { title: "ui.reportGroups.guide4Title", text: "ui.reportGroups.guide4" },
+];
 
 @Component({
   selector: "app-report-groups-page",
@@ -22,6 +31,9 @@ export class ReportGroupsPage {
   /** true when the page was reached by the Back button of the reports; only then is the list restored. */
   readonly restore: boolean;
   readonly title = signal("");
+  readonly guide = GUIDE;
+  /** Open while there is no group yet; unknown until the first page of the list comes. */
+  readonly guideOpen = signal<boolean | null>(null);
   /** The row menu of a group leads to the reports of that group. */
   readonly rowActions: RowAction[] = [];
   private allColumns: DatabaseColumn[] = [];
@@ -61,6 +73,7 @@ export class ReportGroupsPage {
   onLoaded(table: DatabaseTable<any>): void {
     this.title.set(table.name);
     this.allColumns = table.allColumns ?? table.column;
+    this.guideOpen.set(table.total === 0);
   }
 
   add(): void {

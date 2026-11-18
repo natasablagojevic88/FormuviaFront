@@ -10,6 +10,10 @@ import { ModelNode } from "../model";
 import { ModelColumn, newColumn } from "../model-column";
 import { DIALOG_LIMITS } from "../model";
 import { ColumnDialog, ColumnDialogData } from "../column-dialog/column-dialog";
+import { GuideStep } from "../../shared/page-guide/page-guide";
+
+/** What a field is made of, from adding it to the conditions on it. */
+const GUIDE: GuideStep[] = [1, 2, 3, 4].map((n) => ({ title: `ui.column.guide${n}Title`, text: `ui.column.guide${n}` }));
 
 /** One cell of the grid: either a field of the form, or an empty place a new one is added to. */
 interface Cell {
@@ -30,6 +34,9 @@ export class ColumnsPage {
   readonly columns = signal<ModelColumn[]>([]);
   readonly loading = signal(false);
   readonly selectedId = signal<string | null>(null);
+  readonly guide = GUIDE;
+  /** Open while the table has no field yet; unknown until the table and its fields have come. */
+  readonly guideOpen = computed(() => (this.loading() || !this.model() ? null : this.columns().length === 0));
 
   /** Records the fields of this form offer a choice from, by field identifier; used by the conditions. */
   readonly listOfValues = signal<Record<string, ComboOption[]>>({});

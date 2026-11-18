@@ -6,9 +6,9 @@ Svaki ekran sa tabelom u Formuvii radi isto. Naučite jednom i važi za sve: **K
 Tabele koje sami definišete u [Modelu](/sr/model) pojavljuju se u meniju i otvaraju isti ekran kao ugrađene, pa sve sa ove strane važi i za njih — uključujući izmenu pravo u listi. Ono što imaju povrh toga — procedure, izveštaje nad zapisom, šablon za unos — opisano je niže, tamo gde dođe na red.
 :::
 
-Ekran sa tabelom ima tri dela: **zaglavlje** sa naslovom i dugmetom *Dodaj*, **traku** sa pretragom i exportom, i samu **listu** sa straničenjem na dnu.
+Ekran sa tabelom ima tri dela: **zaglavlje** sa naslovom, dugmetom *Dodaj* i linkom *Pročitajte u uputstvu*, koji otvara ovu stranu, **traku** sa pretragom i exportom, i samu **listu** sa straničenjem na dnu.
 
-![Ekran tabele: zaglavlje sa Dodaj, traka sa alatima i lista sa filterima po kolonama](/screenshots/sr/users.png)
+![Ekran tabele: zaglavlje sa Dodaj i linkom ka uputstvu, traka sa alatima i lista sa filterima po kolonama](/screenshots/sr/table.png)
 
 ## Kako da nađete zapis
 

@@ -6,9 +6,17 @@ import { Translate } from "../../services/translate";
 import { ApiRoute } from "../../shared/ApiRoute";
 import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/confirm-dialog";
 import { DataTable, RowAction } from "../../shared/data-table/data-table";
+import { GuideStep } from "../../shared/page-guide/page-guide";
 import { DatabaseColumn, DatabaseTable } from "../../shared/database-table";
 import { SmtpDialog, SmtpDialogData } from "../smtp-dialog/smtp-dialog";
 import { TestMailDialog, TestMailDialogData } from "../test-mail-dialog/test-mail-dialog";
+
+/** The short guide above the list. */
+const GUIDE: GuideStep[] = [
+  { title: "ui.smtp.guide1Title", text: "ui.smtp.guide1" },
+  { title: "ui.smtp.guide2Title", text: "ui.smtp.guide2" },
+  { title: "ui.smtp.guide3Title", text: "ui.smtp.guide3" },
+];
 
 @Component({
   selector: "app-smtp-page",
@@ -19,6 +27,9 @@ import { TestMailDialog, TestMailDialogData } from "../test-mail-dialog/test-mai
 export class SmtpPage {
   readonly tableUrl = ApiRoute.smtpTable;
   readonly title = signal("");
+  readonly guide = GUIDE;
+  /** Open while there is no server yet; unknown until the first page of the list comes. */
+  readonly guideOpen = signal<boolean | null>(null);
   /** The row menu of a server offers a try: one mail is sent through it. */
   readonly rowActions: RowAction[] = [];
   private allColumns: DatabaseColumn[] = [];
@@ -52,6 +63,7 @@ export class SmtpPage {
   onLoaded(table: DatabaseTable<any>): void {
     this.title.set(table.name);
     this.allColumns = table.allColumns ?? table.column;
+    this.guideOpen.set(table.total === 0);
   }
 
   add(): void {

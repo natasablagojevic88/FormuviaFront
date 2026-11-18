@@ -16,7 +16,15 @@ The first account is `admin`, with the password chosen during installation. Chan
 
 **Your name** is at the bottom of the menu. Click it to change your password; the icon next to it signs you out.
 
-![The Roles screen with the menu on the left and the language and theme in the top bar](/screenshots/en/roles.png)
+## Help on every screen
+
+You do not have to keep this guide open next to the application — the application points the way itself:
+
+- **The first screen** after signing in says where to start. An administrator gets the first steps of setting Formuvia up, in the order they depend on each other — roles, users, tables, the mail server, reports — each with *Open*, which leads to its screen. Everyone else gets a short word on how a table works.
+- **A short guide** sits at the top of the main screens of the administration, the model, the form design and the jobs: a few steps, or what each button does. It is open while the screen is still empty — no table in the model yet, no mail server, no job — and folded into one line once there is something in it, so it does not take the room of the list. A click on that line opens or folds it, and your choice is remembered in the browser.
+- **Read in the guide**, under the title of every screen, opens the page of this guide about that screen, in a new tab and in your language. Both Serbian scripts lead to the Serbian guide, which is written in the Latin script.
+
+![The Roles screen with its short guide open, the menu on the left and the language and theme in the top bar](/screenshots/en/roles.png)
 
 ## Language
 

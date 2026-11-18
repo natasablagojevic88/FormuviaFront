@@ -11,15 +11,13 @@ import { ConfirmDialog, ConfirmDialogData } from "../../shared/confirm-dialog/co
 import { JobDialog, JobDialogData, JobItemRow } from "../../report/job-dialog/job-dialog";
 import { WebhookDialog, WebhookDialogData } from "../../report/webhook-dialog/webhook-dialog";
 import { ModelNode } from "../model";
+import { GuideStep } from "../../shared/page-guide/page-guide";
 
 /** Key of the item of the row menu that opens the keys of the webhook of that job. */
 const WEBHOOK_ACTION = "webhook";
 
-/**
- * Whether the steps of the import were folded or opened by hand is kept in the browser. Until then
- * they are open while the table has no job yet, and folded once it has one, so the list gets the room.
- */
-const STEPS_KEY = "formuvia.modelJobs.stepsOpen";
+/** The way from a filled-in template to rows of the table. */
+const STEPS: GuideStep[] = [1, 2, 3, 4].map((n) => ({ title: `ui.modelJobs.step${n}Title`, text: `ui.modelJobs.step${n}` }));
 
 /**
  * Import jobs of one table: each reads filled-in templates of the table from a folder on the server,
@@ -39,10 +37,9 @@ export class ModelJobsPage {
   readonly newRowValues: Record<string, string>;
   readonly modelName = signal("");
   readonly title = signal("");
-  readonly stepsOpen = signal(false);
-  /** The steps wait for the first page of the list when nothing was chosen by hand yet. */
-  readonly stepsReady = signal(false);
-  private stepsChosen: boolean | null = null;
+  readonly steps = STEPS;
+  /** Open while the table has no job yet; unknown until the first page of the list comes. */
+  readonly guideOpen = signal<boolean | null>(null);
   readonly rowActions: RowAction[];
   private allColumns: DatabaseColumn[] = [];
 
@@ -60,11 +57,6 @@ export class ModelJobsPage {
     this.tableUrl = ApiRoute.modelJobTable(this.modelId);
     this.newRowValues = { modelId: this.modelId };
     this.rowActions = [{ key: WEBHOOK_ACTION, label: translate.get("ui.webhook.title"), icon: "fa-solid fa-link" }];
-    this.stepsChosen = this.readStepsOpen();
-    if (this.stepsChosen !== null) {
-      this.stepsOpen.set(this.stepsChosen);
-      this.stepsReady.set(true);
-    }
     this.loadModel();
   }
 
@@ -72,29 +64,6 @@ export class ModelJobsPage {
   private loadModel(): void {
     this.sendRequest.get(ApiRoute.modelId(this.modelId))
       .then((model: ModelNode) => this.modelName.set(model?.name ?? ""));
-  }
-
-  private readStepsOpen(): boolean | null {
-    try {
-      const stored = localStorage.getItem(STEPS_KEY);
-      return stored === null ? null : stored === "1";
-    } catch {
-      return null;
-    }
-  }
-
-  stepsToggled(event: Event): void {
-    const open = (event.target as HTMLDetailsElement).open;
-    if (open === this.stepsOpen()) {
-      // the toggle of the first drawing, not a click
-      return;
-    }
-    this.stepsOpen.set(open);
-    try {
-      localStorage.setItem(STEPS_KEY, open ? "1" : "0");
-    } catch {
-      // without localStorage the steps are simply open again next time
-    }
   }
 
   rowAction(event: { action: RowAction; row: JobItemRow }): void {
@@ -113,10 +82,7 @@ export class ModelJobsPage {
   onLoaded(table: DatabaseTable<any>): void {
     this.title.set(table.name);
     this.allColumns = table.allColumns ?? table.column;
-    if (!this.stepsReady()) {
-      this.stepsOpen.set(!table.total);
-      this.stepsReady.set(true);
-    }
+    this.guideOpen.set(!table.total);
   }
 
   add(): void {
