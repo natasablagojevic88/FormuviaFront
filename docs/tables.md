@@ -3,7 +3,7 @@
 Every table screen in Formuvia works the same way. Learn it once and it applies to all of them: **Users**, **Roles**, and the subtables you reach from a row's ⋯ menu.
 
 ::: info Tables from the Model
-Tables you define yourself in the [Model](/model) appear in the menu and open a screen like the ones described here. Finding a record, sorting, paging, the Excel export, and adding, changing and deleting records through the form all work. The ⋯ button on a row holds the history of the record and the subtables of that table, just like on the built-in screens. What such a table does not have yet is editing straight in the list — double-click and *Quick edit*. See [Where Formuvia is today](/#where-formuvia-is-today).
+Tables you define yourself in the [Model](/model) appear in the menu and open the same screen as the built-in ones, so everything on this page holds for them too — editing straight in the list included. What they have on top of it — procedures, reports over a record, the entry template — is described below, where it comes up.
 :::
 
 A table screen has three parts: a **header** with the title and the *Add* button, a **toolbar** with search and export, and the **list** itself with a paginator at the bottom.

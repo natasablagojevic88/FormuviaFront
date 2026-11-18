@@ -103,10 +103,6 @@ What a trigger writes is in the record straight away: the entry dialog is filled
 
 The last part is **Reports**: reports of JasperReports tied to this table, each one made over a single record of it.
 
-::: info What is in effect today
-A report is kept here with its name and its file, the file is checked when it is sent, and the ⋯ menu of a row in the list offers the report by name. Making the PDF itself is still being finished on the server, so choosing a report ends in an error for now.
-:::
-
 This part appears once the table is saved. **Add a report** asks for two things:
 
 - **Name of the report** — what the user reads over the record. It is unique within the table.

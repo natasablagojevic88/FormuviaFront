@@ -103,10 +103,6 @@ Ono što triger upiše odmah je u zapisu: dijalog za unos se posle snimanja pono
 
 Poslednji deo su **Izveštaji**: JasperReports izveštaji vezani za ovu tabelu, svaki se pravi nad jednim njenim redom.
 
-::: info Šta danas ima dejstvo
-Izveštaj se ovde čuva sa svojim nazivom i fajlom, fajl se proverava pri slanju, a ⋯ meni reda u listi nudi izveštaj po nazivu. Samo pravljenje PDF-a se na serveru još dovršava, pa izbor izveštaja za sada završi greškom.
-:::
-
 Ovaj deo se pojavljuje kad tabela bude sačuvana. **Dodaj izveštaj** traži dve stvari:
 
 - **Naziv izveštaja** — ono što korisnik čita nad zapisom. Jedinstven je u okviru tabele.

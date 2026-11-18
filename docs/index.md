@@ -3,52 +3,57 @@ layout: home
 
 hero:
   name: Formuvia
-  text: Define your tables from inside the application
-  tagline: Describe a table and its fields on screen, and Formuvia creates them in the database — no migration, no deployment in between.
+  text: Build business applications on PostgreSQL
+  tagline: Model your data, lay out its forms, add procedures and triggers of the database, make reports, leave routine work to scheduled jobs and start them from other systems through webhooks — all from inside the application.
   actions:
     - theme: brand
       text: Start here
       link: /getting-started
     - theme: alt
-      text: Working with tables
-      link: /tables
+      text: Build a table
+      link: /model
 
 features:
   - title: Tables without a developer
-    details: Add a table to the model and Formuvia creates it in the database, with its fields, its links and the roles that may use it.
+    details: Add a table to the model and Formuvia creates it in the database, with its fields, its links and the roles that may use it. No migration, nothing to redeploy.
     link: /model
   - title: Lay out a form by clicking
-    details: Place each field on a grid, choose its data type, give it a default value or a list of values from the database.
+    details: Place each field on a grid, give it a default value or a list of values from the database, let the database work a value out, and lock a field until a condition holds.
     link: /form-design
-  - title: Every table screen works the same
-    details: Filtering, advanced search, sorting, paging, editing in the table, history and export to Excel.
-    link: /tables
-  - title: A report that runs by itself
-    details: A report goes out by mail or into a file on a timetable of its own, and the Jobs page shows how every run of it ended.
+  - title: Logic stays in the database
+    details: Put a procedure of the database on a table and run it over a record, or a trigger that the database runs on every write.
+    link: /model#procedures
+  - title: Reports
+    details: A query, a procedure or a Jasper report, with parameters and lists to pick from — shown in a table, taken into Excel or handed over as a PDF.
+    link: /reports
+  - title: Work that runs by itself
+    details: A job sends a report by mail, writes it into a file or imports filled-in Excel templates from a folder, on its own timetable or through a webhook from another system.
     link: /jobs
+  - title: Every table screen works the same
+    details: Filtering, advanced search, sorting, totals, editing straight in the list, history of every record, Excel export and an Excel template for entering data.
+    link: /tables
 ---
 
 ## What Formuvia is
 
-Formuvia is an application you shape from inside the application itself.
+Formuvia is a platform for business applications over a PostgreSQL database, shaped from inside the application itself.
 
-You describe what you need — a menu, a table, the fields on its form — and Formuvia creates the table in the database: the columns, the foreign keys, the constraints. There is no migration script to write and nothing to redeploy. A table added in the **Model** exists in the database the moment you save it.
+You describe what you need — a menu, a table, the fields on its form — and Formuvia creates the table in the database: the columns, the foreign keys, the constraints. There is no migration script to write and nothing to redeploy. A table added in the **Model** exists in the database the moment you save it, appears in the menu and opens as a list with its form.
 
-Around that sits everything a business application needs anyway: accounts and roles, a record of every change, filtering and sorting done on the server, and an Excel export of whatever you are looking at.
+The rules of the business stay where the data is. A field can take its value from a function of the database while a record is being entered, a procedure can be run over a record from its menu, and a trigger runs on every write without anyone asking for it.
+
+On top of the data sit the **reports** — queries, procedures and Jasper reports, with parameters — and the **jobs** that run them on a timetable: a report goes out by mail or into a file, filled-in Excel templates are imported from a folder, and another system can start any job through a webhook.
+
+Around all of that sits everything a business application needs anyway: accounts and roles, a record of every change, filtering, sorting and totals done on the server, and an Excel export of whatever you are looking at.
 
 ## Who this guide is for
 
 - **If you enter and look up data**, read [Signing in](/getting-started) and [Working with tables](/tables). That is everything you need.
-- **If you build the application**, continue with [Model](/model) and [Form design](/form-design), set people up in [Administration](/administration), sort the documents of the application into groups in [Reports](/reports), and watch what runs by itself in [Jobs](/jobs).
+- **If you build the application**, continue with [Model](/model) and [Form design](/form-design), set people up in [Administration](/administration), write the reports of the application in [Reports](/reports), and watch what runs by itself in [Jobs](/jobs).
 
 ## Where Formuvia is today
 
-Formuvia is still being built, and this guide describes what actually works rather than what is planned. Two things are worth knowing before you start:
-
-- The **built-in screens** — Users, Roles and Model — are complete, and so are the subtables you reach from a row's ⋯ menu.
-- A table you define in the **Model** is created in the database, appears in the menu, and opens as a list you can filter, sort, page through and export. Its records are entered, changed and deleted through the form you laid out in [Form design](/form-design). The ⋯ button on a row opens the history of that record and the subtables of that table, the same as everywhere else. What such a table does not have yet is editing straight in the list — double-click and *Quick edit*.
-
-Each page of this guide says which parts of what you define are already in effect.
+Formuvia is still being built, and this guide describes what actually works rather than what is planned. Where something can already be defined but does not take effect yet, the page says so in a box headed *What is in effect today*.
 
 ## Before you start
 
