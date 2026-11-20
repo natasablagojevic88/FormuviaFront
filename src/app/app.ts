@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
 import { Session } from './services/session';
+import { NotificationSocket } from './services/notification-socket';
 import { Translate } from './services/translate';
 
 @Component({
@@ -17,7 +18,9 @@ export class App {
   constructor(
     public session: Session,
     public router: Router,
-    private translate: Translate
+    private translate: Translate,
+    // created here so it starts watching the session; it connects once the user is known
+    private notificationSocket: NotificationSocket
   ){
     this.translate.load();
 

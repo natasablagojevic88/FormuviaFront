@@ -1,0 +1,9 @@
+<app-page-header
+  [title]="'ui.notifications.title' | t"
+  [subtitle]="'ui.notifications.subtitle' | t"
+  [breadcrumb]="'ui.notifications.breadcrumb' | t"
+  guide="notifications">
+</app-page-header>
+
+<app-data-table [url]="tableUrl" [viewRows]="true" [showHistory]="false" [canDelete]="false"
+  [rowActions]="rowActions" (edit)="open($event)" (action)="mark($event.action, $event.row)"></app-data-table>

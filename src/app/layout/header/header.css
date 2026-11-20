@@ -6,6 +6,11 @@
   margin: 0 -16px 16px;
 }
 
+/* while the list under the bell is open, the header stands above the sticky table header (Material gives it ~100) */
+:host:has(.bell-panel) {
+  z-index: 150;
+}
+
 .header {
   display: flex;
   align-items: center;
@@ -44,6 +49,169 @@
 
 
 
+
+/* the bell: number of unread notifications, and the unread ones under it */
+.bell {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.bell-button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.bell-button:hover,
+.bell-button[aria-expanded="true"] {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.bell-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--c-danger-bg);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* a click anywhere outside the list closes it */
+.bell-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+}
+
+.bell-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  width: min(380px, calc(100vw - 32px));
+  max-height: min(480px, calc(100dvh - 96px));
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-2);
+  color: var(--c-text);
+  overflow: hidden;
+}
+
+.bell-head {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--c-border-soft);
+  background: var(--c-surface-2);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.bell-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.bell-empty {
+  margin: 0;
+  padding: 20px 16px;
+  color: var(--c-text-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.bell-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--c-border-soft);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.bell-item:hover,
+.bell-item:focus-visible {
+  background: var(--c-primary-soft);
+}
+
+.bell-item-top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.bell-item-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bell-item-date {
+  flex-shrink: 0;
+  color: var(--c-text-faint);
+  font-size: 12px;
+}
+
+/* two rows of the message; the whole of it is in the dialog */
+.bell-item-body {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--c-text-muted);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.bell-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border-top: 1px solid var(--c-border-soft);
+  background: var(--c-surface-2);
+  color: var(--c-primary);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.bell-all:hover {
+  background: var(--c-primary-soft);
+}
 
 @media (max-width: 900px) {
   .header {
@@ -102,4 +270,20 @@
 
 .theme-button:hover {
   background: rgba(255, 255, 255, 0.22);
+}
+
+@media (max-width: 600px) {
+  /* on a phone the list takes the width of the screen under the header, not the width under the bell */
+  .bell-panel {
+    position: fixed;
+    top: 64px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+    max-height: calc(100dvh - 80px);
+  }
+
+  .theme-button {
+    margin-right: 0;
+  }
 }

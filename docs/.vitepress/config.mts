@@ -39,6 +39,7 @@ export default defineConfig({
               { text: "Signing in", link: "/getting-started" },
               { text: "Working with tables", link: "/tables" },
               { text: "Jobs", link: "/jobs" },
+              { text: "Notifications", link: "/notifications" },
             ],
           },
           {
@@ -78,6 +79,7 @@ export default defineConfig({
               { text: "Prijava na sistem", link: "/sr/getting-started" },
               { text: "Rad sa tabelama", link: "/sr/tables" },
               { text: "Poslovi", link: "/sr/jobs" },
+              { text: "Obaveštenja", link: "/sr/notifications" },
             ],
           },
           {

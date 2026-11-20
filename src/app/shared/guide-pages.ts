@@ -19,6 +19,7 @@ export const GUIDE_PAGES = {
   reportJobs: { en: "reports.html#jobs-a-report-that-runs-by-itself", sr: "reports.html#poslovi-izvestaj-koji-ide-sam" },
   reportRun: { en: "reports.html#running-a-report", sr: "reports.html#pokretanje-izvestaja" },
   jobs: { en: "jobs.html", sr: "jobs.html" },
+  notifications: { en: "notifications.html", sr: "notifications.html" },
   tables: { en: "tables.html", sr: "tables.html" },
 } as const;
 

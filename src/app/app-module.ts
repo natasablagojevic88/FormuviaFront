@@ -12,6 +12,7 @@ import { Sidebar } from './layout/sidebar/sidebar';
 import { Header } from './layout/header/header';
 import { ChangePasswordDialog } from './layout/change-password-dialog/change-password-dialog';
 import { Toast } from './layout/toast/toast';
+import { NotificationDialog } from './layout/notification-dialog/notification-dialog';
 import { TranslateModule } from './shared/translate-module';
 import { FormControlsModule } from './shared/form-controls-module';
 import { TranslatedPaginatorIntl } from './shared/paginator-intl';
@@ -23,7 +24,8 @@ import { AppErrorHandler } from './services/app-error-handler';
     Sidebar,
     Header,
     ChangePasswordDialog,
-    Toast
+    Toast,
+    NotificationDialog
   ],
   imports: [
     BrowserModule,

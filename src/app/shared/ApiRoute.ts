@@ -322,4 +322,28 @@
     static history(className: string, id: string): string {
         return `/api/history/${className}/${id}`;
     }
+
+    /** How many notifications of the current user are unread; the server answers with a bare number. */
+    static readonly notificationCount='/api/notification/count';
+
+    /** Every unread notification of the current user, newest first, for the bell in the header. */
+    static readonly notificationListUnseen='/api/notification/list/unseen';
+
+    /** All notifications of the current user, as a table; the server adds the filter by the user. */
+    static readonly notificationListAll='/api/notification/list/all';
+
+    /** Marks one notification as read. */
+    static notificationSeen(id: string): string {
+        return `/api/notification/seen/${id}`;
+    }
+
+    /** Marks one notification as unread again. */
+    static notificationUnseen(id: string): string {
+        return `/api/notification/unseen/${id}`;
+    }
+
+    /** WebSocket of the notifications of one user; the server checks the id against the cookie. */
+    static websocketNotification(appUserId: string): string {
+        return `/api/websocket/notification/${appUserId}`;
+    }
 }

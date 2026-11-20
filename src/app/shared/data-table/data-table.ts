@@ -148,6 +148,10 @@ export class DataTable implements AfterViewInit, OnDestroy {
   readonly readOnly = input(false);
   /** false: the row cannot be deleted, so the row menu has no "Delete" item. */
   readonly canDelete = input(true);
+  /** true: a row is only looked at (the eye), whatever the server says about changing it. */
+  readonly viewRows = input(false);
+  /** false: the row menu does not offer the history, even when the server sends a className. */
+  readonly showHistory = input(true);
   /**
    * true only when the page was reached by going back from a subtable: the list is then restored as
    * it was left. Opening the same table from the menu, or reloading the page, always starts fresh.
@@ -295,7 +299,7 @@ export class DataTable implements AfterViewInit, OnDestroy {
   readonly rowEditMode = computed(() => this.editRowId() !== null || this.draftRow() !== null);
   readonly canEditMode = computed(() => this.hasUpdate() && !!this.saveUrl() && this.editColumns().length > 0);
   /** The row is only shown, not changed: the pencil becomes an eye and the form opens locked. */
-  readonly viewOnly = computed(() => !this.hasUpdate());
+  readonly viewOnly = computed(() => this.viewRows() || !this.hasUpdate());
   readonly showDelete = computed(() => this.canDelete() && this.hasDelete());
   /** Columns offered in edit mode: every editable column from allColumns, including those hidden in the table. */
   readonly editColumns = computed(() =>
@@ -779,8 +783,7 @@ export class DataTable implements AfterViewInit, OnDestroy {
   /** The ⋯ menu is shown only when there is something in it: history, a subtable or deleting. */
   readonly hasRowMenu = computed(
     () =>
-      !!this.className() ||
-      !!this.historyUrl() ||
+      this.canShowHistory() ||
       this.children().length > 0 ||
       this.subTables().length > 0 ||
       this.rowProcedures().length > 0 ||
@@ -976,7 +979,7 @@ export class DataTable implements AfterViewInit, OnDestroy {
 
   /** History is offered only when the server sends a className with the table. */
   canShowHistory(): boolean {
-    return !!this.className() || !!this.historyUrl();
+    return this.showHistory() && (!!this.className() || !!this.historyUrl());
   }
 
   openHistory(row: any): void {

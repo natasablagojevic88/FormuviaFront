@@ -35,6 +35,11 @@ const routes: Routes = [
     loadChildren: () => import('./job/jobs-module').then(m => m.JobsModule)
   },
   {
+    // the path is the same as in the menu from the server (menu.xml: /notification)
+    path: 'notification',
+    loadChildren: () => import('./notification/notifications-module').then(m => m.NotificationsModule)
+  },
+  {
     path: 'roles',
     loadChildren: () => import('./administration/roles-module').then(m => m.RolesModule)
   },

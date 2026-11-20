@@ -1,7 +1,11 @@
-import { Component } from "@angular/core";
+import { Component, HostListener, computed, signal } from "@angular/core";
 import { Language } from "../../services/language";
 import { Layout } from "../../services/layout";
+import { Notifications } from "../../services/notifications";
 import { Theme } from "../../services/theme";
+import { Translate } from "../../services/translate";
+import { formatDateTime } from "../../shared/date-format";
+import { NotificationItem } from "../../shared/notification-link";
 import { SelectOption } from "../../shared/search-select/search-select";
 
 @Component({
@@ -13,7 +17,58 @@ import { SelectOption } from "../../shared/search-select/search-select";
 export class Header {
   readonly languageOptions: SelectOption[];
 
-  constructor(public language: Language, public layout: Layout, public theme: Theme) {
+  /** The list under the bell; it is read again every time it is opened. */
+  readonly panelOpen = signal(false);
+  readonly loadingList = signal(false);
+  readonly items = signal<NotificationItem[]>([]);
+  readonly unread = computed(() => this.notifications.unread() ?? 0);
+  readonly bellLabel = computed(() => {
+    const title = this.translate.get("ui.notifications.bell");
+    return this.unread() > 0
+      ? `${title}: ${this.translate.get("ui.notifications.unreadCount").replace("{0}", String(this.unread()))}`
+      : title;
+  });
+
+  constructor(
+    public language: Language,
+    public layout: Layout,
+    public theme: Theme,
+    private notifications: Notifications,
+    private translate: Translate
+  ) {
     this.languageOptions = language.options.map((option) => ({ value: option.tag, label: option.label }));
+    // the header is drawn once the user is in the application, so the bell gets its number right away
+    this.notifications.loadCount();
+  }
+
+  togglePanel(): void {
+    if (this.panelOpen()) {
+      this.closePanel();
+      return;
+    }
+    this.panelOpen.set(true);
+    this.loadingList.set(true);
+    this.notifications
+      .listUnseen()
+      .then((list) => {
+        this.items.set(list);
+        // the list is every unread one, so it also tells the number without asking again
+        this.notifications.unread.set(list.length);
+      })
+      .finally(() => this.loadingList.set(false));
+  }
+
+  @HostListener("document:keydown.escape")
+  closePanel(): void {
+    this.panelOpen.set(false);
+  }
+
+  openItem(item: NotificationItem): void {
+    this.closePanel();
+    this.notifications.open(item);
+  }
+
+  dateOf(item: NotificationItem): string {
+    return item.notificationDate ? formatDateTime(item.notificationDate, this.language.current()) : "";
   }
 }

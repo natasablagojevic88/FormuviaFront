@@ -1,0 +1,36 @@
+<div class="fd">
+  <header class="fd-header">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ data.title }}</h2>
+      @if (date) {
+        <p class="fd-subtitle">{{ date }}</p>
+      }
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    <p class="message">{{ data.body }}</p>
+    @if (externalUrl) {
+      <p class="link">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        <span>{{ externalUrl }}</span>
+      </p>
+    }
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint"></span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.close' | t }}</button>
+      @if (hasLink) {
+        <button type="button" class="fd-button fd-button-primary" (click)="close(true)">
+          <i class="fa-solid fa-arrow-right"></i>
+          {{ 'ui.notifications.openLink' | t }}
+        </button>
+      }
+    </div>
+  </footer>
+</div>

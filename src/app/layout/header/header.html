@@ -7,6 +7,44 @@
   <span class="brand-name">Formuvia</span>
   <span class="spacer"></span>
 
+  <div class="bell">
+    <button type="button" class="bell-button" (click)="togglePanel()" [attr.aria-expanded]="panelOpen()"
+      [title]="bellLabel()" [attr.aria-label]="bellLabel()">
+      <i class="fa-solid fa-bell"></i>
+      @if (unread() > 0) {
+        <span class="bell-badge">{{ unread() > 99 ? '99+' : unread() }}</span>
+      }
+    </button>
+
+    @if (panelOpen()) {
+      <div class="bell-backdrop" (click)="closePanel()"></div>
+      <div class="bell-panel" role="dialog" [attr.aria-label]="'ui.notifications.unreadTitle' | t">
+        <div class="bell-head">{{ 'ui.notifications.unreadTitle' | t }}</div>
+        <div class="bell-list">
+          @if (loadingList()) {
+            <p class="bell-empty">{{ 'ui.notifications.loading' | t }}</p>
+          } @else {
+            @for (item of items(); track item.id) {
+              <button type="button" class="bell-item" (click)="openItem(item)">
+                <span class="bell-item-top">
+                  <span class="bell-item-title">{{ item.title }}</span>
+                  <span class="bell-item-date">{{ dateOf(item) }}</span>
+                </span>
+                <span class="bell-item-body">{{ item.body }}</span>
+              </button>
+            } @empty {
+              <p class="bell-empty">{{ 'ui.notifications.none' | t }}</p>
+            }
+          }
+        </div>
+        <a class="bell-all" routerLink="/notification" (click)="closePanel()">
+          {{ 'ui.notifications.all' | t }}
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+    }
+  </div>
+
   <button type="button" class="theme-button" (click)="theme.next()"
     [title]="('ui.theme.' + theme.mode()) | t" [attr.aria-label]="('ui.theme.' + theme.mode()) | t">
     <i class="fa-solid"

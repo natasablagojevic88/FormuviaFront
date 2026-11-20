@@ -10,6 +10,7 @@ export interface MenuItem {
 }
 
 export interface UserInfo {
+  id: string;
   username: string;
   name: string;
   surname: string;
