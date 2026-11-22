@@ -23,7 +23,11 @@ export interface UserInfo {
 export class Session {
   readonly user = signal<UserInfo | null>(null);
 
-  constructor(private sendRequest: SendRequest) {}
+  constructor(private sendRequest: SendRequest) {
+    // a 401 anywhere means the session is gone: the user is cleared, so the socket closes and
+    // nothing keeps working as if someone were still logged in
+    sendRequest.onUnauthorized(() => this.user.set(null));
+  }
 
   load(): Promise<UserInfo> {
     return this.sendRequest.get(ApiRoute.session, { notifyError: false }).then((user: UserInfo) => {

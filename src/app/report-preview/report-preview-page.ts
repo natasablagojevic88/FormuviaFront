@@ -199,31 +199,47 @@ export class ReportPreviewPage implements OnDestroy {
     { value: "false", label: this.translate.get("ui.no") },
   ]);
 
+  /**
+   * The answer belongs to the report it was asked for. The menu can move to another report while a
+   * slow one is still running, and its rows must not be shown under the name of the next one.
+   */
   run(): void {
     if (!this.canRun()) {
       return;
     }
+    const reportId = this.reportId;
+    const current = () => this.reportId === reportId;
     this.running.set(true);
     if (this.isJasper()) {
       this.sendRequest
-        .blob(ApiRoute.reportPreviewJasper(this.reportId), this.body())
-        .then((content: Blob) => this.showPdf(content))
+        .blob(ApiRoute.reportPreviewJasper(reportId), this.body())
+        .then((content: Blob) => {
+          if (current()) {
+            this.showPdf(content);
+          }
+        })
         .finally(() => this.running.set(false));
       return;
     }
     if (this.isExecute()) {
       this.sendRequest
-        .post(ApiRoute.reportPreviewExecute(this.reportId), this.body())
+        .post(ApiRoute.reportPreviewExecute(reportId), this.body())
         .then(() => {
-          this.shown.set(true);
+          // the procedure ran either way, so it is reported even when another report is open now
+          if (current()) {
+            this.shown.set(true);
+          }
           this.notify.success(this.translate.get("ui.reportRun.executed"));
         })
         .finally(() => this.running.set(false));
       return;
     }
     this.sendRequest
-      .post(ApiRoute.reportPreviewTable(this.reportId), this.body())
+      .post(ApiRoute.reportPreviewTable(reportId), this.body())
       .then((result: ReportResult) => {
+        if (!current()) {
+          return;
+        }
         this.columns.set(result?.columns ?? []);
         this.rows.set(result?.list ?? []);
         this.shown.set(true);

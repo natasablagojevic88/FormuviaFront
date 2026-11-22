@@ -1,7 +1,8 @@
-import { Component, HostListener, computed, signal } from "@angular/core";
+import { Component, HostListener, computed, effect, signal, untracked } from "@angular/core";
 import { Language } from "../../services/language";
 import { Layout } from "../../services/layout";
 import { Notifications } from "../../services/notifications";
+import { Session } from "../../services/session";
 import { Theme } from "../../services/theme";
 import { Translate } from "../../services/translate";
 import { formatDateTime } from "../../shared/date-format";
@@ -34,11 +35,18 @@ export class Header {
     public layout: Layout,
     public theme: Theme,
     private notifications: Notifications,
-    private translate: Translate
+    private translate: Translate,
+    session: Session
   ) {
     this.languageOptions = language.options.map((option) => ({ value: option.tag, label: option.label }));
-    // the header is drawn once the user is in the application, so the bell gets its number right away
-    this.notifications.loadCount();
+    // the header is drawn before the session is checked; the bell asks for its number only once the
+    // user is known, so opening the application without a session shows no 401 popup
+    const userId = computed(() => session.user()?.id ?? null);
+    effect(() => {
+      if (userId()) {
+        untracked(() => this.notifications.loadCount());
+      }
+    });
   }
 
   togglePanel(): void {

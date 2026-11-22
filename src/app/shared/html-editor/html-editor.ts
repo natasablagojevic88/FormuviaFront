@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, forwardRef, input, signal, viewChild } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Translate } from "../../services/translate";
+import { safeHtmlNodes } from "./safe-html";
 
 /** One button of the toolbar: the command of the browser and the picture on it. */
 interface Tool {
@@ -56,6 +57,8 @@ export class HtmlEditor implements ControlValueAccessor, AfterViewInit {
   private readonly area = viewChild<ElementRef<HTMLDivElement>>("area");
 
   private value = "";
+  /** The value last put into the formatted field, so it is not put in again while it is being typed in. */
+  private applied: string | null = null;
   /** Where the text stood before the address of a link was typed, so the link lands on it. */
   private savedRange: Range | null = null;
   private onChange: (value: string) => void = () => {};
@@ -92,11 +95,16 @@ export class HtmlEditor implements ControlValueAccessor, AfterViewInit {
     this.applyToArea();
   }
 
-  /** The value is written into the field only when it differs, so what is being typed is left alone. */
+  /**
+   * The value is written into the field only when it differs, so what is being typed is left alone.
+   * It goes in cleaned: the HTML was saved by someone else, and a script or an onerror in it would run
+   * in the session of whoever opens it. The source view shows it as it is, as text.
+   */
   private applyToArea(): void {
     const area = this.area()?.nativeElement;
-    if (area && area.innerHTML !== this.value) {
-      area.innerHTML = this.value;
+    if (area && this.applied !== this.value) {
+      area.replaceChildren(...safeHtmlNodes(this.value));
+      this.applied = this.value;
     }
     this.empty.set(!this.plainText().trim() && !this.value.includes("<img"));
   }
@@ -112,6 +120,7 @@ export class HtmlEditor implements ControlValueAccessor, AfterViewInit {
       return;
     }
     this.value = area.innerHTML === "<br>" ? "" : area.innerHTML;
+    this.applied = this.value;
     this.empty.set(!this.plainText().trim() && !this.value.includes("<img"));
     this.onChange(this.value);
   }

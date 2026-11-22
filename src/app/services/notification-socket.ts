@@ -1,12 +1,17 @@
-import { Injectable, effect, signal } from "@angular/core";
+import { Injectable, computed, effect, signal } from "@angular/core";
 import { environment } from "../../environments/environment";
 import { ApiRoute } from "../shared/ApiRoute";
 import { Notifications } from "./notifications";
+import { SendRequest } from "./send-request";
 import { Session } from "./session";
 
 /** First wait before connecting again, and the longest one; it doubles after every failed try. */
 const RETRY_FIRST_MS = 2000;
 const RETRY_MAX_MS = 60000;
+/** A connection open this long counts as stable, and only then the wait starts again from the first one. */
+const STABLE_MS = 30000;
+/** Close code the server sends when the session does not let the user in (VIOLATED_POLICY). */
+export const CLOSE_NO_ACCESS = 1008;
 
 /** http(s)://host/Formuvia + path -> ws(s)://host/Formuvia + path. */
 export function websocketUrl(apiUrl: string, path: string): string {
@@ -52,8 +57,13 @@ export class NotificationSocket {
   private appUserId: string | null = null;
   private retryTimer: ReturnType<typeof setTimeout> | null = null;
   private retryMs = RETRY_FIRST_MS;
+  private stableTimer: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(session: Session, private notifications: Notifications) {
+  constructor(
+    private session: Session,
+    private notifications: Notifications,
+    private sendRequest: SendRequest
+  ) {
     // Leaving the page (closing the tab, a reload, going to another site) says goodbye to the server
     // with a normal close, so it drops the connection at once. A page kept in the back/forward cache
     // comes back through pageshow and connects again.
@@ -63,8 +73,11 @@ export class NotificationSocket {
         this.open();
       }
     });
+    // Only a different user counts: a session read again (after a 1008, or by the login page) gives a
+    // new object with the same id, and that must not open a connection past the wait between tries.
+    const userId = computed(() => session.user()?.id ?? null);
     effect(() => {
-      const id = session.user()?.id;
+      const id = userId();
       if (id) {
         this.connect(id);
       } else {
@@ -74,7 +87,8 @@ export class NotificationSocket {
   }
 
   private connect(appUserId: string): void {
-    if (this.appUserId === appUserId && this.socket) {
+    // the same user is already connected or waiting for the next try
+    if (this.appUserId === appUserId) {
       return;
     }
     this.disconnect();
@@ -90,8 +104,12 @@ export class NotificationSocket {
     const socket = new WebSocket(websocketUrl(environment.apiUrl, ApiRoute.websocketNotification(appUserId)));
     this.socket = socket;
     socket.onopen = () => {
-      this.retryMs = RETRY_FIRST_MS;
       this.connected.set(true);
+      // A server that accepts the handshake and closes right away must not reset the wait every time.
+      this.stableTimer = setTimeout(() => {
+        this.stableTimer = null;
+        this.retryMs = RETRY_FIRST_MS;
+      }, STABLE_MS);
     };
     socket.onmessage = (event) => {
       const count = unreadFromMessage(event.data);
@@ -99,13 +117,18 @@ export class NotificationSocket {
         this.notifications.unread.set(count);
       }
     };
-    socket.onclose = () => {
+    socket.onclose = (event) => {
       if (this.socket !== socket) {
         return;
       }
       this.socket = null;
       this.connected.set(false);
-      this.scheduleRetry();
+      this.clearStableTimer();
+      if (event.code === CLOSE_NO_ACCESS) {
+        this.checkSession();
+      } else {
+        this.scheduleRetry();
+      }
     };
   }
 
@@ -120,12 +143,35 @@ export class NotificationSocket {
     this.retryMs = Math.min(this.retryMs * 2, RETRY_MAX_MS);
   }
 
+  /**
+   * The server would not let the user in (1008). Whether the session is still good is asked with the
+   * count of unread notifications, a request that changes nothing on the page: when the session has run
+   * out, its 401 sends the page to the login. When it is still good, trying again would only be refused
+   * again, so the socket stays closed until the page is loaded again; the bell still gets its number
+   * from that request. The session itself is not read again here, because a new user object makes the
+   * pages draw their tables again.
+   */
+  private checkSession(): void {
+    this.sendRequest
+      .get(ApiRoute.notificationCount, { notifyError: false })
+      .then((count: number) => this.notifications.unread.set(Number(count) || 0))
+      .catch(() => undefined);
+  }
+
+  private clearStableTimer(): void {
+    if (this.stableTimer) {
+      clearTimeout(this.stableTimer);
+      this.stableTimer = null;
+    }
+  }
+
   /** The page is being left: the connection is closed and no retry is waiting, but the user is kept. */
   private leave(): void {
     if (this.retryTimer) {
       clearTimeout(this.retryTimer);
       this.retryTimer = null;
     }
+    this.clearStableTimer();
     const socket = this.socket;
     this.socket = null;
     this.connected.set(false);
@@ -140,6 +186,7 @@ export class NotificationSocket {
       this.retryTimer = null;
     }
     this.retryMs = RETRY_FIRST_MS;
+    this.clearStableTimer();
     const socket = this.socket;
     this.socket = null;
     this.connected.set(false);

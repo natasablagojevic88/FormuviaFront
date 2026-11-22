@@ -136,7 +136,7 @@ A whole number is shown exactly as it is stored, without thousands separators â€
 
 A decimal number follows the language you chose: `1.234,56` in Serbian, `1,234.56` in English.
 
-Typing follows the same rule. With Serbian chosen you enter the decimal with a comma, with English with a dot, and both the form fields and the search fields accept either, so nothing stops you from typing on a Serbian keyboard.
+Typing follows the same rule. With Serbian chosen you enter the decimal with a comma, with English with a dot. The other sign is read as a thousands separator when it stands between groups of three digits, so `1,000` in English and `1.000` in Serbian are both a thousand. Anywhere else it still counts as the decimal: `1.5` typed on the numeric keypad with Serbian chosen is one and a half. Both the form fields and the search fields work this way.
 
 Numbers are aligned to the right, so the digits of one column line up and the values are easy to compare.
 

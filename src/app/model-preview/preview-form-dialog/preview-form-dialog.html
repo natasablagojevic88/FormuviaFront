@@ -78,7 +78,7 @@
                 [(ngModel)]="values[column.code]" (ngModelChange)="fieldChanged()"
                 (change)="runChange(column)"
                 [ngModelOptions]="{ standalone: true }"
-                [disabled]="isLocked(column)" [attr.maxlength]="column.length || null"
+                [disabled]="isLocked(column)"
                 autocomplete="off"></textarea>
             } @else {
               <label class="fd-label" [class.fd-required]="isRequired(column)" [for]="'pf-' + column.code">{{ column.name }}</label>

@@ -6,6 +6,7 @@ import { PageEvent } from "@angular/material/paginator";
 import { MatSort, Sort } from "@angular/material/sort";
 import { Router } from "@angular/router";
 import { SendRequest } from "../../services/send-request";
+import { Session } from "../../services/session";
 import { ApiRoute } from "../ApiRoute";
 import { Translate } from "../../services/translate";
 import { Language } from "../../services/language";
@@ -47,6 +48,10 @@ interface TableState {
  * a reload of the browser page empties this, so the list then starts fresh.
  */
 const TABLE_STATE = new Map<string, TableState>();
+/** The most lists kept; the oldest is dropped first, so going in and out of subtables does not pile up. */
+const TABLE_STATE_LIMIT = 20;
+/** Who the lists were left by: another user signing in on the same tab must not get them back. */
+let tableStateOwner: string | null = null;
 
 /**
  * An action the page itself puts in the row menu, for what only that page knows about (the reports
@@ -113,23 +118,31 @@ function fromEditValue(text: any, column: DatabaseColumn): any {
   if (text === "" || text === null || text === undefined) {
     return null;
   }
-  if (column.columnType === "BOOLEAN") {
-    return text === "true";
-  }
   if (column.columnType === "FILE") {
     return text || null;
+  }
+  // Every value goes as text, the way the server reads it: a JavaScript number keeps only 15-16
+  // digits, so a long LONG or BIGDECIMAL would be rounded and saved that way.
+  if (column.columnType === "BOOLEAN") {
+    return String(text) === "true" ? "true" : "false";
   }
   switch (column.columnType) {
     case "INTEGER":
     case "LONG":
-      return Number(text);
+      return String(text).trim();
     case "BIGDECIMAL": {
-      const value = parseDecimalText(text);
-      return value === "" ? null : Number(value);
+      const value = parseDecimalText(String(text));
+      return value === "" ? null : value;
     }
     default:
       return text;
   }
+}
+
+/** The editor still holds what it was opened with; a field, a select and a number input all compare as text. */
+function sameEditValue(value: any, start: any): boolean {
+  const text = (item: any) => (item === null || item === undefined ? "" : String(item));
+  return text(value) === text(start);
 }
 
 @Component({
@@ -281,6 +294,8 @@ export class DataTable implements AfterViewInit, OnDestroy {
   readonly sortField = computed(() => this.order()?.fieldName ?? "");
   readonly sortAscending = computed(() => this.order()?.direction !== "DESC");
   editValue: any = "";
+  /** What the cell editor was opened with; leaving it unchanged saves nothing. */
+  private editStart: any = "";
   // A separate edit mode: switched on in the toolbar, it shows every editable column and allows
   // editing a row and entering a new row in the table itself. Outside it the table works as before (dialogs).
   readonly editMode = signal(false);
@@ -413,7 +428,8 @@ export class DataTable implements AfterViewInit, OnDestroy {
     private language: Language,
     private dialog: MatDialog,
     private router: Router,
-    private host: ElementRef<HTMLElement>
+    private host: ElementRef<HTMLElement>,
+    private session: Session
   ) {
     // The table can change without building the component again (another menu item over the same
     // page), so loading is tied to the url instead of ngOnInit. untracked: reload reads the filters
@@ -443,6 +459,8 @@ export class DataTable implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sizeWatch?.disconnect();
+    // a filter typed just before leaving the page must not search a table that is gone
+    clearTimeout(this.filterTimer);
   }
 
   private scheduleMeasure(): void {
@@ -529,7 +547,13 @@ export class DataTable implements AfterViewInit, OnDestroy {
     if (!this.loadedUrl || !this.lastTable) {
       return;
     }
-    TABLE_STATE.set(this.stateKey(this.loadedUrl), {
+    this.claimTableState();
+    const key = this.stateKey(this.loadedUrl);
+    TABLE_STATE.delete(key);
+    while (TABLE_STATE.size >= TABLE_STATE_LIMIT) {
+      TABLE_STATE.delete(TABLE_STATE.keys().next().value!);
+    }
+    TABLE_STATE.set(key, {
       pageIndex: this.pageIndex(),
       pageSize: this.pageSize(),
       filters: this.filters(),
@@ -538,6 +562,15 @@ export class DataTable implements AfterViewInit, OnDestroy {
       highlightedId: this.highlightedId(),
       table: { ...this.lastTable, list: this.rows() },
     });
+  }
+
+  /** The kept lists belong to the user who is logged in now; those of anyone before are dropped. */
+  private claimTableState(): void {
+    const owner = this.session.user()?.id ?? null;
+    if (owner !== tableStateOwner) {
+      TABLE_STATE.clear();
+      tableStateOwner = owner;
+    }
   }
 
   /**
@@ -549,6 +582,7 @@ export class DataTable implements AfterViewInit, OnDestroy {
       return null;
     }
 
+    this.claimTableState();
     const key = this.stateKey(this.url());
     const state = TABLE_STATE.get(key) ?? null;
     TABLE_STATE.delete(key);
@@ -1168,7 +1202,11 @@ export class DataTable implements AfterViewInit, OnDestroy {
     const changed = { ...row };
     this.editColumns().forEach((column) => {
       // a locked column goes back as it came, so the row does not lose the value it had
-      changed[column.fieldName] = this.rowLocked(column)
+      // a locked column goes back as it came, and so does one that was not touched: its editor lost
+      // the seconds of a time or the digits a number could not hold
+      const untouched = column.columnType !== "FILE"
+        && sameEditValue(this.rowValues[column.fieldName], this.rowStartValues[column.fieldName]);
+      changed[column.fieldName] = this.rowLocked(column) || (untouched && this.editRowId() !== null)
         ? row[column.fieldName] ?? null
         : fromEditValue(this.rowValues[column.fieldName] ?? "", column);
     });
@@ -1235,6 +1273,7 @@ export class DataTable implements AfterViewInit, OnDestroy {
       return;
     }
     this.editValue = this.editValueOf(row, column);
+    this.editStart = this.editValue;
     this.editing.set({ id: row[ID_FIELD], fieldName: column.fieldName });
     // a double click on a cell with a list opens the list at once, so it need not be clicked twice
     this.focusEditor(true);
@@ -1289,6 +1328,11 @@ export class DataTable implements AfterViewInit, OnDestroy {
     const column = this.allColumns().find((item) => item.fieldName === cell.fieldName);
     const row = this.rows().find((item) => item[ID_FIELD] === cell.id);
     if (!column || !row) {
+      return;
+    }
+    // Nothing typed, nothing saved: the editor shows a time without seconds and a decimal with the
+    // separator of the language, so the value made from it would differ from the stored one anyway.
+    if (column.columnType !== "FILE" && sameEditValue(this.editValue, this.editStart)) {
       return;
     }
     const value = fromEditValue(this.editValue, column);

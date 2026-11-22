@@ -56,16 +56,20 @@ export function inputTypeFor(column: DatabaseColumn): string {
     case "LOCALTIME":
       return "time";
     case "INTEGER":
-    case "LONG":
       return "number";
-    // A decimal number goes as text: a type="number" field does not accept a comma from a Serbian keyboard.
+    // A LONG goes as text: a type="number" field reads it into a JavaScript number, which keeps only
+    // 15-16 digits. A decimal number goes as text too: a type="number" field does not accept a comma
+    // from a Serbian keyboard.
     default:
       return "text";
   }
 }
 
-/** Keyboard on a phone: numeric for whole numbers, decimal (with a comma) for BIGDECIMAL. */
+/** Keyboard on a phone: numeric for a LONG (a text field), decimal (with a comma) for BIGDECIMAL. */
 export function inputModeFor(column: DatabaseColumn): string | null {
+  if (column.columnType === "LONG") {
+    return "numeric";
+  }
   return isDecimalType(column.columnType) ? "decimal" : null;
 }
 

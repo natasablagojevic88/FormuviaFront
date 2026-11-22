@@ -28,7 +28,7 @@ Iznad radne površine su **Kolone**, **Redovi** i **Širina dijaloga**. Kad ih p
 
 **Naziv** je ono što se čita pored polja za unos. **Naziv kolone u bazi** je tehnički naziv: mala slova, cifre i donja crta, počinje slovom.
 
-Kad kolona jednom postoji, njen naziv je zaključan — kao i tip podatka, i šifarnik ako ga ima. Baza već drži podatke pod njima.
+Kad kolona jednom postoji, njen naziv je zaključan — kao i tip podatka, šifarnik ako ga ima, i broj decimala decimalnog broja. Baza već drži podatke pod njima.
 
 ### Tip podatka
 
@@ -96,7 +96,7 @@ Polje koje je isključeno opcijom *Prikaži na formi* ostaje na svom mestu u diz
 | **Dugačak tekst** | višered umesto jednog reda (samo za tekstualna polja) |
 | **Deo opisa u šifarniku** | vidi niže |
 
-*Opciono* se zaključava pošto je kolona napravljena, jer ograničenje u bazi već postoji.
+*Opciono* i *Dugačak tekst* se zaključavaju pošto je kolona napravljena: baza već drži ograničenje i tip kolone. Polje sa dugačkim tekstom prima tekst bilo koje dužine, a obično tekstualno polje najviše 255 znakova.
 
 ### Deo opisa u šifarniku {#deo-opisa-u-sifarniku}
 

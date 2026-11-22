@@ -16,6 +16,13 @@ const MAX_DECIMALS = 10;
 /** The fewest decimals in a table when the scale of the column is not known. */
 const MIN_DECIMALS = 2;
 
+/** Language of the user for reading typed numbers; Language sets it once (a change reloads the page). */
+let typingLanguage: string | null = null;
+
+export function setTypingLanguage(language: string | null): void {
+  typingLanguage = language;
+}
+
 export function isNumberType(columnType?: ColumnType): boolean {
   return columnType === "INTEGER" || columnType === "LONG" || columnType === "BIGDECIMAL";
 }
@@ -53,14 +60,23 @@ export function toDecimalText(value: any, language: string, decimals?: number | 
   if (value === null || value === undefined || value === "") {
     return "";
   }
+  const text = String(value).trim();
   // The column says how many decimals it holds, so a value opened for editing is shown with that many.
+  // The zeros are added to the text itself: going through a JavaScript number would round a value
+  // with more than 15 digits, and the rounded value would be saved back.
   if (decimals !== null && decimals !== undefined) {
-    const numberValue = Number(String(value).trim());
+    const scale = Math.min(decimals, MAX_DECIMALS);
+    const plain = /^(-?\d+)(?:\.(\d+))?$/.exec(text);
+    if (plain) {
+      const fraction = (plain[2] ?? "").padEnd(scale, "0");
+      return fraction === "" ? plain[1] : plain[1] + decimalSeparator(language) + fraction;
+    }
+    const numberValue = Number(text);
     if (!Number.isNaN(numberValue)) {
-      return numberValue.toFixed(Math.min(decimals, MAX_DECIMALS)).replace(".", decimalSeparator(language));
+      return numberValue.toFixed(scale).replace(".", decimalSeparator(language));
     }
   }
-  return String(value).trim().replace(".", decimalSeparator(language));
+  return text.replace(".", decimalSeparator(language));
 }
 
 /** More decimals than the column holds; the database would round it without a word. */
@@ -75,16 +91,29 @@ export function tooManyDecimals(text: string, decimals?: number | null): boolean
 
 /**
  * Text from the field -> text for the server, always with a dot and without thousands separated.
- * It accepts both a comma and a dot: the last separator in the text is the decimal one, earlier ones are thousands
- * ("1.234,56" and "1,234.56" give the same).
+ *
+ * The separator of the language is the decimal one, and the other one separates thousands: "1.234,56"
+ * in Serbian and "1,234.56" in English give the same, and so do "1.000" in Serbian and "1,000" in
+ * English (a thousand, not one). The other separator is still read as the decimal one when it does
+ * not group thousands ("1.5" typed on a numeric keypad in Serbian is one and a half). Without a known
+ * language the last separator in the text is the decimal one.
  */
-export function parseDecimalText(text: string): string {
+export function parseDecimalText(text: string, language: string | null = typingLanguage): string {
   const value = (text ?? "").trim().replace(/\s/g, "");
   if (value === "") {
     return "";
   }
 
-  const decimalAt = Math.max(value.lastIndexOf(","), value.lastIndexOf("."));
+  const own = language ? decimalSeparator(language) : null;
+  const other = own === "," ? "." : own === "." ? "," : null;
+  let decimalAt: number;
+  if (own && value.includes(own)) {
+    decimalAt = value.lastIndexOf(own);
+  } else if (other && groupsThousands(value, other)) {
+    return value.replace(/[.,]/g, "");
+  } else {
+    decimalAt = Math.max(value.lastIndexOf(","), value.lastIndexOf("."));
+  }
   if (decimalAt < 0) {
     return value;
   }
@@ -92,6 +121,12 @@ export function parseDecimalText(text: string): string {
   const whole = value.substring(0, decimalAt).replace(/[.,]/g, "");
   const fraction = value.substring(decimalAt + 1);
   return fraction === "" ? whole : `${whole}.${fraction}`;
+}
+
+/** 1.000, 12.345.678: the separator stands only between groups of three digits. */
+function groupsThousands(value: string, separator: string): boolean {
+  const escaped = separator === "." ? "\\." : separator;
+  return new RegExp(`^-?[1-9]\\d{0,2}(${escaped}\\d{3})+$`).test(value);
 }
 
 /** Whether the entered text is a number the server can take. */

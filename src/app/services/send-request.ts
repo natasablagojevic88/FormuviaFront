@@ -22,6 +22,9 @@ export class SendRequest {
   /** Queue of requests: every new call is appended to the end. */
   private queue: Promise<unknown> = Promise.resolve();
 
+  /** Called on every 401. Session clears the user through it (it cannot be injected here, it uses this service). */
+  private unauthorizedListeners: (() => void)[] = [];
+
   constructor(
     public http: HttpClient,
     private router: Router,
@@ -36,9 +39,15 @@ export class SendRequest {
       this.errorMessage(error).then((message) => this.notify.error(message));
     }
     if (error.status === 401) {
+      this.unauthorizedListeners.forEach((listener) => listener());
       this.router.navigate(["/login"]);
     }
     return throwError(() => error);
+  }
+
+  /** listener runs whenever the server answers 401: the session is gone. */
+  onUnauthorized(listener: () => void): void {
+    this.unauthorizedListeners.push(listener);
   }
 
   // On a download the error body arrives as a Blob, so the JSON with the message is read out of it.
@@ -135,12 +144,17 @@ export class SendRequest {
     return plain?.trim() || SendRequest.DEFAULT_FILE_NAME;
   }
 
+  // The link is put into the page for the click (Firefox ignores a click on a detached one), and the
+  // address is given back only later: Safari starts reading it after click() has returned.
   private static saveFile(blob: Blob, fileName: string): void {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
     link.download = fileName;
+    link.style.display = "none";
+    document.body.appendChild(link);
     link.click();
-    URL.revokeObjectURL(url);
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
   }
 }

@@ -28,7 +28,7 @@ Above the canvas are **Columns**, **Rows** and **Dialog width**. Change them and
 
 **Label** is what people read next to the input. **Column name in the database** is the technical name: lowercase letters, digits and underscore, starting with a letter.
 
-Once the column exists, its name is locked — as is the data type, and the codebook if it has one. The database already holds data under those.
+Once the column exists, its name is locked — as is the data type, the codebook if it has one, and the number of decimal places of a decimal number. The database already holds data under those.
 
 ### Data type
 
@@ -96,7 +96,7 @@ A field that is switched off with *Show on the form* keeps its place in the desi
 | **Long text** | a multi-line box instead of a single line (text fields only) |
 | **Part of the label in a codebook** | see below |
 
-*Optional* is locked after the column is created, because the database constraint is already there.
+*Optional* and *Long text* are locked after the column is created: the database already holds the constraint and the type of the column. A long text field takes text of any length; an ordinary text field takes up to 255 characters.
 
 ### Part of the label in a codebook
 

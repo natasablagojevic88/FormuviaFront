@@ -1,5 +1,6 @@
 import { Injectable, signal } from "@angular/core";
 import { environment } from "../../environments/environment";
+import { setTypingLanguage } from "../shared/number-format";
 
 export interface LanguageOption {
   tag: string;
@@ -21,6 +22,11 @@ export class Language {
   ];
 
   readonly current = signal(this.read());
+
+  constructor() {
+    // typed numbers are read with the separators of this language (a change reloads the page)
+    setTypingLanguage(this.current());
+  }
 
   change(tag: string): void {
     if (tag === this.current()) {

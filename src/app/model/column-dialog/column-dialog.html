@@ -54,7 +54,11 @@
       @if (isDecimal) {
         <div class="fd-field">
           <label class="fd-label fd-required" for="length">{{ label('length') }}</label>
-          <input id="length" name="length" type="number" class="fd-input" [(ngModel)]="column.length" min="0" max="10" required />
+          <input id="length" name="length" type="number" class="fd-input" [(ngModel)]="column.length" min="0" max="10" required
+            [disabled]="!isNew" />
+          @if (!isNew) {
+            <span class="fd-help">{{ 'ui.column.lengthLocked' | t }}</span>
+          }
         </div>
       }
 
@@ -138,7 +142,7 @@
         @if (isText) {
           <div class="switch-item">
             <label class="switch">
-              <input type="checkbox" name="textArea" [(ngModel)]="column.textArea" />
+              <input type="checkbox" name="textArea" [(ngModel)]="column.textArea" [disabled]="!isNew" />
               <span class="switch-track"><span class="switch-thumb"></span></span>
               <span class="switch-text">{{ label('textArea') }}</span>
             </label>

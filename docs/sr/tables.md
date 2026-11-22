@@ -136,7 +136,7 @@ Ceo broj se prikazuje onako kako je upisan, bez razdvajanja hiljada — šifra, 
 
 Decimalan broj prati jezik koji ste izabrali: na srpskom `1.234,56`, na engleskom `1,234.56`.
 
-Isto važi i za unos. Kad je izabran srpski, decimalu kucate zarezom, na engleskom tačkom, a i polja na formi i polja za pretragu primaju oba — srpska tastatura vas ni u čemu ne ograničava.
+Isto važi i za unos. Kad je izabran srpski, decimalu kucate zarezom, na engleskom tačkom. Drugi znak se čita kao razdvajanje hiljada kad stoji između grupa od po tri cifre, pa je i `1.000` na srpskom i `1,000` na engleskom hiljadu. Na svakom drugom mestu i dalje važi kao decimala: `1.5` otkucano na numeričkom delu tastature uz srpski jezik je jedan i po. Tako rade i polja na formi i polja za pretragu.
 
 Brojevi su poravnati desno, pa se cifre u koloni poklapaju i vrednosti se lako porede.
 
