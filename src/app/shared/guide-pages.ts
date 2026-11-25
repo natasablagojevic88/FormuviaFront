@@ -13,6 +13,7 @@ export const GUIDE_PAGES = {
   model: { en: "model.html", sr: "model.html" },
   formDesign: { en: "form-design.html", sr: "form-design.html" },
   modelJobs: { en: "model.html#import-from-a-folder", sr: "model.html#uvoz-iz-foldera" },
+  processes: { en: "processes.html", sr: "processes.html" },
   reportGroups: { en: "reports.html#groups", sr: "reports.html#grupe" },
   reports: { en: "reports.html#reports-of-a-group", sr: "reports.html#izvestaji-grupe" },
   reportParameters: { en: "reports.html#parameters-of-a-report", sr: "reports.html#parametri-izvestaja" },

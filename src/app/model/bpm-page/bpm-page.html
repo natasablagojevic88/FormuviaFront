@@ -1,0 +1,20 @@
+<app-page-header
+  [title]="(modelName() ? modelName() + ' — ' : '') + ('ui.bpm.title' | t)"
+  [subtitle]="'ui.bpm.subtitle' | t"
+  [breadcrumb]="('ui.model.breadcrumb' | t) + (modelName() ? ' / ' + modelName() : '')"
+  guide="processes">
+  <button type="button" class="back-button" (click)="back()">
+    <i class="fa-solid fa-arrow-left"></i>
+    {{ 'ui.back' | t }}
+  </button>
+  <button type="button" class="add-button" (click)="add()">
+    <i class="fa-solid fa-plus"></i>
+    {{ 'ui.add' | t }}
+  </button>
+</app-page-header>
+
+<app-page-guide key="processes" title="ui.bpm.howTitle" [steps]="steps" note="ui.bpm.notRunning"
+  noteKind="warning" [openByDefault]="guideOpen()" />
+
+<app-data-table [url]="tableUrl" (loaded)="onLoaded($event)" (edit)="edit($event)"
+  (remove)="remove($event)"></app-data-table>

@@ -13,10 +13,12 @@ import { ColumnsPage } from "./columns-page/columns-page";
 import { ColumnDialog } from "./column-dialog/column-dialog";
 import { FunctionHelpDialog } from "./function-help-dialog/function-help-dialog";
 import { ModelJobsPage } from "./model-jobs-page/model-jobs-page";
+import { BpmPage } from "./bpm-page/bpm-page";
+import { BpmDesignPage } from "./bpm-design-page/bpm-design-page";
 import { ReportDialogsModule } from "../report/report-dialogs-module";
 
 @NgModule({
-  declarations: [ModelPage, ModelDialog, ColumnsPage, ColumnDialog, FunctionHelpDialog, ModelJobsPage],
+  declarations: [ModelPage, ModelDialog, ColumnsPage, ColumnDialog, FunctionHelpDialog, ModelJobsPage, BpmPage, BpmDesignPage],
   imports: [CommonModule, FormsModule, MatDialogModule, MatMenuModule, MatTreeModule, ModelRoutingModule, SharedModule, ReportDialogsModule],
 })
 export class ModelModule {}

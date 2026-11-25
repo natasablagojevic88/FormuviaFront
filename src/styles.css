@@ -44,6 +44,10 @@
   --c-warning: #ea580c;
   --c-warning-soft: #fff7ed;
 
+  /* a procedure step of a process (BPM) */
+  --c-proc: #7c3aed;
+  --c-proc-soft: #f3efff;
+
   --c-shadow: rgba(3, 8, 23, 0.06);
   --c-shadow-strong: rgba(3, 8, 23, 0.16);
   --c-focus: rgba(31, 94, 255, 0.15);
@@ -97,6 +101,9 @@
     --c-warning: #fb923c;
     --c-warning-soft: #2a1c10;
 
+    --c-proc: #a78bfa;
+    --c-proc-soft: #241b3d;
+
     --c-shadow: rgba(0, 0, 0, 0.45);
     --c-shadow-strong: rgba(0, 0, 0, 0.6);
     --c-focus: rgba(107, 155, 255, 0.25);
@@ -141,6 +148,9 @@
 
   --c-warning: #fb923c;
   --c-warning-soft: #2a1c10;
+
+  --c-proc: #a78bfa;
+  --c-proc-soft: #241b3d;
 
   --c-shadow: rgba(0, 0, 0, 0.45);
   --c-shadow-strong: rgba(0, 0, 0, 0.6);

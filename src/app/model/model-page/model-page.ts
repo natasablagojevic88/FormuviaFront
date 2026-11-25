@@ -229,6 +229,13 @@ export class ModelPage {
     this.router.navigate(["/model/jobs", node.id]);
   }
 
+  /** Processes of this table: steps a record goes through, with tasks, procedures and notifications. */
+  processes(node: ModelNode): void {
+    this.select(node);
+    this.saveState();
+    this.router.navigate(["/model/bpm", node.id]);
+  }
+
   history(node: ModelNode): void {
     this.select(node);
     this.historyPanel()?.open(HISTORY_CLASS, node.id!, node.name);

@@ -54,6 +54,10 @@
                 <i class="fa-solid fa-table-columns menu-icon"></i>
                 <span>{{ 'ui.column.title' | t }}</span>
               </button>
+              <button type="button" mat-menu-item (click)="processes(node)">
+                <i class="fa-solid fa-diagram-project menu-icon"></i>
+                <span>{{ 'ui.bpm.title' | t }}</span>
+              </button>
             }
             @if (canImport(node)) {
               <button type="button" mat-menu-item (click)="importJobs(node)">

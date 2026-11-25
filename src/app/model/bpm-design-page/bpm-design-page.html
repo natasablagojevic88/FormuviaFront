@@ -1,0 +1,308 @@
+<app-page-header
+  [title]="(modelName() ? modelName() + ' — ' : '') + (process()?.name || ('ui.bpm.newProcess' | t))"
+  [subtitle]="'ui.bpm.designSubtitle' | t"
+  [breadcrumb]="('ui.model.breadcrumb' | t) + (modelName() ? ' / ' + modelName() : '') + ' / ' + ('ui.bpm.title' | t)"
+  guide="processes">
+  <button type="button" class="back-button" (click)="back()">
+    <i class="fa-solid fa-arrow-left"></i>
+    {{ 'ui.back' | t }}
+  </button>
+  <button type="button" class="save-button" (click)="save()" [disabled]="!process() || saving()">
+    <i class="fa-solid" [class.fa-floppy-disk]="!saving()" [class.fa-spinner]="saving()" [class.fa-spin]="saving()"></i>
+    {{ 'ui.save' | t }}
+    @if (dirty()) {
+      <span class="dirty-dot" [title]="'ui.bpm.unsaved' | t"></span>
+    }
+  </button>
+</app-page-header>
+
+@if (!process()) {
+  <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+} @else {
+  <div class="work">
+    <section class="board">
+      <div class="toolbar">
+        <div class="legend">
+          <span><i class="line accept"></i>{{ 'ui.bpm.legendAccept' | t }}</span>
+          <span><i class="line reject"></i>{{ 'ui.bpm.legendReject' | t }}</span>
+          <span><i class="line next"></i>{{ 'ui.bpm.legendNext' | t }}</span>
+        </div>
+        <span class="count">{{ 'ui.bpm.stepsCount' | t }}: {{ stepCount() }}</span>
+      </div>
+
+      <div class="canvas-wrap" #wrap>
+        @if (drawn(); as drawn) {
+          <div class="canvas" [style.width.px]="drawn.width" [style.height.px]="drawn.height">
+            <svg class="edges" [attr.width]="drawn.width" [attr.height]="drawn.height" aria-hidden="true">
+              @for (edge of drawn.edges; track edge.to) {
+                <path [attr.d]="edge.path" [class]="'edge ' + edge.branch"></path>
+              }
+            </svg>
+
+            @for (edge of drawn.edges; track edge.to) {
+              @if (edge.branch !== 'next' && !edge.to.startsWith('end:') || edge.condition) {
+                <div class="edge-label" [style.left.px]="edge.labelX" [style.top.px]="edge.labelY">
+                  @if (edge.branch === 'accept' && !edge.to.startsWith('end:')) {
+                    <span class="pill accept"><i class="fa-solid fa-check"></i>{{ 'ui.bpm.accepted' | t }}</span>
+                  }
+                  @if (edge.branch === 'reject' && !edge.to.startsWith('end:')) {
+                    <span class="pill reject"><i class="fa-solid fa-xmark"></i>{{ 'ui.bpm.rejected' | t }}</span>
+                  }
+                  @if (edge.condition) {
+                    <span class="pill condition" [title]="edge.condition">{{ edge.condition }}</span>
+                  }
+                </div>
+              }
+            }
+
+            @for (node of drawn.nodes; track node.id) {
+              @if (node.kind === 'start') {
+                <button type="button" class="node start" [class.selected]="isSelected(node)"
+                  [style.left.px]="node.x" [style.top.px]="node.y" [style.width.px]="node.w" [style.height.px]="node.h"
+                  (click)="select(node)">
+                  <span class="icon"><i class="fa-solid fa-play"></i></span>
+                  <span class="text">
+                    <span class="type">{{ 'ui.bpm.start' | t }}</span>
+                    <span class="name">{{ process()!.name || ('ui.bpm.newProcess' | t) }}</span>
+                    <span class="sub code">{{ process()!.startSqlProcedure || ('ui.bpm.noStartProcedure' | t) }}</span>
+                  </span>
+                </button>
+              } @else if (node.kind === 'end') {
+                <button type="button" class="node end" [class]="'node end ' + node.branch"
+                  [style.left.px]="node.x" [style.top.px]="node.y" [style.width.px]="node.w" [style.height.px]="node.h"
+                  (click)="select(node)">
+                  <i class="fa-solid fa-flag-checkered"></i>{{ endText(node.branch) }}
+                </button>
+              } @else {
+                <button type="button" class="node step" [class]="'node step ' + node.step!.type"
+                  [class.selected]="isSelected(node)" [class.problem]="hasProblem(node)"
+                  [style.left.px]="node.x" [style.top.px]="node.y" [style.width.px]="node.w" [style.height.px]="node.h"
+                  (click)="select(node)">
+                  <span class="icon"><i [class]="look[node.step!.type].icon"></i></span>
+                  <span class="text">
+                    <span class="type">{{ look[node.step!.type].label | t }}</span>
+                    <span class="name" [class.empty]="!node.step!.name">{{ node.step!.name || ('ui.bpm.unnamed' | t) }}</span>
+                    <span class="sub" [class.code]="node.step!.type === 'EXECUTE_PROCEDURE'">{{ subText(node.step!) }}</span>
+                  </span>
+                  @if (hasProblem(node)) {
+                    <span class="problem-dot" [title]="'ui.bpm.stepHasProblem' | t"><i class="fa-solid fa-exclamation"></i></span>
+                  }
+                </button>
+              }
+            }
+          </div>
+        }
+      </div>
+
+      <div id="bpm-problems" class="checks" [class.failed]="attempted() && problems().length">
+        @if (!problems().length) {
+          <span class="ok"><i class="fa-solid fa-circle-check"></i>{{ 'ui.bpm.allGood' | t }}</span>
+        } @else {
+          <span class="checks-title">
+            <i class="fa-solid fa-list-check"></i>
+            {{ (attempted() ? 'ui.bpm.cannotSave' : 'ui.bpm.stillMissing') | t }}
+          </span>
+          <ul>
+            @for (problem of problems(); track $index) {
+              <li>
+                <button type="button" (click)="selectKey(problem.key)">
+                  {{ problem.message | t }}@if (problem.key) {<strong>: {{ problem.name || ('ui.bpm.unnamed' | t) }}</strong>}
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </section>
+
+    <aside class="panel" #panel>
+      @if (selected(); as step) {
+        <header class="panel-head">
+          <span class="icon" [class]="'icon ' + step.type"><i [class]="look[step.type].icon"></i></span>
+          <div class="panel-titles">
+            <h2>{{ step.name || ('ui.bpm.unnamed' | t) }}</h2>
+            <p>
+              @if (selectedFrom(); as from) {
+                {{ 'ui.bpm.comesAfter' | t }} {{ from.name || ('ui.bpm.unnamed' | t) }}
+                @if (from.type === 'TASK') {
+                  · {{ (step.previousAccept === false ? 'ui.bpm.afterReject' : 'ui.bpm.afterAccept') | t }}
+                }
+              } @else {
+                {{ 'ui.bpm.firstStep' | t }}
+              }
+            </p>
+          </div>
+        </header>
+
+        <div class="fd-field">
+          <span class="fd-label">{{ 'ui.bpm.stepType' | t }}</span>
+          <div class="segmented" role="radiogroup" [attr.aria-label]="'ui.bpm.stepType' | t">
+            @for (type of types; track type) {
+              <button type="button" role="radio" [attr.aria-checked]="step.type === type" [class.on]="step.type === type"
+                (click)="setType(step, type)">
+                <i [class]="look[type].icon"></i>{{ look[type].label | t }}
+              </button>
+            }
+          </div>
+          <span class="fd-help">{{ ('ui.bpm.typeHint.' + step.type) | t }}</span>
+        </div>
+
+        <div class="fd-field">
+          <label class="fd-label fd-required" for="bpm-step-name">{{ 'ui.bpm.stepName' | t }}</label>
+          <input id="bpm-step-name" class="fd-input" autocomplete="off" [ngModel]="step.name"
+            (ngModelChange)="setField(step, 'name', $event)" [placeholder]="'ui.bpm.stepNamePlaceholder' | t" />
+        </div>
+
+        @if (step.type === 'TASK') {
+          <div class="fd-field">
+            <span class="fd-label fd-required">{{ 'ui.bpm.decides' | t }}</span>
+            <app-search-select [options]="users()" [ngModel]="step.appUserId ?? ''"
+              (ngModelChange)="setField(step, 'appUserId', $event || null)" icon="fa-solid fa-user"
+              [placeholder]="'ui.bpm.chooseUser' | t" [ariaLabel]="'ui.bpm.decides' | t" />
+            <span class="fd-help">{{ 'ui.bpm.decidesHint' | t }}</span>
+          </div>
+
+          <div class="fd-field">
+            <span class="fd-label">{{ 'ui.bpm.changeColumns' | t }}</span>
+            @if (columns().length) {
+              <div class="chips">
+                @for (column of columns(); track column.id) {
+                  <button type="button" class="chip" [class.on]="hasColumn(step, column.id!)"
+                    [attr.aria-pressed]="hasColumn(step, column.id!)" (click)="toggleColumn(step, column.id!)">
+                    @if (hasColumn(step, column.id!)) {
+                      <i class="fa-solid fa-check"></i>
+                    }
+                    {{ column.name }}
+                  </button>
+                }
+              </div>
+            } @else {
+              <span class="fd-help">{{ 'ui.bpm.noColumns' | t }}</span>
+            }
+            <span class="fd-help">{{ 'ui.bpm.changeColumnsHint' | t }}</span>
+          </div>
+        }
+
+        @if (step.type === 'EXECUTE_PROCEDURE') {
+          <div class="fd-field">
+            <span class="fd-label fd-required">{{ 'ui.bpm.procedure' | t }}</span>
+            <app-search-select [options]="procedures()" [ngModel]="step.procedure ?? ''"
+              (ngModelChange)="setField(step, 'procedure', $event || null)" icon="fa-solid fa-code"
+              [placeholder]="'ui.bpm.chooseProcedure' | t" [ariaLabel]="'ui.bpm.procedure' | t" />
+            <span class="fd-help">{{ 'ui.bpm.procedureHint' | t }}</span>
+          </div>
+        }
+
+        @if (step.type === 'SEND_NOTIFICATION') {
+          <div class="fd-field">
+            <span class="fd-label fd-required">{{ 'ui.bpm.receivers' | t }}</span>
+            @if (step.receiveNotification.length) {
+              <div class="chips">
+                @for (receive of step.receiveNotification; track receive.appUserId) {
+                  <span class="chip on person">
+                    {{ userName(receive.appUserId) }}
+                    <button type="button" class="chip-remove" [attr.aria-label]="'ui.delete' | t"
+                      (click)="removeReceiver(step, receive.appUserId)"><i class="fa-solid fa-xmark"></i></button>
+                  </span>
+                }
+              </div>
+            }
+            <app-search-select [options]="receiverOptions(step)" [ngModel]="receiverPick() ?? ''"
+              (ngModelChange)="pickReceiver(step, $event || null)" icon="fa-solid fa-user-plus"
+              [placeholder]="'ui.bpm.addReceiver' | t" [ariaLabel]="'ui.bpm.addReceiver' | t" />
+          </div>
+
+          <div class="fd-field">
+            <label class="fd-label fd-required" for="bpm-mail-subject">{{ 'ui.bpm.mailSubject' | t }}</label>
+            <input id="bpm-mail-subject" class="fd-input" autocomplete="off" [ngModel]="step.mailSubject ?? ''"
+              (ngModelChange)="setField(step, 'mailSubject', $event)" />
+          </div>
+
+          <div class="fd-field">
+            <label class="fd-label fd-required" for="bpm-mail-body">{{ 'ui.bpm.mailBody' | t }}</label>
+            <textarea id="bpm-mail-body" class="fd-input area" rows="4" [ngModel]="step.mailBody ?? ''"
+              (ngModelChange)="setField(step, 'mailBody', $event)"></textarea>
+          </div>
+        }
+
+        <div class="fd-field">
+          <label class="fd-label" for="bpm-condition">{{ 'ui.bpm.condition' | t }}</label>
+          <textarea id="bpm-condition" class="fd-input area code" rows="3" spellcheck="false"
+            [ngModel]="step.sqlCondition ?? ''" (ngModelChange)="setField(step, 'sqlCondition', $event)"
+            placeholder="select ..."></textarea>
+          <span class="fd-help">{{ 'ui.bpm.conditionHint' | t }}</span>
+        </div>
+
+        @for (branch of branches(step); track branch) {
+          <section class="branch" [class]="'branch ' + branch">
+            <h3>{{ ('ui.bpm.branch.' + branch) | t }}</h3>
+            <label class="switch" [class.locked]="stepsOn(step, branch).length">
+              <input type="checkbox" [checked]="ends(step, branch)" [disabled]="stepsOn(step, branch).length > 0"
+                (change)="setEnd(step, branch, $any($event.target).checked)" />
+              <span class="switch-track"><span class="switch-thumb"></span></span>
+              <span class="switch-text">{{ 'ui.bpm.endsProcess' | t }}</span>
+            </label>
+            @if (stepsOn(step, branch).length) {
+              <span class="fd-help">{{ 'ui.bpm.endsLocked' | t }}</span>
+            }
+            @if (!ends(step, branch)) {
+              <div class="add-row">
+                <span class="add-label">{{ 'ui.bpm.addNext' | t }}</span>
+                @for (type of types; track type) {
+                  <button type="button" class="add-chip" [class]="'add-chip ' + type" (click)="addAfter(step, branch, type)">
+                    <i class="fa-solid fa-plus"></i>{{ look[type].label | t }}
+                  </button>
+                }
+              </div>
+            }
+          </section>
+        }
+
+        <button type="button" class="remove-step" (click)="remove(step)">
+          <i class="fa-solid fa-trash-can"></i>{{ 'ui.bpm.removeStep' | t }}
+        </button>
+      } @else {
+        <header class="panel-head">
+          <span class="icon start"><i class="fa-solid fa-play"></i></span>
+          <div class="panel-titles">
+            <h2>{{ 'ui.bpm.processTitle' | t }}</h2>
+            <p>{{ 'ui.bpm.processHint' | t }}</p>
+          </div>
+        </header>
+
+        <div class="fd-field">
+          <label class="fd-label fd-required" for="bpm-name">{{ label('name') }}</label>
+          <input id="bpm-name" class="fd-input" autocomplete="off" [ngModel]="process()!.name"
+            (ngModelChange)="setProcess('name', $event)" />
+        </div>
+
+        <div class="fd-field">
+          <span class="fd-label">{{ label('startSqlProcedure') }}</span>
+          <app-search-select [options]="procedures()" [ngModel]="process()!.startSqlProcedure ?? ''"
+            (ngModelChange)="setProcess('startSqlProcedure', $event || null)" icon="fa-solid fa-play"
+            [placeholder]="'ui.bpm.chooseProcedure' | t" [ariaLabel]="label('startSqlProcedure')" />
+          <span class="fd-help">{{ 'ui.bpm.startProcedureHint' | t }}</span>
+        </div>
+
+        <div class="fd-field">
+          <span class="fd-label">{{ label('endSqlProcedure') }}</span>
+          <app-search-select [options]="procedures()" [ngModel]="process()!.endSqlProcedure ?? ''"
+            (ngModelChange)="setProcess('endSqlProcedure', $event || null)" icon="fa-solid fa-flag-checkered"
+            [placeholder]="'ui.bpm.chooseProcedure' | t" [ariaLabel]="label('endSqlProcedure')" />
+          <span class="fd-help">{{ 'ui.bpm.endProcedureHint' | t }}</span>
+        </div>
+
+        <section class="branch next">
+          <h3>{{ (process()!.items.length ? 'ui.bpm.addStartAnother' : 'ui.bpm.addStartFirst') | t }}</h3>
+          <div class="add-row">
+            @for (type of types; track type) {
+              <button type="button" class="add-chip" [class]="'add-chip ' + type" (click)="addFirst(type)">
+                <i class="fa-solid fa-plus"></i>{{ look[type].label | t }}
+              </button>
+            }
+          </div>
+        </section>
+      }
+    </aside>
+  </div>
+}

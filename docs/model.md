@@ -22,7 +22,7 @@ The root is **Model**. Under it the rules are fixed:
 
 A subtable is what makes *Related tables* appear in the ⋯ menu of a row: open a customer and you get to that customer's orders. The chain can be as deep as you need.
 
-Each row of the tree has a **+** button that adds the right kind of child — *Add menu*, *Add table* or *Add subtable*, depending on where you are — and a ⋯ button with *Edit*, *Delete*, *Form design* (tables only), *Import from a folder* (only a table straight under a menu) and *History*.
+Each row of the tree has a **+** button that adds the right kind of child — *Add menu*, *Add table* or *Add subtable*, depending on where you are — and a ⋯ button with *Edit*, *Delete*, *Form design* and *[Processes](/processes)* (tables only), *Import from a folder* (only a table straight under a menu) and *History*.
 
 ## Adding a menu
 

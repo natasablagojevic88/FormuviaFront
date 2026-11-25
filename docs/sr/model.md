@@ -22,7 +22,7 @@ Koren je **Model**. Ispod njega su pravila fiksna:
 
 Podtabela je ono što u ⋯ meniju reda pravi *Povezane tabele*: otvorite kupca i stignete do njegovih porudžbina. Lanac može biti dubok koliko treba.
 
-Svaki red drveta ima dugme **+** koje dodaje odgovarajuće dete — *Dodaj meni*, *Dodaj tabelu* ili *Dodaj podtabelu*, u zavisnosti od toga gde ste — i dugme ⋯ sa stavkama *Izmeni*, *Obriši*, *Dizajn forme* (samo za tabele), *Uvoz iz foldera* (samo tabela direktno ispod menija) i *Istorija*.
+Svaki red drveta ima dugme **+** koje dodaje odgovarajuće dete — *Dodaj meni*, *Dodaj tabelu* ili *Dodaj podtabelu*, u zavisnosti od toga gde ste — i dugme ⋯ sa stavkama *Izmeni*, *Obriši*, *Dizajn forme* i *[Procesi](/sr/processes)* (samo za tabele), *Uvoz iz foldera* (samo tabela direktno ispod menija) i *Istorija*.
 
 ## Dodavanje menija
 

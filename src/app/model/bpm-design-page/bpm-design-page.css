@@ -1,0 +1,799 @@
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+app-page-header {
+  flex-shrink: 0;
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  padding: 64px 0;
+  color: var(--c-primary);
+  font-size: 28px;
+}
+
+/* ------------------------------------------------------------ header buttons */
+
+.save-button,
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 16px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* it sits on the blue bar, so it is always white with blue text */
+.save-button {
+  position: relative;
+  background: var(--c-on-dark);
+  color: #1f5eff;
+  box-shadow: 0 10px 24px rgba(3, 8, 23, 0.15);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.save-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(3, 8, 23, 0.2);
+}
+
+.save-button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+/* something is changed and not saved yet */
+.dirty-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--c-warning);
+}
+
+.back-button {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--c-on-dark);
+  transition: background 0.15s;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* ------------------------------------------------------------ board and panel */
+
+.work {
+  /* the work area takes what is left of the screen: only the board and the panel scroll, never the page */
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 18px;
+  min-height: 420px;
+}
+
+.board,
+.panel {
+  min-width: 0;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-1);
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.toolbar {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--c-border-soft);
+  background: var(--c-surface-2);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  color: var(--c-text-muted);
+  font-size: 12px;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.line {
+  display: inline-block;
+  width: 20px;
+  border-top: 2px solid var(--c-border-strong);
+}
+
+.line.accept {
+  border-color: var(--c-success);
+}
+
+.line.reject {
+  border-color: var(--c-danger);
+}
+
+.count {
+  color: var(--c-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* the board scrolls inside itself in both directions; the page never scrolls sideways */
+.canvas-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background-color: var(--c-surface-2);
+  background-image: radial-gradient(var(--c-border) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+  overscroll-behavior: contain;
+}
+
+.canvas {
+  position: relative;
+  margin: 0 auto;
+}
+
+.edges {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.edge {
+  fill: none;
+  stroke: var(--c-border-strong);
+  stroke-width: 2;
+}
+
+.edge.accept {
+  stroke: var(--c-success);
+}
+
+.edge.reject {
+  stroke: var(--c-danger);
+}
+
+.edge-label {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 200px;
+  padding: 2px 9px;
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  background: var(--c-surface);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pill.accept {
+  border-color: var(--c-success);
+  background: var(--c-success-soft);
+  color: var(--c-success);
+}
+
+.pill.reject {
+  border-color: var(--c-danger);
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+}
+
+.pill.condition {
+  overflow: hidden;
+  color: var(--c-text-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  pointer-events: auto;
+}
+
+/* ------------------------------------------------------------ the boxes */
+
+.node {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  text-align: left;
+  box-shadow: 0 4px 14px var(--c-shadow);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.node:hover {
+  border-color: var(--c-border-strong);
+  box-shadow: var(--shadow-2);
+}
+
+.node:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 2px;
+}
+
+.node.selected {
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 4px var(--c-focus), var(--shadow-2);
+}
+
+.node .icon,
+.panel-head .icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+}
+
+.text {
+  display: grid;
+  min-width: 0;
+}
+
+.type {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.name {
+  overflow: hidden;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.name.empty {
+  color: var(--c-text-faint);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.sub {
+  overflow: hidden;
+  color: var(--c-text-muted);
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.TASK .icon,
+.icon.TASK {
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+}
+
+.TASK .type {
+  color: var(--c-primary);
+}
+
+.EXECUTE_PROCEDURE .icon,
+.icon.EXECUTE_PROCEDURE {
+  background: var(--c-proc-soft);
+  color: var(--c-proc);
+}
+
+.EXECUTE_PROCEDURE .type {
+  color: var(--c-proc);
+}
+
+.SEND_NOTIFICATION .icon,
+.icon.SEND_NOTIFICATION {
+  background: var(--c-warning-soft);
+  color: var(--c-warning);
+}
+
+.SEND_NOTIFICATION .type {
+  color: var(--c-warning);
+}
+
+/* the start is the process itself */
+.node.start {
+  border-color: var(--c-primary);
+  background: var(--gradient-brand);
+  color: var(--c-on-dark);
+}
+
+.node.start .icon {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--c-on-dark);
+}
+
+.node.start .type,
+.node.start .sub {
+  color: var(--c-on-dark-muted);
+}
+
+.node.end {
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.node.end.accept,
+.node.end.next {
+  border-color: var(--c-success);
+  background: var(--c-success-soft);
+  color: var(--c-success);
+}
+
+.node.end.reject {
+  border-color: var(--c-danger);
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+}
+
+.problem-dot {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--c-surface);
+  border-radius: 50%;
+  background: var(--c-warning);
+  color: #fff;
+  font-size: 11px;
+}
+
+/* ------------------------------------------------------------ what is still missing */
+
+.checks {
+  flex-shrink: 0;
+  max-height: 30%;
+  overflow: auto;
+  display: grid;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--c-border-soft);
+  font-size: 13px;
+}
+
+.ok {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--c-success);
+  font-weight: 700;
+}
+
+.checks-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--c-text-muted);
+  font-weight: 700;
+}
+
+.checks.failed {
+  background: var(--c-danger-soft);
+}
+
+.checks.failed .checks-title {
+  color: var(--c-danger);
+}
+
+.checks ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checks li button {
+  min-height: 32px;
+  padding: 4px 11px;
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.checks li button:hover {
+  border-color: var(--c-border-strong);
+}
+
+/* ------------------------------------------------------------ the panel */
+
+.panel {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  min-height: 0;
+  overflow: auto;
+  padding: 20px;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.panel-head .icon.start {
+  background: var(--gradient-brand);
+  color: var(--c-on-dark);
+}
+
+.panel-titles {
+  min-width: 0;
+}
+
+.panel-titles h2 {
+  margin: 0;
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+
+.panel-titles p {
+  margin: 0;
+  color: var(--c-text-muted);
+  font-size: 12.5px;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--c-surface-3);
+}
+
+.segmented button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 52px;
+  padding: 6px 4px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--c-text-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.segmented button.on {
+  background: var(--c-surface);
+  color: var(--c-text);
+  box-shadow: 0 1px 4px var(--c-shadow-strong);
+}
+
+.area {
+  height: auto;
+  padding: 12px 16px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.area.code {
+  font-size: 13px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 4px 12px;
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.chip.on {
+  border-color: var(--c-primary);
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+  font-weight: 600;
+}
+
+.chip.person {
+  padding-right: 4px;
+  cursor: default;
+}
+
+.chip-remove {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.chip-remove:hover {
+  background: var(--c-primary-softer);
+}
+
+/* one way out of the step: what happens after it */
+.branch {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--c-border-soft);
+  border-left: 4px solid var(--c-border-strong);
+  border-radius: var(--radius);
+  background: var(--c-surface-2);
+}
+
+.branch.accept {
+  border-left-color: var(--c-success);
+}
+
+.branch.reject {
+  border-left-color: var(--c-danger);
+}
+
+.branch h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+  cursor: pointer;
+}
+
+.switch.locked {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.switch-track {
+  position: relative;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--c-border-strong);
+  transition: background 0.15s;
+}
+
+.switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--c-surface);
+  box-shadow: 0 2px 6px var(--c-shadow-strong);
+  transition: transform 0.15s;
+}
+
+.switch input:checked + .switch-track {
+  background: var(--c-primary);
+}
+
+.switch input:checked + .switch-track .switch-thumb {
+  transform: translateX(18px);
+}
+
+.switch input:focus-visible + .switch-track {
+  box-shadow: 0 0 0 3px var(--c-focus);
+}
+
+.switch-text {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.add-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.add-label {
+  width: 100%;
+  color: var(--c-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.add-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 4px 12px;
+  border: 1px dashed var(--c-border-strong);
+  border-radius: 999px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-chip i {
+  font-size: 11px;
+}
+
+.add-chip.TASK:hover {
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+}
+
+.add-chip.EXECUTE_PROCEDURE:hover {
+  border-color: var(--c-proc);
+  color: var(--c-proc);
+}
+
+.add-chip.SEND_NOTIFICATION:hover {
+  border-color: var(--c-warning);
+  color: var(--c-warning);
+}
+
+.remove-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 1px solid var(--c-danger-softer);
+  border-radius: 14px;
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.remove-step:hover {
+  border-color: var(--c-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node,
+  .save-button,
+  .switch-track,
+  .switch-thumb {
+    transition: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .save-button,
+  .back-button {
+    justify-content: center;
+    width: 100%;
+  }
+
+  /* on a phone the page scrolls: the board keeps a height of its own and the panel follows it */
+  .work {
+    flex: none;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    min-height: 0;
+  }
+
+  .panel {
+    overflow: visible;
+  }
+
+  .canvas-wrap {
+    flex: none;
+    height: 65dvh;
+  }
+
+  .checks {
+    max-height: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .panel {
+    padding: 16px;
+  }
+
+  .legend {
+    display: none;
+  }
+
+  .segmented button {
+    font-size: 11px;
+  }
+}

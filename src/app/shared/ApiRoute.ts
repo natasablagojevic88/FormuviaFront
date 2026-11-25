@@ -247,6 +247,19 @@
     /** Import job of a table: insert when the id is empty, otherwise update. */
     static readonly modelJob='/api/model/job';
 
+    /** Processes (BPM) of one table, without their steps. */
+    static bpmModelTable(modelId: string): string {
+        return `/api/bpm-model/${modelId}/table`;
+    }
+
+    /** Process with its whole tree of steps: insert when the id is empty, otherwise update. */
+    static readonly bpmModel='/api/bpm-model';
+
+    /** One process with all its steps; DELETE removes it with them. */
+    static bpmModelId(id: string): string {
+        return `/api/bpm-model/${id}`;
+    }
+
     /** Order to offer for a new parameter: one more than the largest one already entered. */
     static reportParameterOrderNumber(reportId: string): string {
         return `/api/report/parameter/next-order-number/${reportId}`;
