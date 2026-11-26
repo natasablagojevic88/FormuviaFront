@@ -34,12 +34,12 @@
         @if (drawn(); as drawn) {
           <div class="canvas" [style.width.px]="drawn.width" [style.height.px]="drawn.height">
             <svg class="edges" [attr.width]="drawn.width" [attr.height]="drawn.height" aria-hidden="true">
-              @for (edge of drawn.edges; track edge.to) {
-                <path [attr.d]="edge.path" [class]="'edge ' + edge.branch"></path>
+              @for (edge of drawn.edges; track edge.id) {
+                <path [attr.d]="edge.path" [class]="'edge ' + edge.branch" [class.lit]="isSelectedEdge(edge.from, edge.to)"></path>
               }
             </svg>
 
-            @for (edge of drawn.edges; track edge.to) {
+            @for (edge of drawn.edges; track edge.id) {
               @if (edge.branch !== 'next' && !edge.to.startsWith('end:') || edge.condition) {
                 <div class="edge-label" [style.left.px]="edge.labelX" [style.top.px]="edge.labelY">
                   @if (edge.branch === 'accept' && !edge.to.startsWith('end:')) {
@@ -87,6 +87,12 @@
                   @if (hasProblem(node)) {
                     <span class="problem-dot" [title]="'ui.bpm.stepHasProblem' | t"><i class="fa-solid fa-exclamation"></i></span>
                   }
+                  @if (node.join; as join) {
+                    <span class="join-badge" [class.risk]="join.risk"
+                      [title]="(join.risk ? 'ui.bpm.joinRiskShort' : 'ui.bpm.joinTitle') | t">
+                      <i class="fa-solid" [class.fa-code-merge]="!join.risk" [class.fa-triangle-exclamation]="join.risk"></i>{{ join.need }}/{{ join.of }}
+                    </span>
+                  }
                 </button>
               }
             }
@@ -122,17 +128,57 @@
           <div class="panel-titles">
             <h2>{{ step.name || ('ui.bpm.unnamed' | t) }}</h2>
             <p>
-              @if (selectedFrom(); as from) {
-                {{ 'ui.bpm.comesAfter' | t }} {{ from.name || ('ui.bpm.unnamed' | t) }}
-                @if (from.type === 'TASK') {
-                  · {{ (step.previousAccept === false ? 'ui.bpm.afterReject' : 'ui.bpm.afterAccept') | t }}
+              @if (selectedFrom().length === 1) {
+                {{ 'ui.bpm.comesAfter' | t }} {{ fromNames() }}
+                @if (selectedFrom()[0].branch !== 'next') {
+                  · {{ (selectedFrom()[0].branch === 'reject' ? 'ui.bpm.afterReject' : 'ui.bpm.afterAccept') | t }}
                 }
+              } @else if (selectedFrom().length) {
+                {{ 'ui.bpm.comesAfter' | t }} {{ fromNames() }}
               } @else {
                 {{ 'ui.bpm.firstStep' | t }}
               }
             </p>
           </div>
         </header>
+
+        @if (selectedFrom().length > 1) {
+          <section class="join">
+            <h3><i class="fa-solid fa-code-merge"></i>{{ 'ui.bpm.joinTitle' | t }}</h3>
+            <ul class="from-list">
+              @for (from of selectedFrom(); track from.step.key) {
+                <li>
+                  <button type="button" class="from-go" (click)="selectKey(from.step.key)">
+                    <i [class]="look[from.step.type].icon"></i>
+                    <span class="from-name">{{ from.step.name || ('ui.bpm.unnamed' | t) }}</span>
+                    @if (from.branch !== 'next') {
+                      <span class="pill" [class]="'pill ' + from.branch">
+                        {{ (from.branch === 'reject' ? 'ui.bpm.rejected' : 'ui.bpm.accepted') | t }}
+                      </span>
+                    }
+                  </button>
+                  <button type="button" class="from-remove" [title]="'ui.bpm.unlink' | t" [attr.aria-label]="'ui.bpm.unlink' | t"
+                    (click)="unlink(from.step, step)"><i class="fa-solid fa-link-slash"></i></button>
+                </li>
+              }
+            </ul>
+            <div class="fd-field">
+              <label class="fd-label fd-required" for="bpm-at-least">{{ 'ui.bpm.atLeast' | t }}</label>
+              <div class="at-least">
+                <input id="bpm-at-least" class="fd-input" type="number" min="1" [max]="selectedFrom().length" step="1"
+                  [ngModel]="step.atLeastEnter" (ngModelChange)="setAtLeast(step, $event)" />
+                <span>{{ 'ui.bpm.atLeastOf' | t }} {{ selectedFrom().length }}</span>
+              </div>
+              <span class="fd-help">{{ 'ui.bpm.atLeastHint' | t }}</span>
+            </div>
+            @if (joinRiskText(step); as warning) {
+              <p class="join-risk" role="note">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>{{ warning }}</span>
+              </p>
+            }
+          </section>
+        }
 
         <div class="fd-field">
           <span class="fd-label">{{ 'ui.bpm.stepType' | t }}</span>
@@ -150,7 +196,12 @@
         <div class="fd-field">
           <label class="fd-label fd-required" for="bpm-step-name">{{ 'ui.bpm.stepName' | t }}</label>
           <input id="bpm-step-name" class="fd-input" autocomplete="off" [ngModel]="step.name"
+            [class.fd-invalid]="nameTaken(step)" [attr.aria-invalid]="nameTaken(step)"
+            [attr.aria-describedby]="nameTaken(step) ? 'bpm-step-name-taken' : null"
             (ngModelChange)="setField(step, 'name', $event)" [placeholder]="'ui.bpm.stepNamePlaceholder' | t" />
+          @if (nameTaken(step)) {
+            <span id="bpm-step-name-taken" class="fd-field-error">{{ 'ui.bpm.nameTaken' | t }}</span>
+          }
         </div>
 
         @if (step.type === 'TASK') {
@@ -254,6 +305,16 @@
                   </button>
                 }
               </div>
+              @if (linkOptions(step); as options) {
+                @if (options.length) {
+                  <div class="link-row">
+                    <app-search-select [options]="options" [ngModel]="linkPick() ?? ''"
+                      (ngModelChange)="pickLink(step, branch, $event || null)" icon="fa-solid fa-link"
+                      [placeholder]="'ui.bpm.linkTo' | t" [ariaLabel]="'ui.bpm.linkTo' | t" />
+                    <span class="fd-help">{{ 'ui.bpm.linkHint' | t }}</span>
+                  </div>
+                }
+              }
             }
           </section>
         }
@@ -293,7 +354,7 @@
         </div>
 
         <section class="branch next">
-          <h3>{{ (process()!.items.length ? 'ui.bpm.addStartAnother' : 'ui.bpm.addStartFirst') | t }}</h3>
+          <h3>{{ (process()!.steps.length ? 'ui.bpm.addStartAnother' : 'ui.bpm.addStartFirst') | t }}</h3>
           <div class="add-row">
             @for (type of types; track type) {
               <button type="button" class="add-chip" [class]="'add-chip ' + type" (click)="addFirst(type)">

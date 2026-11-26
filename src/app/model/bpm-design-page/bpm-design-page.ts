@@ -16,21 +16,27 @@ import {
   BpmBranch,
   BpmNode,
   BpmProcess,
+  BpmProcessDto,
   BpmStep,
   BpmStepType,
-  allSteps,
+  addStep,
   branchesOf,
   changeType,
   childrenOn,
+  connect,
+  disconnect,
+  emptyProcess,
   endsOn,
   findStep,
+  fromDto,
+  joinRisk,
   layout,
-  newStep,
-  parentOf,
+  linkTargets,
+  parentsOf,
+  removalOf,
   removeStep,
   toDto,
   validate,
-  withKeys,
 } from "../bpm";
 
 interface AppUserRow {
@@ -50,9 +56,10 @@ export const STEP_LOOK: Record<BpmStepType, { icon: string; label: string }> = {
 };
 
 /**
- * Designer of one process: the steps are drawn as a tree from the top down, a click on a step opens
- * it in the panel beside the board (below it on a phone). The whole tree goes to the server at once
- * (POST /api/bpm-model); what the server would refuse is listed under the board while drawing.
+ * Designer of one process: the steps are drawn from the top down, a click on a step opens it in the
+ * panel beside the board (below it on a phone). A step may come after more steps: it is drawn once,
+ * with an arrow from each. The whole process goes to the server at once (POST /api/bpm-model);
+ * what the server would refuse is listed under the board while drawing.
  */
 @Component({
   selector: "app-bpm-design-page",
@@ -78,7 +85,7 @@ export class BpmDesignPage {
   readonly types = BPM_STEP_TYPES;
   readonly look = STEP_LOOK;
 
-  /** The tree is changed in place; every change bumps this so the drawing and the checks follow. */
+  /** The process is changed in place; every change bumps this so the drawing and the checks follow. */
   private readonly revision = signal(0);
 
   readonly drawn = computed(() => {
@@ -98,16 +105,16 @@ export class BpmDesignPage {
     const key = this.selectedKey();
     return process && key !== START ? findStep(process, key) : null;
   });
+  /** The steps the selected step comes after, with the way out of each. */
   readonly selectedFrom = computed(() => {
     this.revision();
     const process = this.process();
     const step = this.selected();
-    return process && step ? parentOf(process, step.key!) : null;
+    return process && step ? parentsOf(process, step.key) : [];
   });
   readonly stepCount = computed(() => {
     this.revision();
-    const process = this.process();
-    return process ? allSteps(process).length : 0;
+    return this.process()?.steps.length ?? 0;
   });
   private readonly userNames = computed(() => new Map(this.users().map((u) => [u.value, u.label])));
 
@@ -147,12 +154,12 @@ export class BpmDesignPage {
       .then((columns: ModelColumn[]) => this.columns.set(columns ?? []));
 
     if (id) {
-      this.sendRequest.get(ApiRoute.bpmModelId(id)).then((process: BpmProcess) => {
-        this.process.set(withKeys(process));
+      this.sendRequest.get(ApiRoute.bpmModelId(id)).then((process: BpmProcessDto) => {
+        this.process.set(fromDto(process));
         this.bringIntoView(START, false);
       });
     } else {
-      this.process.set({ modelId: this.modelId, name: "", startSqlProcedure: null, endSqlProcedure: null, items: [] });
+      this.process.set(emptyProcess(this.modelId));
       this.bringIntoView(START, false);
     }
   }
@@ -184,7 +191,7 @@ export class BpmDesignPage {
 
   select(node: BpmNode): void {
     // an end belongs to the step it ends
-    this.selectedKey.set(node.kind === "start" ? START : node.step!.key!);
+    this.selectedKey.set(node.kind === "start" ? START : node.step!.key);
     this.showPanel();
   }
 
@@ -225,8 +232,14 @@ export class BpmDesignPage {
     return node.kind === "start" ? key === START : node.kind === "step" && node.step!.key === key;
   }
 
+  /** The lines of the selected step stand out, the way in and the way out. */
+  isSelectedEdge(from: string, to: string): boolean {
+    const key = this.selectedKey();
+    return key !== START && (from === key || to === key);
+  }
+
   hasProblem(node: BpmNode): boolean {
-    return node.kind === "step" && this.problemKeys().has(node.step!.key!);
+    return node.kind === "step" && this.problemKeys().has(node.step!.key);
   }
 
   /** The second line of a box: who decides, which procedure runs, who is told. */
@@ -266,9 +279,7 @@ export class BpmDesignPage {
     if (!process) {
       return;
     }
-    const step = newStep(type, null);
-    process.items.push(step);
-    this.added(step);
+    this.added(addStep(process, null, "next", type));
   }
 
   /* ------------------------------------------------------------ the selected step */
@@ -279,7 +290,11 @@ export class BpmDesignPage {
   }
 
   setType(step: BpmStep, type: BpmStepType): void {
-    changeType(step, type);
+    const process = this.process();
+    if (!process) {
+      return;
+    }
+    changeType(process, step, type);
     this.changed();
   }
 
@@ -288,7 +303,8 @@ export class BpmDesignPage {
   }
 
   stepsOn(step: BpmStep, branch: BpmBranch): BpmStep[] {
-    return childrenOn(step, branch);
+    const process = this.process();
+    return process ? childrenOn(process, step, branch) : [];
   }
 
   ends(step: BpmStep, branch: BpmBranch): boolean {
@@ -305,15 +321,86 @@ export class BpmDesignPage {
   }
 
   addAfter(step: BpmStep, branch: BpmBranch, type: BpmStepType): void {
-    const next = newStep(type, branch);
-    step.children.push(next);
-    this.added(next);
+    const process = this.process();
+    if (!process) {
+      return;
+    }
+    this.added(addStep(process, step, branch, type));
+  }
+
+  /** Steps already drawn that an arrow from the step may go to; none that would close a circle. */
+  linkOptions(step: BpmStep): SelectOption[] {
+    const process = this.process();
+    if (!process) {
+      return [];
+    }
+    return linkTargets(process, step).map((target) => ({
+      value: target.key,
+      label: `${target.name || this.translate.get("ui.bpm.unnamed")} · ${this.translate.get(this.look[target.type].label)}`,
+    }));
+  }
+
+  /** The value of the field that links a step; it goes back to empty once the arrow is drawn. */
+  readonly linkPick = signal<string | null>(null);
+
+  pickLink(step: BpmStep, branch: BpmBranch, key: string | null): void {
+    const process = this.process();
+    this.linkPick.set(key);
+    if (process && key && connect(process, step, branch, key)) {
+      this.changed();
+      this.bringIntoView(key);
+    }
+    setTimeout(() => this.linkPick.set(null));
+  }
+
+  /** Takes away the arrow from a previous step; the last one stays. */
+  unlink(from: BpmStep, step: BpmStep): void {
+    const process = this.process();
+    if (process && disconnect(process, from.key, step.key)) {
+      this.changed();
+    }
+  }
+
+  setAtLeast(step: BpmStep, value: number | string | null): void {
+    const number = Number(value);
+    step.atLeastEnter = Number.isFinite(number) ? Math.trunc(number) : 0;
+    this.changed();
+  }
+
+  /**
+   * Whether another step already has this name. The server joins the copies of one step by its
+   * name, so two steps with one name could never be told apart: the name has to be unique.
+   */
+  nameTaken(step: BpmStep): boolean {
+    const name = step.name.trim().toLowerCase();
+    return !!name && !!this.process()?.steps.some((other) => other !== step && other.name.trim().toLowerCase() === name);
+  }
+
+  /**
+   * A warning, not a problem: the previous steps that may not lead here, when without them the step
+   * gets fewer than it waits for. Empty when the step is surely entered (or the process ends before).
+   */
+  joinRiskText(step: BpmStep): string {
+    const process = this.process();
+    const risky = process ? joinRisk(process, step) : [];
+    if (!risky.length) {
+      return "";
+    }
+    const names = risky.map((parent) => `„${parent.name || this.translate.get("ui.bpm.unnamed")}“`).join(", ");
+    return this.translate.get("ui.bpm.joinRisk").replace("{steps}", names).replace("{need}", String(step.atLeastEnter));
+  }
+
+  /** "Comes after" in the head of the panel: the names of the previous steps. */
+  fromNames(): string {
+    return this.selectedFrom()
+      .map((from) => from.step.name || this.translate.get("ui.bpm.unnamed"))
+      .join(", ");
   }
 
   private added(step: BpmStep): void {
     this.changed();
-    this.selectedKey.set(step.key!);
-    this.bringIntoView(step.key!);
+    this.selectedKey.set(step.key);
+    this.bringIntoView(step.key);
     // the name is the first thing a new step needs
     setTimeout(() => {
       const input = document.getElementById("bpm-step-name") as HTMLInputElement | null;
@@ -368,10 +455,11 @@ export class BpmDesignPage {
     if (!process) {
       return;
     }
-    const after = allSteps({ ...process, items: step.children }).length;
+    // only the steps left with no way in go with it
+    const after = removalOf(process, step.key).length - 1;
     const drop = () => {
-      const parent = parentOf(process, step.key!);
-      removeStep(process, step.key!);
+      const parent = parentsOf(process, step.key)[0]?.step;
+      removeStep(process, step.key);
       this.selectedKey.set(parent?.key ?? START);
       this.changed();
     };
@@ -406,11 +494,11 @@ export class BpmDesignPage {
     const selectedName = this.selected()?.name;
     this.saving.set(true);
     this.sendRequest.post(ApiRoute.bpmModel, toDto(process))
-      .then((saved: BpmProcess) => {
-        const fresh = withKeys(saved);
+      .then((saved: BpmProcessDto) => {
+        const fresh = fromDto(saved);
         this.process.set(fresh);
         // the new steps got their ids: the selection follows the step by its name, which is unique
-        const again = selectedName ? allSteps(fresh).find((step) => step.name === selectedName) : null;
+        const again = selectedName ? fresh.steps.find((step) => step.name === selectedName) : null;
         this.selectedKey.set(again?.key ?? START);
         this.revision.update((value) => value + 1);
         this.dirty.set(false);

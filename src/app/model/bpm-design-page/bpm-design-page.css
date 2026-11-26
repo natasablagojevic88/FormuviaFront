@@ -186,6 +186,11 @@ app-page-header {
   stroke: var(--c-danger);
 }
 
+/* the lines in and out of the selected step */
+.edge.lit {
+  stroke-width: 3.5;
+}
+
 .edge-label {
   position: absolute;
   z-index: 1;
@@ -399,6 +404,24 @@ app-page-header {
   font-size: 11px;
 }
 
+/* a step more steps lead to: how many of them it waits for */
+.join-badge {
+  position: absolute;
+  top: -12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 9px;
+  border: 1px solid var(--c-proc);
+  border-radius: 999px;
+  background: var(--c-proc-soft);
+  color: var(--c-proc);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 /* ------------------------------------------------------------ what is still missing */
 
 .checks {
@@ -594,6 +617,133 @@ app-page-header {
   background: var(--c-primary-softer);
 }
 
+/* the step may never get as many previous steps as it waits for */
+.join-badge.risk {
+  border-color: var(--c-warning);
+  background: var(--c-warning-soft);
+  color: var(--c-warning);
+}
+
+.join-risk {
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--c-warning);
+  border-radius: var(--radius-sm);
+  background: var(--c-warning-soft);
+  color: var(--c-text);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.join-risk i {
+  margin-top: 2px;
+  color: var(--c-warning);
+}
+
+/* the steps this one comes after, and how many of them it waits for */
+.join {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--c-border-soft);
+  border-left: 4px solid var(--c-proc);
+  border-radius: var(--radius);
+  background: var(--c-surface-2);
+}
+
+.join h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.join h3 i {
+  color: var(--c-proc);
+}
+
+.from-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.from-list li {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  min-width: 0;
+}
+
+.from-go {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.from-go:hover {
+  border-color: var(--c-primary);
+}
+
+.from-go i {
+  color: var(--c-text-muted);
+}
+
+.from-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.from-remove {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 40px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-text-muted);
+  cursor: pointer;
+}
+
+.from-remove:hover {
+  border-color: var(--c-danger);
+  color: var(--c-danger);
+}
+
+.at-least {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.at-least .fd-input {
+  width: 90px;
+}
+
 /* one way out of the step: what happens after it */
 .branch {
   display: grid;
@@ -725,6 +875,11 @@ app-page-header {
 .add-chip.SEND_NOTIFICATION:hover {
   border-color: var(--c-warning);
   color: var(--c-warning);
+}
+
+.link-row {
+  display: grid;
+  gap: 6px;
 }
 
 .remove-step {
