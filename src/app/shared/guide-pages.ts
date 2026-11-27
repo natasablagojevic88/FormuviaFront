@@ -9,6 +9,7 @@ export const GUIDE_PAGES = {
   home: { en: "getting-started.html", sr: "getting-started.html" },
   users: { en: "administration.html#users", sr: "administration.html#korisnici" },
   roles: { en: "administration.html#roles", sr: "administration.html#uloge" },
+  bpmGroups: { en: "administration.html#process-user-groups", sr: "administration.html#grupe-korisnika-za-procese" },
   smtp: { en: "administration.html#mail-servers", sr: "administration.html#serveri-za-postu" },
   model: { en: "model.html", sr: "model.html" },
   formDesign: { en: "form-design.html", sr: "form-design.html" },

@@ -24,6 +24,8 @@ Ovo uputstvo ne mora da stoji otvoreno pored aplikacije — aplikacija sama poka
 - **Kratko uputstvo** stoji na vrhu glavnih ekrana administracije, modela, dizajna forme i poslova: nekoliko koraka, ili šta radi koje dugme. Otvoreno je dok je ekran još prazan — u modelu još nema tabele, nema servera za poštu, nema posla — a skupljeno u jedan red čim u njemu nešto ima, da ne zauzima mesto listi. Klik na taj red ga otvara ili skuplja, a vaš izbor se pamti u browseru.
 - **Pročitajte u uputstvu**, ispod naslova svakog ekrana, otvara stranu ovog uputstva o tom ekranu, u novom tabu i na vašem jeziku. Oba srpska pisma vode na srpsko uputstvo, koje je pisano latinicom.
 
+![Prvi ekran administratora, sa prvim koracima podešavanja Formuvie](/screenshots/sr/home-first-steps.png)
+
 ![Ekran Uloge sa otvorenim kratkim uputstvom, menijem levo i jezikom i temom u gornjoj traci](/screenshots/sr/roles.png)
 
 ## Jezik

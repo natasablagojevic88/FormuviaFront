@@ -21,6 +21,8 @@ Posao koji se još nikad nije pokretao to i piše umesto ishoda. Isključen posa
 
 Ceo spisak dolazi odjednom, bez strana: poslovi jedne aplikacije se broje u desetinama, ne u hiljadama. *Osveži* u zaglavlju čita sve ponovo, i to je način da se vidi kako se završio posao koji je upravo radio.
 
+![Strana Poslovi sa poljem za pretragu i dugmadima svakog reda](/screenshots/sr/jobs.png)
+
 ## Pronalaženje posla
 
 Polje iznad spiska traži po **nazivu**, i traži dok se piše. Gleda u spisak koji je već na ekranu, pa se serveru ništa ne šalje, a iks vraća ceo spisak.

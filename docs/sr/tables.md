@@ -88,6 +88,8 @@ Dugme ⋯ pored *Izmeni* nosi sve ostalo:
 
 **Istorija** — ko je i kada menjao ovaj zapis, sa starom i novom vrednošću svakog polja koje se promenilo, u panelu koji se izvlači s desne strane. Brisanja i unosi se takođe beleže, pa panel priča celu priču o zapisu.
 
+![Panel Istorija jednog zapisa](/screenshots/sr/history-panel.png)
+
 **Podtabele** — ako tabela ima podtabele, svaka je navedena ovde. Kad je otvorite, vidite samo redove koji pripadaju zapisu iz kog ste došli, a u zaglavlju piše koji je to zapis: *Komitenti: Acme d.o.o.*, sa dugmetom **Nazad** pored. Lanac može ići koliko god duboko model ide.
 
 **Nazad** vraća listu tačno onakvu kakvu ste ostavili — ista strana, isti filteri i sortiranje, i red u koji ste ušli i dalje označen — pa ne morate ponovo da tražite gde ste stali. Kad tu tabelu ponovo otvorite iz menija, ili osvežite stranu, kreće ispočetka.

@@ -51,6 +51,8 @@ The **type** decides what the report does, and the form follows it:
 
 A Jasper report has no query, and the first two types keep no file. Editing a Jasper report without choosing a file keeps the one it holds — the form says so — and a new file takes the place of the old one.
 
+![The New report dialog](/screenshots/en/report-dialog.png)
+
 ## Parameters of a report
 
 ⋯ → **Parameters** on a report opens the parameters of that report. *Back* in the header leads to the reports of the group again, with the report gone into still marked.
@@ -128,6 +130,8 @@ At the bottom stands the expression the schedule comes down to, the way the sche
 
 Read from the left: at second 0, every 5 minutes, at 8 and at 16 hours, on no particular day of the month, every month, on Monday and Friday, every year. The `?` stands where a day is left to the other field.
 
+![The schedule in the form of a job, with the expression at the bottom](/screenshots/en/job-schedule.png)
+
 ### Running a job from the outside
 
 A job is also run by somebody who is not in the application at all. *Webhook* in the row menu of the job opens its **keys**: with a key, another program — the one that makes the data, a scheduler of its own, a button in a third application — runs this job whenever it needs to, without logging in.
@@ -147,6 +151,8 @@ On the left stand the parameters, in the order they were given. A parameter with
 - **Jasper report** — the server fills the compiled `.jasper` file with the values entered and makes a PDF out of it; the document opens on the right in the same reader as everywhere in Formuvia, with paging, zoom, printing and saving of its own. *Show* again makes the report over the new values, and the document that comes back takes the place of the one on the right.
 
 On a phone the two sides go one under another: first what the report asks for, then what came back, and every row of the answer is a card with the name of the column beside each value. A PDF stands under the parameters the same way, as tall as the screen allows.
+
+![The page of a report: the parameters on the left, the answer on the right](/screenshots/en/report-run.png)
 
 ## A report over one record is something else
 

@@ -51,6 +51,8 @@ Spisak prikazuje vrstu, naziv i opis svakog izveštaja grupe. *Dodaj* i *Izmeni*
 
 Jasper izveštaj nema upit, a prve dve vrste ne čuvaju fajl. Izmena Jasper izveštaja bez izbora fajla zadržava postojeći — forma to i kaže — a nov fajl dolazi na mesto starog.
 
+![Dijalog Nov izveštaj](/screenshots/sr/report-dialog.png)
+
 ## Parametri izveštaja
 
 ⋯ → **Parametri** na izveštaju otvara parametre tog izveštaja. *Nazad* u zaglavlju vodi ponovo na izveštaje grupe, sa izveštajem u koji se ušlo i dalje označenim.
@@ -128,6 +130,8 @@ Na dnu stoji izraz na koji se raspored svodi, onako kako ga raspored čita:
 
 Čita se sleva: u sekundi 0, svakih 5 minuta, u 8 i u 16 sati, bez određenog dana u mesecu, svakog meseca, u ponedeljak i petak, svake godine. Znak `?` stoji tamo gde se dan prepušta drugom polju.
 
+![Raspored u formi posla, sa izrazom na dnu](/screenshots/sr/job-schedule.png)
+
 ### Pokretanje posla izvan aplikacije
 
 Posao pokreće i onaj koga u aplikaciji nema. *Webhook* u meniju reda posla otvara njegove **ključeve**: sa ključem drugi program — onaj koji pravi podatke, sopstveni raspoređivač, dugme u trećoj aplikaciji — pokreće ovaj posao kad mu zatreba, bez prijave.
@@ -147,6 +151,8 @@ Levo stoje parametri, onim redom kojim su uneti. Parametar sa podrazumevanom vre
 - **Jasper izveštaj** — server popuni prevedeni `.jasper` fajl unetim vrednostima i od njega napravi PDF; dokument se prikaže desno, u istom čitaču kao svuda u Formuvia-i, sa svojim listanjem, uvećanjem, štampom i snimanjem. Ponovno *Prikaži* pravi izveštaj nad novim vrednostima, a dokument koji dođe dolazi na mesto onog desno.
 
 Na telefonu dve strane idu jedna pod drugu: prvo ono što izveštaj traži, pa ono što je vratio, a svaki red odgovora je kartica sa nazivom kolone uz svaku vrednost. PDF stoji ispod parametara na isti način, visok koliko ekran dozvoljava.
+
+![Strana izveštaja: levo parametri, desno odgovor](/screenshots/sr/report-run.png)
 
 ## Izveštaj nad jednim zapisom je druga stvar
 

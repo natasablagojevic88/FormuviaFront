@@ -24,6 +24,8 @@ You do not have to keep this guide open next to the application — the applicat
 - **A short guide** sits at the top of the main screens of the administration, the model, the form design and the jobs: a few steps, or what each button does. It is open while the screen is still empty — no table in the model yet, no mail server, no job — and folded into one line once there is something in it, so it does not take the room of the list. A click on that line opens or folds it, and your choice is remembered in the browser.
 - **Read in the guide**, under the title of every screen, opens the page of this guide about that screen, in a new tab and in your language. Both Serbian scripts lead to the Serbian guide, which is written in the Latin script.
 
+![The first screen of an administrator, with the first steps of setting Formuvia up](/screenshots/en/home-first-steps.png)
+
 ![The Roles screen with its short guide open, the menu on the left and the language and theme in the top bar](/screenshots/en/roles.png)
 
 ## Language

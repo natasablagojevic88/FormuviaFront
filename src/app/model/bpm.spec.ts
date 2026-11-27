@@ -40,7 +40,7 @@ function purchase(): BpmProcess {
   const director = item("TASK", "Director", { appUserId: "u2", sqlCondition: "select 1", isAcceptEnd: true, isRejectEnd: true, previousAccept: true });
   const order = item("EXECUTE_PROCEDURE", "Order", { procedure: "make_order", previousAccept: true, children: [notify] });
   const manager = item("TASK", "Manager", { appUserId: "u1", isRejectEnd: true, children: [director, order] });
-  return fromDto({ modelId: "m1", name: "Purchase", items: [manager] });
+  return fromDto({ modelId: "m1", name: "Purchase", smtpId: "s1", items: [manager] });
 }
 
 /** Two bosses decide on their own; the order goes out once both have accepted. */
@@ -50,6 +50,7 @@ function twoBosses(): BpmProcessDto {
   return {
     modelId: "m1",
     name: "Two bosses",
+    smtpId: "s1",
     items: [
       item("TASK", "Boss 1", { id: "b1", appUserId: "u1", isRejectEnd: true, children: [order(true)] }),
       item("TASK", "Boss 2", { id: "b2", appUserId: "u2", isAcceptEnd: true, children: [order(false)] }),
@@ -79,10 +80,18 @@ describe("a process is checked as the server checks it", () => {
   it("each type asks for its own fields, and the problem points at the step", () => {
     const process = emptyProcess("m1");
     process.name = "P";
+    process.smtpId = "s1";
     const task = addStep(process, null, "next", "TASK");
     task.name = "Check";
     task.isAcceptEnd = task.isRejectEnd = true;
     expect(validate(process)).toEqual([{ message: "ui.bpm.problem.user", key: task.key, name: "Check" }]);
+  });
+
+  it("the notifications need a mail server to go through", () => {
+    const process = purchase();
+    process.smtpId = null;
+    expect(validate(process)).toEqual([{ message: "ui.bpm.problem.smtp" }]);
+    expect(toDto(purchase()).smtpId).toBe("s1");
   });
 
   it("two steps with the same name are refused, as the database would", () => {
@@ -94,6 +103,7 @@ describe("a process is checked as the server checks it", () => {
   it("some step has to end the process", () => {
     const process = emptyProcess("m1");
     process.name = "P";
+    process.smtpId = "s1";
     const task = addStep(process, null, "next", "TASK");
     Object.assign(task, { name: "Check", appUserId: "u1", isRejectEnd: true });
     const messages = validate(process).map((p) => p.message);
@@ -229,6 +239,35 @@ describe("the process sent to the server", () => {
     expect(boss.isRejectEnd).toBe(false);
     expect(parentsOf(process, "o").map((p) => p.branch)).toEqual(["accept", "next"]);
     expect(toDto(process).items[1].children[0].previousAccept).toBe(true);
+  });
+});
+
+describe("a task or a notification given to a group", () => {
+  it("a task is decided by one user or by a group, and only the chosen one is sent", () => {
+    const process = purchase();
+    const manager = step(process, "Manager");
+    manager.decidedBy = "group";
+    expect(validate(process).map((p) => p.message)).toEqual(["ui.bpm.problem.group"]);
+    manager.bpmGroupId = "g1";
+    expect(validate(process)).toEqual([]);
+    const sent = toDto(process).items[0];
+    expect([sent.appUserId, sent.bpmGroupId]).toEqual([null, "g1"]);
+    // read back, the task is again the one of the group
+    expect(step(fromDto(toDto(process)), "Manager").decidedBy).toBe("group");
+  });
+
+  it("a notification reaches its users, a group, or both", () => {
+    const process = purchase();
+    const notify = step(process, "Tell the buyer");
+    notify.receiveNotification = [];
+    expect(validate(process).map((p) => p.message)).toEqual(["ui.bpm.problem.receivers"]);
+    notify.bpmGroupId = "g1";
+    expect(validate(process)).toEqual([]);
+    const order = toDto(process).items[0].children[1];
+    expect(order.children[0].bpmGroupId).toBe("g1");
+    // a procedure has nobody to give it to
+    step(process, "Order").bpmGroupId = "g2";
+    expect(toDto(process).items[0].children[1].bpmGroupId).toBeNull();
   });
 });
 

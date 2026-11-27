@@ -1,0 +1,65 @@
+<form class="fd" (ngSubmit)="save()">
+  <header class="fd-header">
+    <div class="fd-titles">
+      <h2 class="fd-title">{{ (isNew ? 'ui.bpmGroups.addTitle' : 'ui.bpmGroups.editTitle') | t }}</h2>
+      <p class="fd-subtitle">{{ 'ui.bpmGroups.formSubtitle' | t }}</p>
+    </div>
+    <button type="button" class="fd-close" (click)="close()" [attr.aria-label]="'ui.close' | t">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <div class="fd-body">
+    @if (loading()) {
+      <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    } @else {
+      <div class="fd-grid">
+        <div class="fd-field fd-field-wide">
+          <label class="fd-label fd-required" for="name">{{ label('name') }}</label>
+          <input id="name" name="name" class="fd-input" [(ngModel)]="group.name" autocomplete="off" required />
+          <span class="fd-help">{{ 'ui.bpmGroups.nameHint' | t }}</span>
+        </div>
+
+        <div class="fd-field fd-field-wide">
+          <span class="fd-label">{{ label('users') }}<span class="count">{{ users().length }}</span></span>
+          <div class="members">
+            @if (users().length) {
+              <div class="member-chips">
+                @for (user of users(); track user.id) {
+                  <span class="member-chip" [class.inactive]="user.active === false"
+                    [title]="user.active === false ? ('ui.bpmGroups.inactive' | t) : ''">
+                    <i class="fa-solid fa-user"></i>
+                    <span class="member-text">{{ userLabel(user) }}</span>
+                    <button type="button" class="member-remove" (click)="removeUser(user.id)"
+                      [title]="'ui.bpmGroups.removeUser' | t" [attr.aria-label]="('ui.bpmGroups.removeUser' | t) + ': ' + userLabel(user)">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </span>
+                }
+              </div>
+            } @else {
+              <span class="fd-help">{{ 'ui.bpmGroups.noUsers' | t }}</span>
+            }
+
+            @if (userOptions().length) {
+              <app-search-select class="member-select" [options]="userOptions()" [ngModel]="userToAdd"
+                (ngModelChange)="addUser($event)" [ngModelOptions]="{ standalone: true }"
+                icon="fa-solid fa-user-plus" [placeholder]="'ui.bpmGroups.addUser' | t" [ariaLabel]="'ui.bpmGroups.addUser' | t" />
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <footer class="fd-footer">
+    <span class="fd-hint">{{ 'ui.requiredFieldsMarked' | t }}</span>
+    <div class="fd-actions">
+      <button type="button" class="fd-button fd-button-secondary" (click)="close()">{{ 'ui.cancel' | t }}</button>
+      <button type="submit" class="fd-button fd-button-primary" [disabled]="!canSave()">
+        <i class="fa-solid" [class.fa-floppy-disk]="!saving()" [class.fa-spinner]="saving()" [class.fa-spin]="saving()"></i>
+        {{ 'ui.save' | t }}
+      </button>
+    </div>
+  </footer>
+</form>

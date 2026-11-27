@@ -34,6 +34,8 @@ export interface BpmItemDto {
   name: string;
   type: BpmStepType;
   appUserId?: string | null;
+  /** A task: the group that decides instead of one user. A notification: a group that gets it too. */
+  bpmGroupId?: string | null;
   procedure?: string | null;
   mailSubject?: string | null;
   mailBody?: string | null;
@@ -54,6 +56,8 @@ export interface BpmProcessDto {
   name: string;
   startSqlProcedure?: string | null;
   endSqlProcedure?: string | null;
+  /** The mail server the notifications of the process go through; the server requires it. */
+  smtpId?: string | null;
   items: BpmItemDto[];
 }
 
@@ -67,6 +71,10 @@ export interface BpmStep {
   type: BpmStepType;
   /** The user who accepts or rejects a task. */
   appUserId?: string | null;
+  /** The group that decides a task instead of one user, or that gets a notification as well. */
+  bpmGroupId?: string | null;
+  /** A task is decided either by one user or by a group; only the chosen one goes to the server. */
+  decidedBy: BpmDecider;
   procedure?: string | null;
   mailSubject?: string | null;
   mailBody?: string | null;
@@ -79,6 +87,9 @@ export interface BpmStep {
   receiveNotification: BpmReceive[];
   changeColumns: BpmChangeColumn[];
 }
+
+/** Who decides a task. */
+export type BpmDecider = "user" | "group";
 
 /** The way out of a step: after the acceptance or the rejection of a task, or simply next. */
 export type BpmBranch = "accept" | "reject" | "next";
@@ -96,6 +107,7 @@ export interface BpmProcess {
   name: string;
   startSqlProcedure?: string | null;
   endSqlProcedure?: string | null;
+  smtpId?: string | null;
   /** Every step once; the steps nothing leads to are where the process starts. */
   steps: BpmStep[];
   links: BpmLink[];
@@ -107,7 +119,7 @@ function newKey(): string {
 }
 
 export function emptyProcess(modelId: string): BpmProcess {
-  return { modelId, name: "", startSqlProcedure: null, endSqlProcedure: null, steps: [], links: [] };
+  return { modelId, name: "", startSqlProcedure: null, endSqlProcedure: null, smtpId: null, steps: [], links: [] };
 }
 
 export function newStep(type: BpmStepType): BpmStep {
@@ -115,6 +127,7 @@ export function newStep(type: BpmStepType): BpmStep {
     key: newKey(),
     name: "",
     type,
+    decidedBy: "user",
     isAcceptEnd: false,
     isRejectEnd: false,
     atLeastEnter: 1,
@@ -142,6 +155,7 @@ export function fromDto(dto: BpmProcessDto): BpmProcess {
     name: dto.name ?? "",
     startSqlProcedure: dto.startSqlProcedure ?? null,
     endSqlProcedure: dto.endSqlProcedure ?? null,
+    smtpId: dto.smtpId ?? null,
     steps: [],
     links: [],
   };
@@ -157,6 +171,8 @@ export function fromDto(dto: BpmProcessDto): BpmProcess {
         name: item.name ?? "",
         type: item.type,
         appUserId: item.appUserId ?? null,
+        bpmGroupId: item.bpmGroupId ?? null,
+        decidedBy: item.type === "TASK" && item.bpmGroupId && !item.appUserId ? "group" : "user",
         procedure: item.procedure ?? null,
         mailSubject: item.mailSubject ?? null,
         mailBody: item.mailBody ?? null,
@@ -397,6 +413,9 @@ export function validate(process: BpmProcess): BpmProblem[] {
   if (empty(process.name)) {
     problems.push({ message: "ui.bpm.problem.name" });
   }
+  if (empty(process.smtpId)) {
+    problems.push({ message: "ui.bpm.problem.smtp" });
+  }
   const steps = process.steps;
   if (!steps.length) {
     problems.push({ message: "ui.bpm.problem.noSteps" });
@@ -418,8 +437,11 @@ export function validate(process: BpmProcess): BpmProblem[] {
     } else if ((names.get(step.name.trim().toLowerCase()) ?? 0) > 1) {
       problems.push({ message: "ui.bpm.problem.sameName", ...at });
     }
-    if (step.type === "TASK" && empty(step.appUserId)) {
+    if (step.type === "TASK" && step.decidedBy === "user" && empty(step.appUserId)) {
       problems.push({ message: "ui.bpm.problem.user", ...at });
+    }
+    if (step.type === "TASK" && step.decidedBy === "group" && empty(step.bpmGroupId)) {
+      problems.push({ message: "ui.bpm.problem.group", ...at });
     }
     if (step.type === "EXECUTE_PROCEDURE" && empty(step.procedure)) {
       problems.push({ message: "ui.bpm.problem.procedure", ...at });
@@ -431,7 +453,7 @@ export function validate(process: BpmProcess): BpmProblem[] {
       if (empty(step.mailBody)) {
         problems.push({ message: "ui.bpm.problem.body", ...at });
       }
-      if (!step.receiveNotification.length) {
+      if (!step.receiveNotification.length && empty(step.bpmGroupId)) {
         problems.push({ message: "ui.bpm.problem.receivers", ...at });
       }
     }
@@ -470,7 +492,8 @@ export function toDto(process: BpmProcess): BpmProcessDto {
       id: step.id ?? null,
       name: step.name.trim(),
       type: step.type,
-      appUserId: task ? orNull(step.appUserId) : null,
+      appUserId: task && step.decidedBy === "user" ? orNull(step.appUserId) : null,
+      bpmGroupId: (task && step.decidedBy === "group") || notification ? orNull(step.bpmGroupId) : null,
       procedure: step.type === "EXECUTE_PROCEDURE" ? orNull(step.procedure) : null,
       mailSubject: notification ? orNull(step.mailSubject) : null,
       mailBody: notification ? orNull(step.mailBody) : null,
@@ -495,6 +518,7 @@ export function toDto(process: BpmProcess): BpmProcessDto {
     name: process.name.trim(),
     startSqlProcedure: orNull(process.startSqlProcedure),
     endSqlProcedure: orNull(process.endSqlProcedure),
+    smtpId: orNull(process.smtpId),
     items: startSteps(process).map((step) => convert(step, null, new Set())),
   };
 }

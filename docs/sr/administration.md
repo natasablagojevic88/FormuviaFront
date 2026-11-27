@@ -2,7 +2,7 @@
 
 Ekrani pod *Administracijom* odlučuju ko ulazi u Formuviu i šta sme kad uđe — **Korisnici** i **Uloge** — i drže podešavanja same aplikacije, kao što su **serveri za poštu** preko kojih šalje.
 
-Korisnici i uloge su obični ekrani sa tabelom, pa sve iz [Rada sa tabelama](/sr/tables) — filtriranje, sortiranje, istorija, export u Excel — važi i za njih.
+Korisnici, uloge i grupe korisnika za procese su obični ekrani sa tabelom, pa sve iz [Rada sa tabelama](/sr/tables) — filtriranje, sortiranje, istorija, export u Excel — važi i za njih.
 
 ## Uloge
 
@@ -38,6 +38,18 @@ Ono što korisnik vidi sledi direktno iz ovoga: meni se gradi iz njegovih uloga,
 Pošto `admin` implicitno ima sve uloge, administrator vidi sve i nije mu potrebno dodeljivati ništa drugo.
 
 ![Dijalog Izmena korisnika sa ulogama](/screenshots/sr/user-dialog.png)
+
+## Grupe korisnika za procese
+
+*Administracija / Grupe korisnika za procese* čuva grupe korisnika za korake [procesa](/sr/processes). To je obična tabelarna strana, pa pretraga, sortiranje, strane, istorija i izvoz u Excel rade kao i svuda.
+
+*Dodaj* traži **naziv** grupe, koji dve grupe ne mogu deliti, i njene **korisnike**: prikazuju se kao čipovi, dodaju se sa spiska ispod njih, a izbacuju sa × na čipu. Spisak nudi samo korisnike koji su uključeni i još nisu u grupi; jedan korisnik može biti u koliko god grupa treba. Korisnik koji se kasnije isključi ostaje u grupi, precrtan, dok ga ne izbacite.
+
+Brisanje grupe samo izbacuje korisnike iz nje; sami korisnici ostaju.
+
+U [dizajneru procesa](/sr/processes) zadatak može da se da grupi umesto jednom korisniku, a obaveštenje može da ide grupi, uz primaoce ili bez njih.
+
+![Dijalog Nova grupa za grupe korisnika za procese](/screenshots/sr/process-group-dialog.png)
 
 ## Serveri za poštu
 

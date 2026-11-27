@@ -4,13 +4,7 @@ Ovde tabela dobija svoja polja. Otvara se iz drveta modela: ⋯ na tabeli → **
 
 Svako polje koje ovde dodate jeste dve stvari odjednom — **kolona u tabeli u bazi** i **polje za unos na formi**. Zato dodavanje traži trenutak razmišljanja, a brisanje nosi podatke sa sobom.
 
-::: info Šta danas ima dejstvo
-Sve što se tiče **baze** dešava se odmah: dodavanje polja pravi kolonu, izbor šifarnika pravi strani ključ, brisanje polja briše kolonu i njene podatke.
-
-Polja koja dodate odmah se vide i kao kolone liste te tabele u meniju, redosledom i sa nazivima koje ste im dali, a *Prikaži u tabeli* određuje koja se tamo pojavljuju.
-
-**Dijalog za unos** koji ovde složite je ono što korisnici zaista dobiju: u tabeli iz Modela *Dodaj* i *Izmeni* otvaraju formu sa vašom mrežom, svakim poljem na svom mestu, nazivima na jeziku koji su izabrali, listama vrednosti i podrazumevanim vrednostima, a ono što unesu upisuje se u tabelu koju ste definisali.
-:::
+Sve to ima dejstvo odmah: dodavanje polja pravi kolonu, izbor šifarnika pravi strani ključ, a brisanje polja briše kolonu sa njenim podacima. Polje se odmah vidi kao kolona liste te tabele, ako je uključeno *Prikaži u tabeli*, i na svom mestu na formi za unos koju otvaraju *Dodaj* i *Izmeni*.
 
 ## Radna površina
 
@@ -22,7 +16,13 @@ Sredina ekrana je dijalog za unos, nacrtan u svojoj pravoj širini, sa mrežom o
 
 Iznad radne površine su **Kolone**, **Redovi** i **Širina dijaloga**. Kad ih promenite, mreža se odmah precrtava da vidite rezultat; **Sačuvaj** to zadržava, a **Poništi** vraća na staro. Ako bi izmena izbacila postojeća polja van mreže, Formuvia upozorava i ne dozvoljava snimanje dok ne stanu.
 
+![Radna površina Dizajna forme: dva polja u mreži i prazno mesto sa +](/screenshots/sr/form-design-canvas.png)
+
 ## Dodavanje polja
+
+Klik na prazno mesto na radnoj površini otvara dijalog novog polja, već postavljenog tu:
+
+![Dijalog Novo polje](/screenshots/sr/form-design-field.png)
 
 ### Naziv i naziv kolone
 
@@ -104,7 +104,7 @@ Ova opcija se tiče **drugih** tabela, ne ove.
 
 Kad druga tabela poveže ovu kao šifarnik, njen izbor mora da prikaže nešto čitljivo umesto internog identifikatora. Uključite ovu opciju na poljima čije vrednosti treba da čine taj opis. Uključite ih više i vrednosti se spajaju razmakom, redosledom kojim polja stoje na formi — na primer šifra i naziv, što daje `PAR-001 Acme d.o.o.` u svakom izboru koji pokazuje ovamo.
 
-Opis se već gradi i održava na serveru kad god se šifarnik promeni i šalje se uz kolonu; izbori koji će ga prikazivati deo su generisanog dijaloga za unos koji tek dolazi.
+Opis se gradi i održava na serveru kad god se šifarnik promeni, i njega prikazuje svaki izbor koji pokazuje na ovu tabelu — i na formi za unos i u listi.
 
 ## Podrazumevana vrednost i lista vrednosti
 

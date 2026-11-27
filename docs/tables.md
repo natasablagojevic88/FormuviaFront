@@ -88,6 +88,8 @@ The ⋯ button next to *Edit* holds everything else:
 
 **History** — who changed this record and when, with the old and the new value of every field that changed, in a panel that slides in from the right. Deletions and insertions are recorded too, so the panel tells the whole story of the record.
 
+![The History panel of a record](/screenshots/en/history-panel.png)
+
 **Subtables** — if the table has subtables, each one is listed here. Opening one shows only the rows belonging to the record you came from, and the header says which record that is: *Customers: Acme d.o.o.*, with a **Back** button beside it. The chain can go as deep as the model does.
 
 **Back** puts the list exactly as you left it — the same page, the same filters and sorting, and the row you went into still marked — so you never have to find your place again. Opening that table from the menu again, or reloading the page, starts it fresh.

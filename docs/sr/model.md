@@ -10,10 +10,6 @@ Sve na ovoj strani menja bazu. Dodavanje tabele je pravi, brisanje tabele je bri
 
 ## Kako se drvo gradi
 
-::: info Šta danas ima dejstvo
-Tabela dodata ovde zaista se pravi u bazi, sa svojom šifrom, kolonama i dozvolama, i pojavljuje se u meniju ispod svoje nadređene stavke, gde se otvara kao lista. *Dodaj* i *Izmeni* na toj listi otvaraju dijalog za unos u veličini i rasporedu koje zadate ovde i u [Dizajnu forme](/sr/form-design), a ⋯ na redu briše zapis. Do podtabele takve tabele stiže se iz ⋯ menija reda, kao i svuda drugde.
-:::
-
 Koren je **Model**. Ispod njega su pravila fiksna:
 
 - ispod korena idu **meniji** — meni samo grupiše stvari u navigaciji, nema sopstvene podatke
@@ -23,6 +19,8 @@ Koren je **Model**. Ispod njega su pravila fiksna:
 Podtabela je ono što u ⋯ meniju reda pravi *Povezane tabele*: otvorite kupca i stignete do njegovih porudžbina. Lanac može biti dubok koliko treba.
 
 Svaki red drveta ima dugme **+** koje dodaje odgovarajuće dete — *Dodaj meni*, *Dodaj tabelu* ili *Dodaj podtabelu*, u zavisnosti od toga gde ste — i dugme ⋯ sa stavkama *Izmeni*, *Obriši*, *Dizajn forme* i *[Procesi](/sr/processes)* (samo za tabele), *Uvoz iz foldera* (samo tabela direktno ispod menija) i *Istorija*.
+
+![Drvo modela sa otvorenim ⋯ menijem tabele](/screenshots/sr/model-tree.png)
 
 ## Dodavanje menija
 
@@ -68,6 +66,8 @@ Ako tabela već ima polja, mreža ne može da se smanji ispod onoga što ta polj
 :::
 
 Tabela se pravi u bazi onog trenutka kad snimite.
+
+![Dijalog Dodaj tabelu kod dijaloga za unos, sa pregledom mreže i četiri uloge](/screenshots/sr/model-add-table.png)
 
 ### Procedure
 

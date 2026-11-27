@@ -10,10 +10,6 @@ Everything on this page changes the database. Adding a table creates it; deletin
 
 ## How the tree is built
 
-::: info What is in effect today
-A table added here is really created in the database, with its code, its columns and its permissions, and it appears in the menu under its parent item, where it opens as a list. *Add* and *Edit* on that list open the entry dialog laid out as you set it here and in [Form design](/form-design), and the ⋯ button on a row deletes the record. A subtable of such a table is reached from the ⋯ menu of a row, like everywhere else.
-:::
-
 The root is **Model**. Under it the rules are fixed:
 
 - under the root go **menus** — a menu only groups things in the navigation, it has no data of its own
@@ -23,6 +19,8 @@ The root is **Model**. Under it the rules are fixed:
 A subtable is what makes *Related tables* appear in the ⋯ menu of a row: open a customer and you get to that customer's orders. The chain can be as deep as you need.
 
 Each row of the tree has a **+** button that adds the right kind of child — *Add menu*, *Add table* or *Add subtable*, depending on where you are — and a ⋯ button with *Edit*, *Delete*, *Form design* and *[Processes](/processes)* (tables only), *Import from a folder* (only a table straight under a menu) and *History*.
+
+![The model tree with the ⋯ menu of a table open](/screenshots/en/model-tree.png)
 
 ## Adding a menu
 
@@ -68,6 +66,8 @@ If the table already has fields, the grid cannot be made smaller than what those
 :::
 
 The table is created in the database the moment you save.
+
+![The Add table dialog at the entry dialog, with the preview of the grid and the four roles](/screenshots/en/model-add-table.png)
 
 ### Procedures
 

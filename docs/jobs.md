@@ -21,6 +21,8 @@ A job that has never run yet says so instead of an outcome. A job that was switc
 
 The whole list comes at once, without pages: the jobs of an application are counted in tens, not in thousands. *Refresh* in the header reads them all again, which is the way to see how a job that has just been running ended.
 
+![The Jobs page with the search field and the buttons of each row](/screenshots/en/jobs.png)
+
 ## Finding a job
 
 The field above the list searches by **name**, and it searches while it is typed. It looks into the list that is already on the screen, so nothing is asked of the server and the x gives the whole list back.

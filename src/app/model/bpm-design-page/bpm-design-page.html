@@ -207,10 +207,27 @@
         @if (step.type === 'TASK') {
           <div class="fd-field">
             <span class="fd-label fd-required">{{ 'ui.bpm.decides' | t }}</span>
-            <app-search-select [options]="users()" [ngModel]="step.appUserId ?? ''"
-              (ngModelChange)="setField(step, 'appUserId', $event || null)" icon="fa-solid fa-user"
-              [placeholder]="'ui.bpm.chooseUser' | t" [ariaLabel]="'ui.bpm.decides' | t" />
-            <span class="fd-help">{{ 'ui.bpm.decidesHint' | t }}</span>
+            <div class="segmented two" role="radiogroup" [attr.aria-label]="'ui.bpm.decides' | t">
+              <button type="button" role="radio" [attr.aria-checked]="step.decidedBy === 'user'"
+                [class.on]="step.decidedBy === 'user'" (click)="setDecider(step, 'user')">
+                <i class="fa-solid fa-user"></i>{{ 'ui.bpm.byUser' | t }}
+              </button>
+              <button type="button" role="radio" [attr.aria-checked]="step.decidedBy === 'group'"
+                [class.on]="step.decidedBy === 'group'" (click)="setDecider(step, 'group')">
+                <i class="fa-solid fa-people-group"></i>{{ 'ui.bpm.byGroup' | t }}
+              </button>
+            </div>
+            @if (step.decidedBy === 'group') {
+              <app-search-select [options]="groups()" [ngModel]="step.bpmGroupId ?? ''"
+                (ngModelChange)="setField(step, 'bpmGroupId', $event || null)" icon="fa-solid fa-people-group"
+                [placeholder]="'ui.bpm.chooseGroup' | t" [ariaLabel]="'ui.bpm.decides' | t" />
+              <span class="fd-help">{{ (groups().length ? 'ui.bpm.decidesGroupHint' : 'ui.bpm.noGroups') | t }}</span>
+            } @else {
+              <app-search-select [options]="deciderOptions(step)" [ngModel]="step.appUserId ?? ''"
+                (ngModelChange)="setField(step, 'appUserId', $event || null)" icon="fa-solid fa-user"
+                [placeholder]="'ui.bpm.chooseUser' | t" [ariaLabel]="'ui.bpm.decides' | t" />
+              <span class="fd-help">{{ 'ui.bpm.decidesHint' | t }}</span>
+            }
           </div>
 
           <div class="fd-field">
@@ -261,6 +278,10 @@
             <app-search-select [options]="receiverOptions(step)" [ngModel]="receiverPick() ?? ''"
               (ngModelChange)="pickReceiver(step, $event || null)" icon="fa-solid fa-user-plus"
               [placeholder]="'ui.bpm.addReceiver' | t" [ariaLabel]="'ui.bpm.addReceiver' | t" />
+            <app-search-select [options]="groups()" [ngModel]="step.bpmGroupId ?? ''"
+              (ngModelChange)="setField(step, 'bpmGroupId', $event || null)" icon="fa-solid fa-people-group"
+              [placeholder]="'ui.bpm.receiverGroup' | t" [ariaLabel]="'ui.bpm.receiverGroup' | t" />
+            <span class="fd-help">{{ (groups().length ? 'ui.bpm.receiversHint' : 'ui.bpm.noGroups') | t }}</span>
           </div>
 
           <div class="fd-field">
@@ -335,6 +356,14 @@
           <label class="fd-label fd-required" for="bpm-name">{{ label('name') }}</label>
           <input id="bpm-name" class="fd-input" autocomplete="off" [ngModel]="process()!.name"
             (ngModelChange)="setProcess('name', $event)" />
+        </div>
+
+        <div class="fd-field">
+          <span class="fd-label fd-required">{{ label('smtpId') }}</span>
+          <app-search-select [options]="smtps()" [ngModel]="process()!.smtpId ?? ''"
+            (ngModelChange)="setProcess('smtpId', $event || null)" icon="fa-solid fa-envelope"
+            [placeholder]="'ui.bpm.chooseSmtp' | t" [ariaLabel]="label('smtpId')" />
+          <span class="fd-help">{{ 'ui.bpm.smtpHint' | t }}</span>
         </div>
 
         <div class="fd-field">

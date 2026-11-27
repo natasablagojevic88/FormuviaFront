@@ -2,7 +2,7 @@
 
 The screens under *Administration* decide who gets into Formuvia and what they may do once inside — **Users** and **Roles** — and hold the settings of the application itself, such as the **mail servers** it sends through.
 
-Users and roles are ordinary table screens, so everything in [Working with tables](/tables) — filtering, sorting, history, Excel export — applies to them as well.
+Users, roles and process user groups are ordinary table screens, so everything in [Working with tables](/tables) — filtering, sorting, history, Excel export — applies to them as well.
 
 ## Roles
 
@@ -38,6 +38,18 @@ What a user sees follows directly from this: the menu is built from their roles,
 Since `admin` implicitly holds every role, an administrator sees everything, and you do not need to assign them anything else.
 
 ![The Edit user dialog with the role chips](/screenshots/en/user-dialog.png)
+
+## Process user groups
+
+*Administration / Process user groups* keeps groups of users for the steps of [processes](/processes). It is an ordinary table screen, so searching, sorting, pages, history and Excel export work on it as everywhere else.
+
+**Add** asks for the **name** of the group, which two groups cannot share, and its **users**: they appear as chips, added from the list under them and taken out with the × on the chip. The list offers only users who are switched on and not in the group yet; one user can be in as many groups as needed. A user who is switched off later stays in the group, crossed out, until you take them out.
+
+Deleting a group only takes its users out of it; the users themselves stay.
+
+In the [process designer](/processes) a task can be given to a group instead of one user, and a notification can go to a group as well as to its recipients.
+
+![The New group dialog for process user groups](/screenshots/en/process-group-dialog.png)
 
 ## Mail servers
 

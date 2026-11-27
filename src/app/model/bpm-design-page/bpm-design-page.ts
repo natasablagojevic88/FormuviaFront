@@ -14,6 +14,7 @@ import { ModelColumn } from "../model-column";
 import {
   BPM_STEP_TYPES,
   BpmBranch,
+  BpmDecider,
   BpmNode,
   BpmProcess,
   BpmProcessDto,
@@ -44,9 +45,11 @@ interface AppUserRow {
   username: string;
   name?: string | null;
   surname?: string | null;
+  active?: boolean | null;
 }
 
 const START = "start";
+const SMTP_PAGE_SIZE = 200;
 
 /** Icon and color of each kind of step; the same on the board, in the panel and in the buttons. */
 export const STEP_LOOK: Record<BpmStepType, { icon: string; label: string }> = {
@@ -77,8 +80,25 @@ export class BpmDesignPage {
   /** Set by Save while something is missing: the list of problems is then shown as an error. */
   readonly attempted = signal(false);
 
-  readonly users = signal<SelectOption[]>([]);
+  /** Every user, the switched-off ones too, so that a step given to one of them still shows the name. */
+  private readonly allUsers = signal<AppUserRow[]>([]);
+  /** Users a step can be given to: only those switched on. */
+  readonly users = computed<SelectOption[]>(() =>
+    this.allUsers()
+      .filter((user) => user.active !== false)
+      .map((user) => ({ value: user.id, label: this.userLabel(user) }))
+      .sort((a, b) => a.label.localeCompare(b.label)));
   readonly procedures = signal<SelectOption[]>([]);
+  /** Process user groups a task or a notification can be given to. */
+  readonly groups = signal<SelectOption[]>([]);
+  private readonly groupNames = computed(() => new Map(this.groups().map((g) => [g.value, g.label])));
+  private readonly smtpList = signal<SelectOption[]>([]);
+  /** The mail servers come with the column (@ComboboxList on the server); the list of servers is the fallback. */
+  readonly smtps = computed<SelectOption[]>(() => {
+    const fromColumn = (this.allColumns().find((column) => column.fieldName === "smtpId")?.listOfValues ?? [])
+      .map((value) => ({ value: value.value, label: value.option }));
+    return fromColumn.length ? fromColumn : this.smtpList();
+  });
   readonly columns = signal<ModelColumn[]>([]);
   private readonly allColumns = signal<DatabaseColumn[]>([]);
 
@@ -116,7 +136,7 @@ export class BpmDesignPage {
     this.revision();
     return this.process()?.steps.length ?? 0;
   });
-  private readonly userNames = computed(() => new Map(this.users().map((u) => [u.value, u.label])));
+  private readonly userNames = computed(() => new Map(this.allUsers().map((u) => [u.id, this.userLabel(u)])));
 
   private readonly panel = viewChild<ElementRef<HTMLElement>>("panel");
   private readonly wrap = viewChild<ElementRef<HTMLElement>>("wrap");
@@ -140,14 +160,18 @@ export class BpmDesignPage {
       .then((model: ModelNode) => this.modelName.set(model?.name ?? ""));
     // only the labels of the fields of a process are needed: one row is enough
     this.sendRequest.post(ApiRoute.bpmModelTable(this.modelId), { pageIndex: 0, pageSize: 1, filters: [], orders: [] })
-      .then((table: DatabaseTable<unknown>) => this.allColumns.set(table.allColumns ?? table.column ?? []));
-    // without pageSize the server gives every user
-    this.sendRequest.post(ApiRoute.appuserTable, { pageIndex: 0, filters: [], orders: [] })
-      .then((table: DatabaseTable<AppUserRow>) => this.users.set(
-        (table.list ?? [])
-          .map((user) => ({ value: user.id, label: this.userLabel(user) }))
-          .sort((a, b) => a.label.localeCompare(b.label))
-      ));
+      .then((table: DatabaseTable<unknown>) => {
+        const columns = table.allColumns ?? table.column ?? [];
+        this.allColumns.set(columns);
+        if (!columns.find((column) => column.fieldName === "smtpId")?.listOfValues?.length) {
+          this.loadSmtps();
+        }
+      });
+    this.sendRequest.get(ApiRoute.bpmGroupAllUsers)
+      .then((users: AppUserRow[]) => this.allUsers.set(users ?? []));
+    this.sendRequest.get(ApiRoute.bpmModelAllGroups)
+      .then((groups: { id: string; name: string }[]) => this.groups.set(
+        (groups ?? []).map((group) => ({ value: group.id, label: group.name })).sort((a, b) => a.label.localeCompare(b.label))));
     this.sendRequest.get(ApiRoute.databaseRoutines("PROCEDURE"))
       .then((names: string[]) => this.procedures.set((names ?? []).map((name) => ({ value: name, label: name }))));
     this.sendRequest.get(ApiRoute.modelColumnList(this.modelId))
@@ -164,9 +188,26 @@ export class BpmDesignPage {
     }
   }
 
+  /** The mail servers are few: the first page holds them all. */
+  private loadSmtps(): void {
+    this.sendRequest.post(ApiRoute.smtpTable, { pageIndex: 0, pageSize: SMTP_PAGE_SIZE, filters: [], orders: [] })
+      .then((table: DatabaseTable<{ id: string; name: string }>) => this.smtpList.set(
+        (table?.list ?? []).map((smtp) => ({ value: smtp.id, label: smtp.name }))));
+  }
+
   private userLabel(user: AppUserRow): string {
     const full = [user.name, user.surname].filter(Boolean).join(" ");
-    return full ? `${full} (${user.username})` : user.username;
+    const label = full ? `${full} (${user.username})` : user.username;
+    return user.active === false ? `${label} · ${this.translate.get("ui.bpm.userOff")}` : label;
+  }
+
+  /** The users a task can be given to, and the one it has now even when that one is switched off. */
+  deciderOptions(step: BpmStep): SelectOption[] {
+    const options = this.users();
+    const current = step.appUserId;
+    return !current || options.some((option) => option.value === current)
+      ? options
+      : [{ value: current, label: this.userName(current) || current }, ...options];
   }
 
   /** Label of a field of the process, translated on the server. */
@@ -176,6 +217,24 @@ export class BpmDesignPage {
 
   userName(id?: string | null): string {
     return id ? this.userNames().get(id) ?? "" : "";
+  }
+
+  groupName(id?: string | null): string {
+    return id ? this.groupNames().get(id) ?? "" : "";
+  }
+
+  /** A task goes either to one user or to a group: the other one is let go. */
+  setDecider(step: BpmStep, by: BpmDecider): void {
+    if (step.decidedBy === by) {
+      return;
+    }
+    step.decidedBy = by;
+    if (by === "group") {
+      step.appUserId = null;
+    } else {
+      step.bpmGroupId = null;
+    }
+    this.changed();
   }
 
   columnName(id: string): string {
@@ -246,11 +305,17 @@ export class BpmDesignPage {
   subText(step: BpmStep): string {
     switch (step.type) {
       case "TASK":
-        return this.userName(step.appUserId) || this.translate.get("ui.bpm.noUser");
+        return step.decidedBy === "group"
+          ? this.groupName(step.bpmGroupId) || this.translate.get("ui.bpm.noGroup")
+          : this.userName(step.appUserId) || this.translate.get("ui.bpm.noUser");
       case "EXECUTE_PROCEDURE":
         return step.procedure || this.translate.get("ui.bpm.noProcedure");
       default: {
         const count = step.receiveNotification.length;
+        const group = this.groupName(step.bpmGroupId);
+        if (group) {
+          return count ? `${group} + ${count}` : group;
+        }
         if (count === 1) {
           return this.userName(step.receiveNotification[0].appUserId);
         }
@@ -265,7 +330,7 @@ export class BpmDesignPage {
 
   /* ------------------------------------------------------------ the process */
 
-  setProcess(field: "name" | "startSqlProcedure" | "endSqlProcedure", value: string | null): void {
+  setProcess(field: "name" | "startSqlProcedure" | "endSqlProcedure" | "smtpId", value: string | null): void {
     const process = this.process();
     if (!process) {
       return;

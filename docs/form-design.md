@@ -4,13 +4,7 @@ This is where a table gets its fields. Open it from the model tree: ⋯ on a tab
 
 Each field you add here is two things at once — a **column in the database table** and an **input in the entry form**. That is why adding one takes a moment's thought, and why deleting one takes data with it.
 
-::: info What is in effect today
-Everything about the **database** happens immediately: adding a field creates the column, choosing a codebook creates the foreign key, deleting a field drops the column and its data.
-
-The fields you add also show up straight away as the columns of the table's list in the menu, in the order and with the labels you gave them, and *Show in the table* decides which of them appear there.
-
-The **entry dialog** you lay out here is what people actually get: in a table from the Model, *Add* and *Edit* open a form with your grid, each field in its place, the labels in the language they chose, the lists of values and the default values, and what they enter is stored in the table you defined.
-:::
+All of it takes effect at once: adding a field creates the column, choosing a codebook creates the foreign key, and deleting a field drops the column with its data. The field shows up straight away as a column of the table's list, if *Show in the table* is on, and in its place on the entry form that *Add* and *Edit* open.
 
 ## The canvas
 
@@ -22,7 +16,13 @@ The middle of the screen is the entry dialog, drawn at its real width, with a gr
 
 Above the canvas are **Columns**, **Rows** and **Dialog width**. Change them and the grid redraws immediately so you can see the result; **Save** keeps it and **Undo** puts it back. If a change would push existing fields outside the grid, Formuvia warns you and refuses to save until they fit.
 
+![The canvas of Form design: two fields in the grid and an empty place with +](/screenshots/en/form-design-canvas.png)
+
 ## Adding a field
+
+Click an empty place on the canvas and the dialog of a new field opens, already placed there:
+
+![The New field dialog](/screenshots/en/form-design-field.png)
 
 ### Label and column name
 
@@ -104,7 +104,7 @@ This one is about **other** tables, not this one.
 
 When another table links to this table as a codebook, its picker has to show something readable instead of an internal identifier. Tick this option on the fields whose values should make up that label. Tick several and their values are joined with a space, in the order the fields sit in the form — a code and a name, for example, giving `PAR-001 Acme d.o.o.` in every picker that points here.
 
-The label is already built and kept up to date on the server whenever the codebook changes, and it is sent along with the column; the pickers that will show it are part of the generated entry dialog still to come.
+The label is built and kept up to date on the server whenever the codebook changes, and it is what every picker pointing at this table shows — on the entry form and in the list alike.
 
 ## Default value and list of values
 

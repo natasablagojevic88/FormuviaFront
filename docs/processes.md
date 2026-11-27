@@ -16,9 +16,11 @@ The page lists the processes of the table by name, with their start and end proc
 
 The designer has two parts: the **board**, where the process is drawn from the top down, and the **panel** beside it (under it on a phone), where the box you clicked is set up. Nothing goes to the server until you click **Save** at the top; a dot on the button says there are unsaved changes, and *Back* asks before it lets them go.
 
-### The start: name and procedures
+![The designer: the board with the start and one task on the left, the panel of the task on the right, and the list of what is still missing under the board](/screenshots/en/process-designer.png)
 
-The blue box at the top is the process itself. Click it to give the process its **name**, which has to be unique within the table, and, if you need them:
+### The start: name, mail server and procedures
+
+The blue box at the top is the process itself. Click it to give the process its **name**, which has to be unique within the table, and its **mail server**, the one the notifications of the process go through. Mail servers are entered under [Administration / Mail servers](/administration#mail-servers); without one the process cannot be saved. If you need them, add also:
 
 - **Start procedure** — a procedure of the database that runs when the process begins
 - **End procedure** — one that runs when the process reaches any of its ends
@@ -29,9 +31,9 @@ Both are chosen from the procedures that exist in the database. In the same pane
 
 Every box under the start is a step, and it is one of three kinds, each with its own color:
 
-- **Task** (blue) — one user accepts or rejects it. Choose **who decides**, and the **fields the user may change** while deciding; the other fields of the record stay as they are.
+- **Task** (blue) — it is accepted or rejected. Under **who decides** choose *One user* and the user, or *A group* and one of the [process user groups](/administration#process-user-groups), when anyone in that group may decide. Choose also the **fields the user may change** while deciding; the other fields of the record stay as they are. Only users who are switched on are offered, here and among the recipients of a notification; a step whose user was switched off later keeps them, marked *switched off*, until you choose someone else.
 - **Procedure** (violet) — a procedure of the database runs, and the process goes on.
-- **Notification** (orange) — the chosen **recipients** get a notification with the **subject** and **text** you write, and the process goes on.
+- **Notification** (orange) — the chosen **recipients**, a chosen group, or both get a notification with the **subject** and **text** you write, and the process goes on.
 
 The kind can be changed in the panel at any time. A step turned from a task into something else keeps the steps after it, but they no longer depend on a decision.
 
@@ -62,7 +64,7 @@ The button beside a previous step takes its arrow away. The last arrow cannot be
 
 ### What is still missing
 
-Under the board the designer lists what the server would refuse, all at once: a step without a name, a task nobody decides, a notification without recipients, a branch that leads nowhere, a step that waits for more steps than lead to it, or a process that never ends. Click an item to open the step it is about; a step with something missing also carries an orange mark on the board. The process is saved only when the list is empty and says that the process is complete.
+Under the board the designer lists what the server would refuse, all at once: a process without a mail server, a step without a name, a task nobody decides, a notification without recipients, a branch that leads nowhere, a step that waits for more steps than lead to it, or a process that never ends. Click an item to open the step it is about; a step with something missing also carries an orange mark on the board. The process is saved only when the list is empty and says that the process is complete.
 
 ### Deleting a step
 

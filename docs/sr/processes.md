@@ -16,9 +16,11 @@ Strana prikazuje procese tabele po nazivu, sa početnom i završnom procedurom. 
 
 Dizajner ima dva dela: **tablu**, na kojoj se proces crta odozgo nadole, i **panel** pored nje (ispod nje na telefonu), u kom se podešava kutija na koju ste kliknuli. Ništa ne ide na server dok ne kliknete **Sačuvaj** na vrhu; tačka na dugmetu kaže da ima nesačuvanih izmena, a *Nazad* pita pre nego što ih odbaci.
 
-### Početak: naziv i procedure
+![Dizajner: levo tabla sa početkom i jednim zadatkom, desno panel zadatka, a ispod table spisak onoga što još fali](/screenshots/sr/process-designer.png)
 
-Plava kutija na vrhu je sam proces. Kliknite je da procesu date **naziv**, koji mora biti jedinstven u tabeli, i, ako vam trebaju:
+### Početak: naziv, server za poštu i procedure
+
+Plava kutija na vrhu je sam proces. Kliknite je da procesu date **naziv**, koji mora biti jedinstven u tabeli, i **server za poštu**, onaj kroz koji idu obaveštenja procesa. Serveri za poštu se unose u [Administracija / Serveri za poštu](/sr/administration#serveri-za-postu); bez njega se proces ne može sačuvati. Ako vam trebaju, dodajte i:
 
 - **Početnu proceduru** — proceduru baze koja se izvršava kad proces krene
 - **Završnu proceduru** — onu koja se izvršava kad proces stigne do bilo kog kraja
@@ -29,9 +31,9 @@ Obe se biraju iz procedura koje postoje u bazi. U istom panelu *Dodajte prvi kor
 
 Svaka kutija ispod početka je korak, i to jedne od tri vrste, svaka svoje boje:
 
-- **Zadatak** (plavo) — jedan korisnik ga prihvata ili odbija. Izaberite **ko odlučuje** i **polja koja korisnik sme da menja** dok odlučuje; ostala polja zapisa ostaju kakva jesu.
+- **Zadatak** (plavo) — prihvata se ili odbija. Pod **ko odlučuje** izaberite *Jedan korisnik* i korisnika, ili *Grupa* i jednu od [grupa korisnika za procese](/sr/administration#grupe-korisnika-za-procese), kad sme da odluči bilo ko iz te grupe. Izaberite i **polja koja korisnik sme da menja** dok odlučuje; ostala polja zapisa ostaju kakva jesu. Nude se samo uključeni korisnici, ovde i među primaocima obaveštenja; korak čiji je korisnik kasnije isključen zadržava ga, sa oznakom *isključen*, dok ne izaberete nekog drugog.
 - **Procedura** (ljubičasto) — izvršava se procedura baze i proces ide dalje.
-- **Obaveštenje** (narandžasto) — izabrani **primaoci** dobijaju obaveštenje sa **naslovom** i **tekstom** koje napišete, i proces ide dalje.
+- **Obaveštenje** (narandžasto) — izabrani **primaoci**, izabrana grupa ili i jedni i drugi dobijaju obaveštenje sa **naslovom** i **tekstom** koje napišete, i proces ide dalje.
 
 Vrsta može da se promeni u panelu u svakom trenutku. Korak koji od zadatka postane nešto drugo zadržava korake posle sebe, ali oni više ne zavise od odluke.
 
@@ -62,7 +64,7 @@ Dugme pored prethodnog koraka uklanja njegovu strelicu. Poslednja strelica ne mo
 
 ### Šta još fali
 
-Ispod table dizajner odjednom nabraja sve što bi server odbio: korak bez naziva, zadatak o kom niko ne odlučuje, obaveštenje bez primalaca, granu koja nikud ne vodi, korak koji čeka više koraka nego što ih vodi do njega ili proces koji se nikad ne završava. Klik na stavku otvara korak na koji se odnosi; korak kom nešto fali nosi i narandžastu oznaku na tabli. Proces se čuva tek kad je spisak prazan i kaže da je proces potpun.
+Ispod table dizajner odjednom nabraja sve što bi server odbio: proces bez servera za poštu, korak bez naziva, zadatak o kom niko ne odlučuje, obaveštenje bez primalaca, granu koja nikud ne vodi, korak koji čeka više koraka nego što ih vodi do njega ili proces koji se nikad ne završava. Klik na stavku otvara korak na koji se odnosi; korak kom nešto fali nosi i narandžastu oznaku na tabli. Proces se čuva tek kad je spisak prazan i kaže da je proces potpun.
 
 ### Brisanje koraka
 

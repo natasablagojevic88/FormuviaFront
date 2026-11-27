@@ -32,6 +32,16 @@
         return `/api/smtp/test-mail/${smtpId}`;
     }
 
+    /** Groups of users for the steps of processes: insert when the id is empty, otherwise update. */
+    static readonly bpmGroup='/api/bpm-group';
+    static readonly bpmGroupTable='/api/bpm-group/table';
+    /** Every user, to choose the members of a new group from (on edit they come with the group). */
+    static readonly bpmGroupAllUsers='/api/bpm-group/all-users';
+
+    static bpmGroupId(id: string): string {
+        return `/api/bpm-group/${id}`;
+    }
+
     static readonly model='/api/model';
     static readonly modelTree='/api/model/tree';
 
@@ -254,6 +264,8 @@
 
     /** Process with its whole tree of steps: insert when the id is empty, otherwise update. */
     static readonly bpmModel='/api/bpm-model';
+    /** Every process user group, to give a task or a notification to. */
+    static readonly bpmModelAllGroups='/api/bpm-model/all-groups';
 
     /** One process with all its steps; DELETE removes it with them. */
     static bpmModelId(id: string): string {

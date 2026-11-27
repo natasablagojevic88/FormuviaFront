@@ -1,0 +1,14 @@
+<app-page-header
+  [title]="title() || ('ui.bpmGroups.title' | t)"
+  [subtitle]="'ui.bpmGroups.subtitle' | t"
+  [breadcrumb]="'ui.bpmGroups.breadcrumb' | t"
+  guide="bpmGroups">
+  <button type="button" class="add-button" (click)="add()">
+    <i class="fa-solid fa-plus"></i>
+    {{ 'ui.add' | t }}
+  </button>
+</app-page-header>
+
+<app-page-guide key="bpmGroups" title="ui.bpmGroups.guideTitle" [steps]="guide" [openByDefault]="guideOpen()" />
+
+<app-data-table [url]="tableUrl" (loaded)="onLoaded($event)" (edit)="edit($event)" (remove)="remove($event)"></app-data-table>
