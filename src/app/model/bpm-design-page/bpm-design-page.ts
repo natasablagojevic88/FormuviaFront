@@ -14,7 +14,7 @@ import { ModelColumn } from "../model-column";
 import {
   BPM_STEP_TYPES,
   BpmBranch,
-  BpmDecider,
+  BpmGivenTo,
   BpmNode,
   BpmProcess,
   BpmProcessDto,
@@ -223,14 +223,15 @@ export class BpmDesignPage {
     return id ? this.groupNames().get(id) ?? "" : "";
   }
 
-  /** A task goes either to one user or to a group: the other one is let go. */
-  setDecider(step: BpmStep, by: BpmDecider): void {
-    if (step.decidedBy === by) {
+  /** A task or a notification goes either to users or to a group: the other one is let go. */
+  setGivenTo(step: BpmStep, by: BpmGivenTo): void {
+    if (step.givenTo === by) {
       return;
     }
-    step.decidedBy = by;
+    step.givenTo = by;
     if (by === "group") {
       step.appUserId = null;
+      step.receiveNotification = [];
     } else {
       step.bpmGroupId = null;
     }
@@ -305,17 +306,16 @@ export class BpmDesignPage {
   subText(step: BpmStep): string {
     switch (step.type) {
       case "TASK":
-        return step.decidedBy === "group"
+        return step.givenTo === "group"
           ? this.groupName(step.bpmGroupId) || this.translate.get("ui.bpm.noGroup")
           : this.userName(step.appUserId) || this.translate.get("ui.bpm.noUser");
       case "EXECUTE_PROCEDURE":
         return step.procedure || this.translate.get("ui.bpm.noProcedure");
       default: {
-        const count = step.receiveNotification.length;
-        const group = this.groupName(step.bpmGroupId);
-        if (group) {
-          return count ? `${group} + ${count}` : group;
+        if (step.givenTo === "group") {
+          return this.groupName(step.bpmGroupId) || this.translate.get("ui.bpm.noGroup");
         }
+        const count = step.receiveNotification.length;
         if (count === 1) {
           return this.userName(step.receiveNotification[0].appUserId);
         }

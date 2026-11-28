@@ -208,16 +208,16 @@
           <div class="fd-field">
             <span class="fd-label fd-required">{{ 'ui.bpm.decides' | t }}</span>
             <div class="segmented two" role="radiogroup" [attr.aria-label]="'ui.bpm.decides' | t">
-              <button type="button" role="radio" [attr.aria-checked]="step.decidedBy === 'user'"
-                [class.on]="step.decidedBy === 'user'" (click)="setDecider(step, 'user')">
+              <button type="button" role="radio" [attr.aria-checked]="step.givenTo === 'user'"
+                [class.on]="step.givenTo === 'user'" (click)="setGivenTo(step, 'user')">
                 <i class="fa-solid fa-user"></i>{{ 'ui.bpm.byUser' | t }}
               </button>
-              <button type="button" role="radio" [attr.aria-checked]="step.decidedBy === 'group'"
-                [class.on]="step.decidedBy === 'group'" (click)="setDecider(step, 'group')">
+              <button type="button" role="radio" [attr.aria-checked]="step.givenTo === 'group'"
+                [class.on]="step.givenTo === 'group'" (click)="setGivenTo(step, 'group')">
                 <i class="fa-solid fa-people-group"></i>{{ 'ui.bpm.byGroup' | t }}
               </button>
             </div>
-            @if (step.decidedBy === 'group') {
+            @if (step.givenTo === 'group') {
               <app-search-select [options]="groups()" [ngModel]="step.bpmGroupId ?? ''"
                 (ngModelChange)="setField(step, 'bpmGroupId', $event || null)" icon="fa-solid fa-people-group"
                 [placeholder]="'ui.bpm.chooseGroup' | t" [ariaLabel]="'ui.bpm.decides' | t" />
@@ -264,24 +264,38 @@
         @if (step.type === 'SEND_NOTIFICATION') {
           <div class="fd-field">
             <span class="fd-label fd-required">{{ 'ui.bpm.receivers' | t }}</span>
-            @if (step.receiveNotification.length) {
-              <div class="chips">
-                @for (receive of step.receiveNotification; track receive.appUserId) {
-                  <span class="chip on person">
-                    {{ userName(receive.appUserId) }}
-                    <button type="button" class="chip-remove" [attr.aria-label]="'ui.delete' | t"
-                      (click)="removeReceiver(step, receive.appUserId)"><i class="fa-solid fa-xmark"></i></button>
-                  </span>
-                }
-              </div>
+            <div class="segmented two" role="radiogroup" [attr.aria-label]="'ui.bpm.receivers' | t">
+              <button type="button" role="radio" [attr.aria-checked]="step.givenTo === 'user'"
+                [class.on]="step.givenTo === 'user'" (click)="setGivenTo(step, 'user')">
+                <i class="fa-solid fa-user"></i>{{ 'ui.bpm.toUsers' | t }}
+              </button>
+              <button type="button" role="radio" [attr.aria-checked]="step.givenTo === 'group'"
+                [class.on]="step.givenTo === 'group'" (click)="setGivenTo(step, 'group')">
+                <i class="fa-solid fa-people-group"></i>{{ 'ui.bpm.byGroup' | t }}
+              </button>
+            </div>
+            @if (step.givenTo === 'group') {
+              <app-search-select [options]="groups()" [ngModel]="step.bpmGroupId ?? ''"
+                (ngModelChange)="setField(step, 'bpmGroupId', $event || null)" icon="fa-solid fa-people-group"
+                [placeholder]="'ui.bpm.chooseGroup' | t" [ariaLabel]="'ui.bpm.receivers' | t" />
+              <span class="fd-help">{{ (groups().length ? 'ui.bpm.receiverGroupHint' : 'ui.bpm.noGroups') | t }}</span>
+            } @else {
+              @if (step.receiveNotification.length) {
+                <div class="chips">
+                  @for (receive of step.receiveNotification; track receive.appUserId) {
+                    <span class="chip on person">
+                      {{ userName(receive.appUserId) }}
+                      <button type="button" class="chip-remove" [attr.aria-label]="'ui.delete' | t"
+                        (click)="removeReceiver(step, receive.appUserId)"><i class="fa-solid fa-xmark"></i></button>
+                    </span>
+                  }
+                </div>
+              }
+              <app-search-select [options]="receiverOptions(step)" [ngModel]="receiverPick() ?? ''"
+                (ngModelChange)="pickReceiver(step, $event || null)" icon="fa-solid fa-user-plus"
+                [placeholder]="'ui.bpm.addReceiver' | t" [ariaLabel]="'ui.bpm.addReceiver' | t" />
+              <span class="fd-help">{{ 'ui.bpm.receiversHint' | t }}</span>
             }
-            <app-search-select [options]="receiverOptions(step)" [ngModel]="receiverPick() ?? ''"
-              (ngModelChange)="pickReceiver(step, $event || null)" icon="fa-solid fa-user-plus"
-              [placeholder]="'ui.bpm.addReceiver' | t" [ariaLabel]="'ui.bpm.addReceiver' | t" />
-            <app-search-select [options]="groups()" [ngModel]="step.bpmGroupId ?? ''"
-              (ngModelChange)="setField(step, 'bpmGroupId', $event || null)" icon="fa-solid fa-people-group"
-              [placeholder]="'ui.bpm.receiverGroup' | t" [ariaLabel]="'ui.bpm.receiverGroup' | t" />
-            <span class="fd-help">{{ (groups().length ? 'ui.bpm.receiversHint' : 'ui.bpm.noGroups') | t }}</span>
           </div>
 
           <div class="fd-field">

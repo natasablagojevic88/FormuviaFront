@@ -47,7 +47,7 @@ Pošto `admin` implicitno ima sve uloge, administrator vidi sve i nije mu potreb
 
 Brisanje grupe samo izbacuje korisnike iz nje; sami korisnici ostaju.
 
-U [dizajneru procesa](/sr/processes) zadatak može da se da grupi umesto jednom korisniku, a obaveštenje može da ide grupi, uz primaoce ili bez njih.
+U [dizajneru procesa](/sr/processes) zadatak može da se da grupi umesto jednom korisniku, a obaveštenje može da ide grupi umesto izabranim korisnicima.
 
 ![Dijalog Nova grupa za grupe korisnika za procese](/screenshots/sr/process-group-dialog.png)
 

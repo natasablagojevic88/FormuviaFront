@@ -34,7 +34,7 @@ export interface BpmItemDto {
   name: string;
   type: BpmStepType;
   appUserId?: string | null;
-  /** A task: the group that decides instead of one user. A notification: a group that gets it too. */
+  /** The group that decides a task instead of one user, or that gets a notification instead of chosen users. */
   bpmGroupId?: string | null;
   procedure?: string | null;
   mailSubject?: string | null;
@@ -71,10 +71,13 @@ export interface BpmStep {
   type: BpmStepType;
   /** The user who accepts or rejects a task. */
   appUserId?: string | null;
-  /** The group that decides a task instead of one user, or that gets a notification as well. */
+  /** The group that decides a task instead of one user, or that gets a notification instead of chosen users. */
   bpmGroupId?: string | null;
-  /** A task is decided either by one user or by a group; only the chosen one goes to the server. */
-  decidedBy: BpmDecider;
+  /**
+   * A task is decided by one user or by a group, a notification goes to chosen users or to a group - never both,
+   * the server refuses that; only the chosen one is sent.
+   */
+  givenTo: BpmGivenTo;
   procedure?: string | null;
   mailSubject?: string | null;
   mailBody?: string | null;
@@ -88,8 +91,8 @@ export interface BpmStep {
   changeColumns: BpmChangeColumn[];
 }
 
-/** Who decides a task. */
-export type BpmDecider = "user" | "group";
+/** Whom a task or a notification is given to: users or a group. */
+export type BpmGivenTo = "user" | "group";
 
 /** The way out of a step: after the acceptance or the rejection of a task, or simply next. */
 export type BpmBranch = "accept" | "reject" | "next";
@@ -127,7 +130,7 @@ export function newStep(type: BpmStepType): BpmStep {
     key: newKey(),
     name: "",
     type,
-    decidedBy: "user",
+    givenTo: "user",
     isAcceptEnd: false,
     isRejectEnd: false,
     atLeastEnter: 1,
@@ -172,7 +175,7 @@ export function fromDto(dto: BpmProcessDto): BpmProcess {
         type: item.type,
         appUserId: item.appUserId ?? null,
         bpmGroupId: item.bpmGroupId ?? null,
-        decidedBy: item.type === "TASK" && item.bpmGroupId && !item.appUserId ? "group" : "user",
+        givenTo: item.bpmGroupId && !item.appUserId && !item.receiveNotification?.length ? "group" : "user",
         procedure: item.procedure ?? null,
         mailSubject: item.mailSubject ?? null,
         mailBody: item.mailBody ?? null,
@@ -437,10 +440,10 @@ export function validate(process: BpmProcess): BpmProblem[] {
     } else if ((names.get(step.name.trim().toLowerCase()) ?? 0) > 1) {
       problems.push({ message: "ui.bpm.problem.sameName", ...at });
     }
-    if (step.type === "TASK" && step.decidedBy === "user" && empty(step.appUserId)) {
+    if (step.type === "TASK" && step.givenTo === "user" && empty(step.appUserId)) {
       problems.push({ message: "ui.bpm.problem.user", ...at });
     }
-    if (step.type === "TASK" && step.decidedBy === "group" && empty(step.bpmGroupId)) {
+    if (step.type === "TASK" && step.givenTo === "group" && empty(step.bpmGroupId)) {
       problems.push({ message: "ui.bpm.problem.group", ...at });
     }
     if (step.type === "EXECUTE_PROCEDURE" && empty(step.procedure)) {
@@ -453,8 +456,11 @@ export function validate(process: BpmProcess): BpmProblem[] {
       if (empty(step.mailBody)) {
         problems.push({ message: "ui.bpm.problem.body", ...at });
       }
-      if (!step.receiveNotification.length && empty(step.bpmGroupId)) {
+      if (step.givenTo === "user" && !step.receiveNotification.length) {
         problems.push({ message: "ui.bpm.problem.receivers", ...at });
+      }
+      if (step.givenTo === "group" && empty(step.bpmGroupId)) {
+        problems.push({ message: "ui.bpm.problem.receiverGroup", ...at });
       }
     }
     for (const branch of branchesOf(step)) {
@@ -492,8 +498,8 @@ export function toDto(process: BpmProcess): BpmProcessDto {
       id: step.id ?? null,
       name: step.name.trim(),
       type: step.type,
-      appUserId: task && step.decidedBy === "user" ? orNull(step.appUserId) : null,
-      bpmGroupId: (task && step.decidedBy === "group") || notification ? orNull(step.bpmGroupId) : null,
+      appUserId: task && step.givenTo === "user" ? orNull(step.appUserId) : null,
+      bpmGroupId: (task || notification) && step.givenTo === "group" ? orNull(step.bpmGroupId) : null,
       procedure: step.type === "EXECUTE_PROCEDURE" ? orNull(step.procedure) : null,
       mailSubject: notification ? orNull(step.mailSubject) : null,
       mailBody: notification ? orNull(step.mailBody) : null,
@@ -502,7 +508,7 @@ export function toDto(process: BpmProcess): BpmProcessDto {
       sqlCondition: orNull(step.sqlCondition),
       atLeastEnter: step.atLeastEnter,
       previousAccept: branch ? branch !== "reject" : false,
-      receiveNotification: notification ? step.receiveNotification.map((r) => ({ id: r.id ?? null, appUserId: r.appUserId })) : [],
+      receiveNotification: notification && step.givenTo === "user" ? step.receiveNotification.map((r) => ({ id: r.id ?? null, appUserId: r.appUserId })) : [],
       changeColumns: task ? step.changeColumns.map((c) => ({ id: c.id ?? null, modelColumnId: c.modelColumnId })) : [],
       // a circle cannot be drawn, but a broken process must not hang the page
       children: process.links

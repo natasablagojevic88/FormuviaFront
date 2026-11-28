@@ -47,7 +47,7 @@ Since `admin` implicitly holds every role, an administrator sees everything, and
 
 Deleting a group only takes its users out of it; the users themselves stay.
 
-In the [process designer](/processes) a task can be given to a group instead of one user, and a notification can go to a group as well as to its recipients.
+In the [process designer](/processes) a task can be given to a group instead of one user, and a notification can go to a group instead of chosen users.
 
 ![The New group dialog for process user groups](/screenshots/en/process-group-dialog.png)
 

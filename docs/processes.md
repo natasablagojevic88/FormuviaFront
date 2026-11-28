@@ -31,9 +31,9 @@ Both are chosen from the procedures that exist in the database. In the same pane
 
 Every box under the start is a step, and it is one of three kinds, each with its own color:
 
-- **Task** (blue) — it is accepted or rejected. Under **who decides** choose *One user* and the user, or *A group* and one of the [process user groups](/administration#process-user-groups), when anyone in that group may decide. Choose also the **fields the user may change** while deciding; the other fields of the record stay as they are. Only users who are switched on are offered, here and among the recipients of a notification; a step whose user was switched off later keeps them, marked *switched off*, until you choose someone else.
+- **Task** (blue) — it is accepted or rejected. Under **who decides** choose *One user* and the user, or *A group* and one of the [process user groups](/administration#process-user-groups), when anyone in that group may decide — never both. Choose also the **fields the user may change** while deciding; the other fields of the record stay as they are. Only users who are switched on are offered, here and among the recipients of a notification; a step whose user was switched off later keeps them, marked *switched off*, until you choose someone else.
 - **Procedure** (violet) — a procedure of the database runs, and the process goes on.
-- **Notification** (orange) — the chosen **recipients**, a chosen group, or both get a notification with the **subject** and **text** you write, and the process goes on.
+- **Notification** (orange) — either the chosen **recipients** or everyone in a chosen group — one or the other, not both — get a notification with the **subject** and **text** you write, and the process goes on.
 
 The kind can be changed in the panel at any time. A step turned from a task into something else keeps the steps after it, but they no longer depend on a decision.
 

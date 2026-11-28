@@ -246,25 +246,29 @@ describe("a task or a notification given to a group", () => {
   it("a task is decided by one user or by a group, and only the chosen one is sent", () => {
     const process = purchase();
     const manager = step(process, "Manager");
-    manager.decidedBy = "group";
+    manager.givenTo = "group";
     expect(validate(process).map((p) => p.message)).toEqual(["ui.bpm.problem.group"]);
     manager.bpmGroupId = "g1";
     expect(validate(process)).toEqual([]);
     const sent = toDto(process).items[0];
     expect([sent.appUserId, sent.bpmGroupId]).toEqual([null, "g1"]);
     // read back, the task is again the one of the group
-    expect(step(fromDto(toDto(process)), "Manager").decidedBy).toBe("group");
+    expect(step(fromDto(toDto(process)), "Manager").givenTo).toBe("group");
   });
 
-  it("a notification reaches its users, a group, or both", () => {
+  it("a notification goes to chosen users or to a group, never to both", () => {
     const process = purchase();
     const notify = step(process, "Tell the buyer");
     notify.receiveNotification = [];
     expect(validate(process).map((p) => p.message)).toEqual(["ui.bpm.problem.receivers"]);
+    notify.givenTo = "group";
+    expect(validate(process).map((p) => p.message)).toEqual(["ui.bpm.problem.receiverGroup"]);
     notify.bpmGroupId = "g1";
+    notify.receiveNotification = [{ appUserId: "u3" }];
     expect(validate(process)).toEqual([]);
-    const order = toDto(process).items[0].children[1];
-    expect(order.children[0].bpmGroupId).toBe("g1");
+    // the users left over are not sent with the group
+    const sent = toDto(process).items[0].children[1].children[0];
+    expect([sent.bpmGroupId, sent.receiveNotification]).toEqual(["g1", []]);
     // a procedure has nobody to give it to
     step(process, "Order").bpmGroupId = "g2";
     expect(toDto(process).items[0].children[1].bpmGroupId).toBeNull();

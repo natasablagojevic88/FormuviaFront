@@ -31,9 +31,9 @@ Obe se biraju iz procedura koje postoje u bazi. U istom panelu *Dodajte prvi kor
 
 Svaka kutija ispod početka je korak, i to jedne od tri vrste, svaka svoje boje:
 
-- **Zadatak** (plavo) — prihvata se ili odbija. Pod **ko odlučuje** izaberite *Jedan korisnik* i korisnika, ili *Grupa* i jednu od [grupa korisnika za procese](/sr/administration#grupe-korisnika-za-procese), kad sme da odluči bilo ko iz te grupe. Izaberite i **polja koja korisnik sme da menja** dok odlučuje; ostala polja zapisa ostaju kakva jesu. Nude se samo uključeni korisnici, ovde i među primaocima obaveštenja; korak čiji je korisnik kasnije isključen zadržava ga, sa oznakom *isključen*, dok ne izaberete nekog drugog.
+- **Zadatak** (plavo) — prihvata se ili odbija. Pod **ko odlučuje** izaberite *Jedan korisnik* i korisnika, ili *Grupa* i jednu od [grupa korisnika za procese](/sr/administration#grupe-korisnika-za-procese), kad sme da odluči bilo ko iz te grupe — nikad oboje. Izaberite i **polja koja korisnik sme da menja** dok odlučuje; ostala polja zapisa ostaju kakva jesu. Nude se samo uključeni korisnici, ovde i među primaocima obaveštenja; korak čiji je korisnik kasnije isključen zadržava ga, sa oznakom *isključen*, dok ne izaberete nekog drugog.
 - **Procedura** (ljubičasto) — izvršava se procedura baze i proces ide dalje.
-- **Obaveštenje** (narandžasto) — izabrani **primaoci**, izabrana grupa ili i jedni i drugi dobijaju obaveštenje sa **naslovom** i **tekstom** koje napišete, i proces ide dalje.
+- **Obaveštenje** (narandžasto) — ili izabrani **primaoci** ili svi iz izabrane grupe — jedno ili drugo, ne oboje — dobijaju obaveštenje sa **naslovom** i **tekstom** koje napišete, i proces ide dalje.
 
 Vrsta može da se promeni u panelu u svakom trenutku. Korak koji od zadatka postane nešto drugo zadržava korake posle sebe, ali oni više ne zavise od odluke.
 
